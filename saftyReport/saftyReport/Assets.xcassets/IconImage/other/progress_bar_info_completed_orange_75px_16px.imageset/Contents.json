@@ -2,16 +2,7 @@
   "images" : [
     {
       "filename" : "progress_bar_info_completed_orange_75px_16px.svg",
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
-      "idiom" : "universal",
-      "scale" : "2x"
-    },
-    {
-      "idiom" : "universal",
-      "scale" : "3x"
+      "idiom" : "universal"
     }
   ],
   "info" : {
