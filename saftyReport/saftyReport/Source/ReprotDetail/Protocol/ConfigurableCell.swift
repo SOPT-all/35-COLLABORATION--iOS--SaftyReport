@@ -8,5 +8,5 @@
 import Foundation
 
 protocol ConfigurableCell {
-    func configure(with item: Item)
+    func configure(with item: ReprotDetailItem)
 }

@@ -10,8 +10,6 @@ import UIKit
 import SnapKit
 import Then
 
-
-
 class BaseCell: UICollectionViewCell {
     static var reuseIdentifier: String { return String(describing: self) }
     
@@ -47,7 +45,7 @@ class BaseCell: UICollectionViewCell {
         }
     }
     
-    func configure(with item: Item) {
+    func configure(with item: ReprotDetailItem) {
         titleLabel.text = item.title
         requiredMark.isHidden = !item.isRequired
     }

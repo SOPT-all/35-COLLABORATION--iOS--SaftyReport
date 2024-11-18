@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 import Then
 
-struct Item: Hashable {
+struct ReprotDetailItem: Hashable {
     let id = UUID()
     let section: ReportDetailSection
     let title: String
@@ -21,12 +21,15 @@ struct Item: Hashable {
 class ReportDetailViewController: UIViewController {
     
     private var collectionView: UICollectionView!
-    private var dataSource: UICollectionViewDiffableDataSource<ReportDetailSection, Item>!
-    private let items: [Item] = [
-        Item(section: .photo, title: "사진", isRequired: true, placeholder: "사진을 추가해주세요"),
-        Item(section: .location, title: "발생지역", isRequired: true, placeholder: "지역을 입력해주세요"),
-        Item(section: .content, title: "내용", isRequired: true, placeholder: "내용을 입력해주세요"),
-        Item(section: .phone, title: "휴대전화", isRequired: true, placeholder: "010-2998-0867")
+    private var dataSource: UICollectionViewDiffableDataSource<
+        ReportDetailSection,
+        ReprotDetailItem
+    >!
+    private let items: [ReprotDetailItem] = [
+        ReprotDetailItem(section: .photo, title: "사진", isRequired: true, placeholder: "사진을 추가해주세요"),
+        ReprotDetailItem(section: .location, title: "발생지역", isRequired: true, placeholder: "지역을 입력해주세요"),
+        ReprotDetailItem(section: .content, title: "내용", isRequired: true, placeholder: "내용을 입력해주세요"),
+        ReprotDetailItem(section: .phone, title: "휴대전화", isRequired: true, placeholder: "010-2998-0867")
     ]
     
     override func viewDidLoad() {
@@ -72,12 +75,12 @@ class ReportDetailViewController: UIViewController {
     }
     
     private func configureDataSource() {
-        dataSource = UICollectionViewDiffableDataSource<ReportDetailSection, Item>(collectionView: collectionView) { collectionView, indexPath, item in
+        dataSource = UICollectionViewDiffableDataSource<ReportDetailSection, ReprotDetailItem>(collectionView: collectionView) { collectionView, indexPath, item in
             return self.cellForItem(collectionView: collectionView, indexPath: indexPath, item: item)
         }
     }
     
-    private func cellForItem(collectionView: UICollectionView, indexPath: IndexPath, item: Item) -> UICollectionViewCell {
+    private func cellForItem(collectionView: UICollectionView, indexPath: IndexPath, item: ReprotDetailItem) -> UICollectionViewCell {
         guard let section = ReportDetailSection(rawValue: indexPath.section) else {
             return UICollectionViewCell()
         }
@@ -102,7 +105,7 @@ class ReportDetailViewController: UIViewController {
     }
     
     private func applySnapshot() {
-        var snapshot = NSDiffableDataSourceSnapshot<ReportDetailSection, Item>()
+        var snapshot = NSDiffableDataSourceSnapshot<ReportDetailSection, ReprotDetailItem>()
         ReportDetailSection.allCases.forEach { section in
             snapshot.appendSections([section])
             snapshot.appendItems(items.filter { $0.section == section }, toSection: section)
