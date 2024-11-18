@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "icon_alert_line_red_16px.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

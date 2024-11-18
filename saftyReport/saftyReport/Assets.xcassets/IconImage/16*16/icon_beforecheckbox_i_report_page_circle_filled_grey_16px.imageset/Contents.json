@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "icon_beforecheckbox_i_report_page_circle_filled_grey_16px.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

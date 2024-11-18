@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "icn_home_line_grey_24px.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
