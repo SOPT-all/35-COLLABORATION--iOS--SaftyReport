@@ -71,12 +71,14 @@ class ContentCell: BaseCell {
     }
     
     private let copyButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "doc.on.doc"), for: .normal)
-        $0.setTitle("내용복사", for: .normal)
-        $0.setTitleColor(.darkGray, for: .normal)
+        var config = UIButton.Configuration.plain()
+        config.image = UIImage(systemName: "doc.on.doc")
+        config.title = "내용복사"
+        config.imagePadding = 4 
+        config.baseForegroundColor = .darkGray
+        
+        $0.configuration = config
         $0.titleLabel?.font = .systemFont(ofSize: 14)
-        $0.tintColor = .darkGray
-   //     $0.imageEdgeInsets = UIEdgeInsets(top: 0, left: -4, bottom: 0, right: 0)
     }
     
     override init(frame: CGRect) {
@@ -91,12 +93,10 @@ class ContentCell: BaseCell {
     }
     
     private func setupUI() {
-        // 스택 뷰 구성
         titleStackView.addArrangedSubview(titleLabel)
         titleStackView.addArrangedSubview(requiredMark)
         titleStackView.addArrangedSubview(infoButton)
         
-        // 타이틀 레이블이 텍스트 길이에 맞추도록 설정
         titleLabel.setContentHuggingPriority(.required, for: .horizontal)
         titleLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
         

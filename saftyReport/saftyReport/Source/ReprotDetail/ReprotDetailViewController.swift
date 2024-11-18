@@ -26,10 +26,30 @@ class ReportDetailViewController: UIViewController {
         ReprotDetailItem
     >!
     private let items: [ReprotDetailItem] = [
-        ReprotDetailItem(section: .photo, title: "사진", isRequired: true, placeholder: "사진을 추가해주세요"),
-        ReprotDetailItem(section: .location, title: "발생지역", isRequired: true, placeholder: "지역을 입력해주세요"),
-        ReprotDetailItem(section: .content, title: "내용", isRequired: true, placeholder: "내용을 입력해주세요"),
-        ReprotDetailItem(section: .phone, title: "휴대전화", isRequired: true, placeholder: "010-2998-0867")
+        ReprotDetailItem(
+            section: .photo,
+            title: "사진",
+            isRequired: true,
+            placeholder: "사진을 추가해주세요"
+        ),
+        ReprotDetailItem(
+            section: .location,
+            title: "발생지역",
+            isRequired: true,
+            placeholder: "지역을 입력해주세요"
+        ),
+        ReprotDetailItem(
+            section: .content,
+            title: "내용",
+            isRequired: true,
+            placeholder: "내용을 입력해주세요"
+        ),
+        ReprotDetailItem(
+            section: .phone,
+            title: "휴대전화",
+            isRequired: true,
+            placeholder: "010-2998-0867"
+        )
     ]
     
     override func viewDidLoad() {
@@ -97,7 +117,10 @@ class ReportDetailViewController: UIViewController {
             reuseIdentifier = PhoneCell.reuseIdentifier
         }
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath)
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: reuseIdentifier,
+            for: indexPath
+        )
         if let configurableCell = cell as? ConfigurableCell {
             configurableCell.configure(with: item)
         }
