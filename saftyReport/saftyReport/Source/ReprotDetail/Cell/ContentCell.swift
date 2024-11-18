@@ -4,7 +4,9 @@
 //
 //  Created by 이지훈 on 11/17/24.
 //
+
 import UIKit
+
 import SnapKit
 import Then
 
@@ -74,7 +76,7 @@ class ContentCell: BaseCell {
         $0.setTitleColor(.darkGray, for: .normal)
         $0.titleLabel?.font = .systemFont(ofSize: 14)
         $0.tintColor = .darkGray
-        $0.imageEdgeInsets = UIEdgeInsets(top: 0, left: -4, bottom: 0, right: 0)
+   //     $0.imageEdgeInsets = UIEdgeInsets(top: 0, left: -4, bottom: 0, right: 0)
     }
     
     override init(frame: CGRect) {
@@ -112,7 +114,6 @@ class ContentCell: BaseCell {
         bottomStackView.addArrangedSubview(copyButton)
         contentView.addSubview(bottomStackView)
         
-        // 기존 제약 조건 유지하면서 수정
         titleContentStackView.snp.makeConstraints {
             $0.top.leading.equalToSuperview().offset(8)
             $0.trailing.equalToSuperview().inset(8)
@@ -132,7 +133,7 @@ class ContentCell: BaseCell {
         
         bottomStackView.snp.makeConstraints {
              $0.top.equalTo(textView.snp.bottom).offset(8)
-             $0.leading.trailing.equalToSuperview().inset(8)  // inset 추가
+             $0.leading.trailing.equalToSuperview().inset(8)
              $0.bottom.equalToSuperview()
          }
     }

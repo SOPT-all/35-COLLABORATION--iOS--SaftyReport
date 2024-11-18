@@ -7,6 +7,13 @@
 
 import UIKit
 
+import SnapKit
+import Then
+
+protocol ConfigurableCell {
+    func configure(with item: ReportDetailViewController.Item)
+}
+
 class BaseCell: UICollectionViewCell {
     static var reuseIdentifier: String { return String(describing: self) }
     
@@ -42,7 +49,7 @@ class BaseCell: UICollectionViewCell {
         }
     }
     
-    func configure(with item: ReportViewController.Item) {
+    func configure(with item: ReportDetailViewController.Item) {
         titleLabel.text = item.title
         requiredMark.isHidden = !item.isRequired
     }

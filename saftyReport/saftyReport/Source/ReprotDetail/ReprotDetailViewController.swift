@@ -10,9 +10,8 @@ import UIKit
 import SnapKit
 import Then
 
-
-class ReprotDetailViewController: UIViewController {
-
+class ReportDetailViewController: UIViewController {
+    
     private var collectionView: UICollectionView!
     private var dataSource: UICollectionViewDiffableDataSource<ReportDetailSection, Item>!
     
@@ -46,8 +45,11 @@ class ReprotDetailViewController: UIViewController {
             $0.edges.equalToSuperview()
         }
         
-        [PhotoCell.self, LocationCell.self, ContentCell.self, PhoneCell.self].forEach {
-            collectionView.register($0, forCellWithReuseIdentifier: $0.reuseIdentifier)
+        [(PhotoCell.self, PhotoCell.reuseIdentifier),
+         (LocationCell.self, LocationCell.reuseIdentifier),
+         (ContentCell.self, ContentCell.reuseIdentifier),
+         (PhoneCell.self, PhoneCell.reuseIdentifier)].forEach { cellClass, identifier in
+            collectionView.register(cellClass, forCellWithReuseIdentifier: identifier)
         }
     }
     
@@ -71,13 +73,13 @@ class ReprotDetailViewController: UIViewController {
     }
     
     private func configureDataSource() {
-        dataSource = UICollectionViewDiffableDataSource<Section, Item>(collectionView: collectionView) { collectionView, indexPath, item in
+        dataSource = UICollectionViewDiffableDataSource<ReportDetailSection, Item>(collectionView: collectionView) { collectionView, indexPath, item in
             return self.cellForItem(collectionView: collectionView, indexPath: indexPath, item: item)
         }
     }
     
     private func cellForItem(collectionView: UICollectionView, indexPath: IndexPath, item: Item) -> UICollectionViewCell {
-        guard let section = Section(rawValue: indexPath.section) else {
+        guard let section = ReportDetailSection(rawValue: indexPath.section) else {
             return UICollectionViewCell()
         }
         
@@ -93,24 +95,20 @@ class ReprotDetailViewController: UIViewController {
             reuseIdentifier = PhoneCell.reuseIdentifier
         }
         
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? ConfigurableCell else {
-            return UICollectionViewCell()
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath)
+        if let configurableCell = cell as? ConfigurableCell {
+            configurableCell.configure(with: item)
         }
-        cell.configure(with: item)
         return cell
     }
     
     private func applySnapshot() {
-        var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
-        Section.allCases.forEach { section in
+        var snapshot = NSDiffableDataSourceSnapshot<ReportDetailSection, Item>()
+        ReportDetailSection.allCases.forEach { section in
             snapshot.appendSections([section])
             snapshot.appendItems(items.filter { $0.section == section }, toSection: section)
         }
         dataSource.apply(snapshot, animatingDifferences: false)
     }
-}
-
-protocol ConfigurableCell {
-    func configure(with item: ReprotDetailViewController.Item)
 }
 

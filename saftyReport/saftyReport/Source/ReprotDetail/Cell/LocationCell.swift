@@ -35,7 +35,7 @@ class LocationCell: BaseCell {
         }
     }
     
-    override func configure(with item: ReportViewController.Item) {
+    override func configure(with item: ReportDetailViewController.Item) {
         super.configure(with: item)
         textField.placeholder = item.placeholder
     }
