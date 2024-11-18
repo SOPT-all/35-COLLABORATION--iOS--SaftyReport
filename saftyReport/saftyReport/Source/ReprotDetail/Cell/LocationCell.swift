@@ -7,6 +7,9 @@
 
 import UIKit
 
+import SnapKit
+import Then
+
 class LocationCell: BaseCell {
     private let textField = UITextField().then {
         $0.backgroundColor = .systemGray6

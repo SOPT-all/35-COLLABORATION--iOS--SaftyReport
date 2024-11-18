@@ -74,7 +74,7 @@ class ContentCell: BaseCell {
         var config = UIButton.Configuration.plain()
         config.image = UIImage(systemName: "doc.on.doc")
         config.title = "내용복사"
-        config.imagePadding = 4 
+        config.imagePadding = 4
         config.baseForegroundColor = .darkGray
         
         $0.configuration = config
@@ -138,8 +138,6 @@ class ContentCell: BaseCell {
          }
     }
 
-
-    
     private func setupPlaceholder() {
         textView.text = "내용을 입력해주세요"
         textView.textColor = .lightGray

@@ -6,6 +6,10 @@
 //
 
 import UIKit
+
+import SnapKit
+import Then
+
 class PhotoCell: BaseCell {
     private let photoButton = UIButton().then {
         $0.backgroundColor = .systemGray6
