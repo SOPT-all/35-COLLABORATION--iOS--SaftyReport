@@ -10,19 +10,18 @@ import UIKit
 import SnapKit
 import Then
 
+struct Item: Hashable {
+    let id = UUID()
+    let section: ReportDetailSection
+    let title: String
+    let isRequired: Bool
+    let placeholder: String?
+}
+
 class ReportDetailViewController: UIViewController {
     
     private var collectionView: UICollectionView!
     private var dataSource: UICollectionViewDiffableDataSource<ReportDetailSection, Item>!
-    
-    struct Item: Hashable {
-        let id = UUID()
-        let section: ReportDetailSection
-        let title: String
-        let isRequired: Bool
-        let placeholder: String?
-    }
-    
     private let items: [Item] = [
         Item(section: .photo, title: "사진", isRequired: true, placeholder: "사진을 추가해주세요"),
         Item(section: .location, title: "발생지역", isRequired: true, placeholder: "지역을 입력해주세요"),
