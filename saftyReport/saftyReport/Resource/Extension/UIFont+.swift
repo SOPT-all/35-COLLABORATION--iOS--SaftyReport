@@ -8,7 +8,6 @@
 import UIKit
 
 extension UIFont {
-    
     enum PretendardWeight: String {
         case black = "Pretendard-Black"
         case bold = "Pretendard-Bold"
