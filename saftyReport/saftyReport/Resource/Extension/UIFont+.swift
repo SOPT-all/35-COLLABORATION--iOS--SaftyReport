@@ -50,4 +50,23 @@ extension UIFont {
       static var caption07: UIFont { .pretendard(weight: .medium, size: 10) }
       static var caption08: UIFont { .pretendard(weight: .bold, size: 8) }
       static var caption09: UIFont { .pretendard(weight: .medium, size: 8) }
+    
+    var lineHeight: CGFloat {
+        get {
+            switch self {
+            case UIFont.heading01: return 24
+            case UIFont.heading02: return 21
+            case UIFont.body01, UIFont.body02: return 20
+            case UIFont.body03: return 24
+            case UIFont.body04, UIFont.body05: return 18
+            case UIFont.body06, UIFont.body08: return 17
+            case UIFont.body07, UIFont.body09: return 20
+            case UIFont.caption01, UIFont.caption02, UIFont.caption03: return 14
+            case UIFont.caption04: return 19
+            case UIFont.caption05, UIFont.caption06, UIFont.caption07: return 12
+            case UIFont.caption08, UIFont.caption09: return 10
+            default: return self.pointSize * 1.2 // 기본 line height
+            }
+        }
+    }
 }
