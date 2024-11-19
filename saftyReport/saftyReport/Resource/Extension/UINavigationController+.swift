@@ -8,7 +8,7 @@
 import UIKit
 
 extension UINavigationController {
-    func setNavigationBar() {
+    func setUpNavigationBarColor() {
         let appearance = UINavigationBarAppearance()
         appearance.backgroundColor = UIColor.primaryOrange
         appearance.titleTextAttributes = [.foregroundColor: UIColor.gray1]

@@ -12,31 +12,21 @@ import SnapKit
 import Then
 
 class MainViewController: UIViewController {
-    let customNavigationItem = CustomNavigationItem()
+    let customNavigationItem = CustomNavigationItem(title: "홈") // 반드시 타이틀 설정
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
 
-        setNavigationBar()
+        setUpNavigationBar()
     }
-    
-//    private func setUI() {
-//
-//        
-//    }
-//    
-//    private func setLayout() {
-//        
-//        
-//    }
-//    
-    private func setNavigationBar() {
-        title = ""
-        
-        navigationController?.setNavigationBar()
-        customNavigationItem.setupNavigationBar(for: .leftRight)
 
+    private func setUpNavigationBar() {
+        navigationController?.setUpNavigationBarColor()
+        customNavigationItem.setUpNavigationBar(for: .leftRight)
+        customNavigationItem.setUpTitle(title: "")
+
+        navigationItem.title = customNavigationItem.title
         navigationItem.leftBarButtonItem = customNavigationItem.leftBarButtonItem
         navigationItem.rightBarButtonItem = customNavigationItem.rightBarButtonItem
     }
