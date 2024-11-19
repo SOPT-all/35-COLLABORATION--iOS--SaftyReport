@@ -25,7 +25,14 @@ class ReportDetailViewController: UIViewController {
         ReportDetailSection,
         ReportDetailItem
     >!
+    
     private let items: [ReportDetailItem] = [
+        ReportDetailItem(
+            section: .reportType,
+            title: "신고 유형 선택하기",
+            isRequired: true,
+            placeholder: nil
+        ),
         ReportDetailItem(
             section: .photo,
             title: "사진",
