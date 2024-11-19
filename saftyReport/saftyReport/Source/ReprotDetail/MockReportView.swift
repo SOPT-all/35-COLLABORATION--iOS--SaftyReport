@@ -23,7 +23,7 @@ class MockReportView: UIView {
     }
     
     private let arrowImageView = UIImageView().then {
-        $0.image = UIImage(systemName: "chevron.down")
+        $0.image = UIImage.icnArrowDownLineBlack24Px
         $0.tintColor = .darkGray
     }
     
@@ -137,7 +137,9 @@ class MockReportView: UIView {
         }
         
         UIView.animate(withDuration: 0.3) {
-            self.arrowImageView.transform = self.isExpanded ? .init(rotationAngle: .pi) : .identity
+            self.arrowImageView.image = self.isExpanded ?
+            UIImage.icnArrowUpLineBlack24Px:
+            UIImage.icnArrowDownLineBlack24Px
             self.optionsContainer.alpha = self.isExpanded ? 1 : 0
         } completion: { _ in
             if !self.isExpanded {
