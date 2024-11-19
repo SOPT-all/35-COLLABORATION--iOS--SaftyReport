@@ -29,8 +29,8 @@ class ReportDetailViewController: UIViewController {
     private let items: [ReportDetailItem] = [
         ReportDetailItem(
             section: .reportType,
-            title: "신고 유형 선택하기",
-            isRequired: true,
+            title: "",
+            isRequired: false,
             placeholder: nil
         ),
         ReportDetailItem(
@@ -106,9 +106,9 @@ class ReportDetailViewController: UIViewController {
                 let section = NSCollectionLayoutSection(group: group)
                 section.contentInsets = NSDirectionalEdgeInsets(
                     top: 16,
-                    leading: 16,
+                    leading: 0,
                     bottom: 0,
-                    trailing: 16
+                    trailing: 0
                 )
                 return section
             }
@@ -125,7 +125,7 @@ class ReportDetailViewController: UIViewController {
             
             let layoutSection = NSCollectionLayoutSection(group: group)
             layoutSection.contentInsets = NSDirectionalEdgeInsets(
-                top: 8,  
+                top: 8,
                 leading: 16,
                 bottom: 16,
                 trailing: 16

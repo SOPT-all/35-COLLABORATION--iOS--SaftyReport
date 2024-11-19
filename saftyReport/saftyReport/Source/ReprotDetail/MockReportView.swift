@@ -13,9 +13,13 @@ import Then
 class MockReportView: UIView {
     let mainButton = UIButton().then {
         $0.backgroundColor = .systemGray6
-        $0.layer.cornerRadius = 8
         $0.contentHorizontalAlignment = .left
-        $0.titleEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
+        
+        var configuration = UIButton.Configuration.plain()
+        configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0)
+        configuration.baseForegroundColor = .darkGray
+        
+        $0.configuration = configuration
     }
     
     private let arrowImageView = UIImageView().then {
@@ -47,6 +51,7 @@ class MockReportView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
+        setupCornerRadius()
     }
     
     required init?(coder: NSCoder) {
@@ -56,7 +61,6 @@ class MockReportView: UIView {
     private func setupUI() {
         [mainButton, arrowImageView].forEach { addSubview($0) }
         
-        // 메인 버튼 설정
         mainButton.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
             $0.height.equalTo(48)
@@ -64,14 +68,12 @@ class MockReportView: UIView {
         mainButton.setTitle("신고 유형을 선택해주세요", for: .normal)
         mainButton.setTitleColor(.darkGray, for: .normal)
         
-        // 화살표 이미지
         arrowImageView.snp.makeConstraints {
             $0.centerY.equalTo(mainButton)
             $0.trailing.equalTo(mainButton).offset(-16)
             $0.width.height.equalTo(20)
         }
         
-        // 옵션 컨테이너 설정 (window에 추가)
         DispatchQueue.main.async {
             if let window = self.window {
                 window.addSubview(self.optionsContainer)
@@ -84,6 +86,14 @@ class MockReportView: UIView {
         }
         
         setupOptions()
+    }
+    
+    private func setupCornerRadius() {
+        mainButton.layer.cornerRadius = 15
+        mainButton.layer.maskedCorners = [
+            .layerMinXMaxYCorner,
+            .layerMaxXMaxYCorner 
+        ]
     }
     
     private func setupOptions() {
@@ -104,16 +114,16 @@ class MockReportView: UIView {
     
     @objc private func optionSelected(_ sender: UIButton) {
         if let title = sender.title(for: .normal) {
+            var newConfiguration = mainButton.configuration
+            newConfiguration?.baseForegroundColor = .black
+            mainButton.configuration = newConfiguration
             mainButton.setTitle(title, for: .normal)
-            mainButton.setTitleColor(.black, for: .normal)
             isExpanded = false
         }
     }
-    
     private func updateUI() {
         guard let window = self.window else { return }
         
-        // 메인 버튼의 전체 화면 좌표 계산
         let buttonFrame = mainButton.convert(mainButton.bounds, to: window)
         
         if isExpanded {
@@ -121,7 +131,7 @@ class MockReportView: UIView {
                 x: buttonFrame.minX,
                 y: buttonFrame.maxY + 8,
                 width: buttonFrame.width,
-                height: 400 // 필요한 높이로 조정
+                height: 400
             )
             optionsContainer.isHidden = false
         }
