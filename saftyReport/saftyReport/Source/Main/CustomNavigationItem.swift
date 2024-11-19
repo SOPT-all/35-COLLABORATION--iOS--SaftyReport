@@ -51,4 +51,8 @@ class CustomNavigationItem: UINavigationItem {
             self.rightBarButtonItem = UIBarButtonItem(customView: rightButtonStackView)
         }
     }
+    
+    func settingTitle(title: String?){
+        self.title = title ?? ""
+    }
 }
