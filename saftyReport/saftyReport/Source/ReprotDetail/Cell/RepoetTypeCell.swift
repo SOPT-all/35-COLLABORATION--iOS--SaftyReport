@@ -10,15 +10,13 @@ import UIKit
 import SnapKit
 import Then
 
-class ReportTypeCell: UICollectionViewCell, ConfigurableCell {
-    static let reuseIdentifier = "ReportTypeCell"
-    
+class ReportTypeCell: BaseCell {
     private let mockReportView = MockReportView()
-    private var isExpanded = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
+        setupTapGesture()
     }
     
     required init?(coder: NSCoder) {
@@ -30,19 +28,18 @@ class ReportTypeCell: UICollectionViewCell, ConfigurableCell {
         mockReportView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-        
+    }
+    
+    private func setupTapGesture() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
         mockReportView.addGestureRecognizer(tapGesture)
     }
     
     @objc private func handleTap() {
-        isExpanded.toggle()
-        UIView.animate(withDuration: 0.3) {
-            self.mockReportView.updateExpandedState(self.isExpanded)
-        }
+        mockReportView.isExpanded.toggle()
     }
     
-    func configure(with item: ReportDetailItem) {
-        // mockReportView의 설정이 필요한 경우 여기서 구현
+    override func configure(with item: ReportDetailItem) {
+        super.configure(with: item)
     }
 }
