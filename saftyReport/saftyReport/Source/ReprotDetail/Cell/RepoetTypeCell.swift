@@ -31,8 +31,7 @@ class ReportTypeCell: BaseCell {
     }
     
     private func setupTapGesture() {
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
-        mockReportView.addGestureRecognizer(tapGesture)
+        mockReportView.mainButton.addTarget(self, action: #selector(handleTap), for: .touchUpInside)
     }
     
     @objc private func handleTap() {

@@ -90,13 +90,13 @@ class ReportDetailViewController: UIViewController {
             if section == .reportType {
                 let itemSize = NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .estimated(200)
+                    heightDimension: .estimated(48)
                 )
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 
                 let groupSize = NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .estimated(200)
+                    heightDimension: .estimated(48)
                 )
                 let group = NSCollectionLayoutGroup.horizontal(
                     layoutSize: groupSize,
@@ -104,7 +104,12 @@ class ReportDetailViewController: UIViewController {
                 )
                 
                 let section = NSCollectionLayoutSection(group: group)
-                section.contentInsets = NSDirectionalEdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16)
+                section.contentInsets = NSDirectionalEdgeInsets(
+                    top: 16,
+                    leading: 16,
+                    bottom: 0,
+                    trailing: 16
+                )
                 return section
             }
             
@@ -119,7 +124,12 @@ class ReportDetailViewController: UIViewController {
             )
             
             let layoutSection = NSCollectionLayoutSection(group: group)
-            layoutSection.contentInsets = NSDirectionalEdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16)
+            layoutSection.contentInsets = NSDirectionalEdgeInsets(
+                top: 8,  
+                leading: 16,
+                bottom: 16,
+                trailing: 16
+            )
             return layoutSection
         }
         return layout
@@ -171,3 +181,6 @@ class ReportDetailViewController: UIViewController {
     }
 }
 
+#Preview {
+    ReportDetailViewController()
+}

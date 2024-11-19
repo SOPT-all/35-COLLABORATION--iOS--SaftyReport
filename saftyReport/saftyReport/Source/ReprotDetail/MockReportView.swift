@@ -11,9 +11,11 @@ import SnapKit
 import Then
 
 class MockReportView: UIView {
-    private let titleLabel = UILabel().then {
-        $0.text = "신고 유형 선택하기"
-        $0.font = .systemFont(ofSize: 16, weight: .medium)
+    let mainButton = UIButton().then {
+        $0.backgroundColor = .systemGray6
+        $0.layer.cornerRadius = 8
+        $0.contentHorizontalAlignment = .left
+        $0.titleEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
     }
     
     private let arrowImageView = UIImageView().then {
@@ -21,15 +23,19 @@ class MockReportView: UIView {
         $0.tintColor = .darkGray
     }
     
-    private let containerView = UIView().then {
-        $0.backgroundColor = .systemGray6
+    private let optionsContainer = UIView().then {
+        $0.backgroundColor = .white
         $0.layer.cornerRadius = 8
+        $0.layer.shadowColor = UIColor.black.cgColor
+        $0.layer.shadowOpacity = 0.1
+        $0.layer.shadowRadius = 4
+        $0.layer.shadowOffset = CGSize(width: 0, height: 2)
+        $0.isHidden = true
     }
     
     private let optionsStackView = UIStackView().then {
         $0.axis = .vertical
         $0.spacing = 12
-        $0.isHidden = true
     }
     
     var isExpanded: Bool = false {
@@ -48,27 +54,33 @@ class MockReportView: UIView {
     }
     
     private func setupUI() {
-        [titleLabel, arrowImageView, containerView].forEach { addSubview($0) }
-        containerView.addSubview(optionsStackView)
+        [mainButton, arrowImageView].forEach { addSubview($0) }
         
-        titleLabel.snp.makeConstraints {
-            $0.top.leading.equalToSuperview().offset(16)
+        // 메인 버튼 설정
+        mainButton.snp.makeConstraints {
+            $0.top.leading.trailing.equalToSuperview()
+            $0.height.equalTo(48)
         }
+        mainButton.setTitle("신고 유형을 선택해주세요", for: .normal)
+        mainButton.setTitleColor(.darkGray, for: .normal)
         
+        // 화살표 이미지
         arrowImageView.snp.makeConstraints {
-            $0.centerY.equalTo(titleLabel)
-            $0.trailing.equalToSuperview().inset(16)
+            $0.centerY.equalTo(mainButton)
+            $0.trailing.equalTo(mainButton).offset(-16)
             $0.width.height.equalTo(20)
         }
         
-        containerView.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(8)
-            $0.leading.trailing.equalToSuperview()
-            $0.bottom.equalToSuperview().inset(16)
-        }
-        
-        optionsStackView.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(16)
+        // 옵션 컨테이너 설정 (window에 추가)
+        DispatchQueue.main.async {
+            if let window = self.window {
+                window.addSubview(self.optionsContainer)
+                self.optionsContainer.addSubview(self.optionsStackView)
+                
+                self.optionsStackView.snp.makeConstraints {
+                    $0.edges.equalToSuperview().inset(16)
+                }
+            }
         }
         
         setupOptions()
@@ -84,16 +96,48 @@ class MockReportView: UIView {
                 $0.setTitleColor(.black, for: .normal)
                 $0.contentHorizontalAlignment = .left
                 $0.titleLabel?.font = .systemFont(ofSize: 14)
+                $0.addTarget(self, action: #selector(optionSelected(_:)), for: .touchUpInside)
             }
             optionsStackView.addArrangedSubview(button)
         }
     }
     
+    @objc private func optionSelected(_ sender: UIButton) {
+        if let title = sender.title(for: .normal) {
+            mainButton.setTitle(title, for: .normal)
+            mainButton.setTitleColor(.black, for: .normal)
+            isExpanded = false
+        }
+    }
+    
     private func updateUI() {
+        guard let window = self.window else { return }
+        
+        // 메인 버튼의 전체 화면 좌표 계산
+        let buttonFrame = mainButton.convert(mainButton.bounds, to: window)
+        
+        if isExpanded {
+            optionsContainer.frame = CGRect(
+                x: buttonFrame.minX,
+                y: buttonFrame.maxY + 8,
+                width: buttonFrame.width,
+                height: 400 // 필요한 높이로 조정
+            )
+            optionsContainer.isHidden = false
+        }
+        
         UIView.animate(withDuration: 0.3) {
             self.arrowImageView.transform = self.isExpanded ? .init(rotationAngle: .pi) : .identity
-            self.optionsStackView.isHidden = !self.isExpanded
-            self.layoutIfNeeded()
+            self.optionsContainer.alpha = self.isExpanded ? 1 : 0
+        } completion: { _ in
+            if !self.isExpanded {
+                self.optionsContainer.isHidden = true
+            }
         }
+    }
+    
+    override func removeFromSuperview() {
+        super.removeFromSuperview()
+        optionsContainer.removeFromSuperview()
     }
 }
