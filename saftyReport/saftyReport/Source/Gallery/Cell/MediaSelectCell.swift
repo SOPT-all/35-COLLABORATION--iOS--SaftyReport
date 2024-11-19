@@ -53,6 +53,6 @@ class MediaSelectCell: UICollectionViewCell {
             $0.leading.equalTo(photoLabel.snp.trailing)
             $0.width.equalToSuperview().multipliedBy(0.5)
         }
-
     }
+    
 }

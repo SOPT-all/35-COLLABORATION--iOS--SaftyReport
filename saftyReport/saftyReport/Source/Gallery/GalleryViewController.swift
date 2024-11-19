@@ -94,7 +94,7 @@ class GalleryViewController: UIViewController {
         
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1),
-            heightDimension: .absolute(38)
+            heightDimension: .absolute(74)
         )
         let group = NSCollectionLayoutGroup.horizontal(
             layoutSize: groupSize,
@@ -155,7 +155,7 @@ extension GalleryViewController : UICollectionViewDelegate{
             }
             return cell
         case 1:
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MediaSelectCell.cellIdentifier, for: indexPath) as? MediaSelectCell else {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WarningCell.cellIdentifier, for: indexPath) as? WarningCell else {
                 return UICollectionViewCell(frame: .zero)
             }
             return cell
