@@ -7,23 +7,37 @@
 
 import UIKit
 
-class MainViewController: UIViewController {
+import SnapKit
 
+import Then
+
+class MainViewController: UIViewController {
+    let customNavigationItem = CustomNavigationItem()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .white
 
-        // Do any additional setup after loading the view.
+        setNavigationBar()
     }
     
+//    private func setUI() {
+//
+//        
+//    }
+//    
+//    private func setLayout() {
+//        
+//        
+//    }
+//    
+    private func setNavigationBar() {
+        title = ""
+        
+        navigationController?.setNavigationBar()
+        customNavigationItem.setupNavigationBar(for: .leftRight)
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+        navigationItem.leftBarButtonItem = customNavigationItem.leftBarButtonItem
+        navigationItem.rightBarButtonItem = customNavigationItem.rightBarButtonItem
     }
-    */
-
 }
