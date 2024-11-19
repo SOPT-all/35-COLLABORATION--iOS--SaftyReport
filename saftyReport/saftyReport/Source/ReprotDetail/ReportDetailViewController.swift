@@ -37,7 +37,14 @@ class ReportDetailViewController: UIViewController {
         ReportDetailSection,
         ReportDetailItem
     >!
+    
     private let items: [ReportDetailItem] = [
+        ReportDetailItem(
+            section: .reportType,
+            title: "",
+            isRequired: false,
+            placeholder: nil
+        ),
         ReportDetailItem(
             section: .photo,
             title: "사진",
@@ -83,7 +90,8 @@ class ReportDetailViewController: UIViewController {
             $0.bottom.equalTo(containerView.snp.top)
         }
         
-        [(PhotoCell.self, PhotoCell.reuseIdentifier),
+        [(ReportTypeCell.self, ReportTypeCell.reuseIdentifier),
+         (PhotoCell.self, PhotoCell.reuseIdentifier),
          (LocationCell.self, LocationCell.reuseIdentifier),
          (ContentCell.self, ContentCell.reuseIdentifier),
          (PhoneCell.self, PhoneCell.reuseIdentifier)].forEach { cellClass, identifier in
@@ -93,6 +101,34 @@ class ReportDetailViewController: UIViewController {
     
     private func createLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewCompositionalLayout { sectionIndex, _ in
+            let section = ReportDetailSection(rawValue: sectionIndex)
+            
+            if section == .reportType {
+                let itemSize = NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(1.0),
+                    heightDimension: .estimated(48)
+                )
+                let item = NSCollectionLayoutItem(layoutSize: itemSize)
+                
+                let groupSize = NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(1.0),
+                    heightDimension: .estimated(48)
+                )
+                let group = NSCollectionLayoutGroup.horizontal(
+                    layoutSize: groupSize,
+                    subitems: [item]
+                )
+                
+                let section = NSCollectionLayoutSection(group: group)
+                section.contentInsets = NSDirectionalEdgeInsets(
+                    top: 16,
+                    leading: 0,
+                    bottom: 0,
+                    trailing: 0
+                )
+                return section
+            }
+            
             let groupSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
                 heightDimension: .estimated(100)
@@ -104,7 +140,12 @@ class ReportDetailViewController: UIViewController {
             )
             
             let layoutSection = NSCollectionLayoutSection(group: group)
-            layoutSection.contentInsets = NSDirectionalEdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16)
+            layoutSection.contentInsets = NSDirectionalEdgeInsets(
+                top: 8,
+                leading: 16,
+                bottom: 16,
+                trailing: 16
+            )
             return layoutSection
         }
         return layout
@@ -124,6 +165,8 @@ class ReportDetailViewController: UIViewController {
         let reuseIdentifier: String
         
         switch section {
+        case .reportType:
+            reuseIdentifier = ReportTypeCell.reuseIdentifier
         case .photo:
             reuseIdentifier = PhotoCell.reuseIdentifier
         case .location:
