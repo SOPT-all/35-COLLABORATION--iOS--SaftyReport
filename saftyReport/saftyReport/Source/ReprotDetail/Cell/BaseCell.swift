@@ -45,7 +45,7 @@ class BaseCell: UICollectionViewCell, ConfigurableCell{
         }
     }
     
-    func configure(with item: ReprotDetailItem) {
+    func configure(with item: ReportDetailItem) {
         titleLabel.text = item.title
         requiredMark.isHidden = !item.isRequired
     }

@@ -38,7 +38,7 @@ class LocationCell: BaseCell {
         }
     }
     
-    override func configure(with item: ReprotDetailItem) {
+    override func configure(with item: ReportDetailItem) {
         super.configure(with: item)
         textField.placeholder = item.placeholder
     }
