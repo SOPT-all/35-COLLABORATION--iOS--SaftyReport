@@ -106,6 +106,7 @@ class ReportDetailViewController: UIViewController {
         }
         
         let reuseIdentifier: String
+        
         switch section {
         case .photo:
             reuseIdentifier = PhotoCell.reuseIdentifier

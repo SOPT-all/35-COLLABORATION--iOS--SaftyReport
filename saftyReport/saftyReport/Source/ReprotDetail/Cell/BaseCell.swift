@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 import Then
 
-class BaseCell: UICollectionViewCell {
+class BaseCell: UICollectionViewCell, ConfigurableCell{
     static var reuseIdentifier: String { return String(describing: self) }
     
     let titleLabel = UILabel().then {
