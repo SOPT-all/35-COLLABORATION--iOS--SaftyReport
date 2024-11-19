@@ -138,3 +138,6 @@ class ReportDetailViewController: UIViewController {
     }
 }
 
+#Preview{
+  ReportDetailViewController()
+}
