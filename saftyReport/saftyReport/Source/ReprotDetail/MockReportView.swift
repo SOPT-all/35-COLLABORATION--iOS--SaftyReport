@@ -98,7 +98,7 @@ class MockReportView: UIView {
     
     private func setupOptions() {
         let options = ["소화전", "교차로 모퉁이", "버스 정류소", "황단보도",
-                      "어린이 보호구역", "인도", "기타", "장애인 전용구역", "전환경차 충전구역"]
+                      "어린이 보호구역", "인도", "기타", "장애인 전용구역", "친환경차 충전구역"]
         
         options.forEach { option in
             let button = UIButton(type: .system).then {
