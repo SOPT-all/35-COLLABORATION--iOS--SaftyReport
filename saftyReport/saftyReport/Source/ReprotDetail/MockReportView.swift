@@ -16,7 +16,12 @@ class MockReportView: UIView {
         $0.contentHorizontalAlignment = .left
         
         var configuration = UIButton.Configuration.plain()
-        configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0)
+        configuration.contentInsets = NSDirectionalEdgeInsets(
+            top: 0,
+            leading: 16,
+            bottom: 0,
+            trailing: 0
+        )
         configuration.baseForegroundColor = .darkGray
         
         $0.configuration = configuration
