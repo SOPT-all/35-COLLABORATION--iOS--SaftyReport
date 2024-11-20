@@ -23,15 +23,16 @@ class BaseOneButtonAlertView: UIView {
     
     private let titleLabel = UILabel()
     
-    private let exitButton = UIButton()
+    let exitButton = UIButton()
     
     private let contentView = UIView()
     
-    private let confirmButton = UIButton().then {
+    let confirmButton = UIButton().then {
         var config = UIButton.Configuration.bordered()
+        config.background.cornerRadius = 10
+        config.background.strokeColor = .gray5
         config.baseBackgroundColor = .gray1
         config.baseForegroundColor = .gray8
-        config.background.strokeColor = .gray5
         config.attributedTitle = AttributedString(
             NSAttributedString.styled(text: "확인", style: .body4)
             )
