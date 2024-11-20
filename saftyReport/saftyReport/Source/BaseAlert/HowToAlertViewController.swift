@@ -14,10 +14,12 @@ class HowToAlertViewController: UIViewController {
     
     let labelAlertButton = UIButton().then {
         $0.setTitle("Label Alert  띄우기", for: .normal)
+        $0.setTitleColor(.tintColor, for: .normal)
     }
     
     let imageAlertButton = UIButton().then {
         $0.setTitle("View Alert 띄우기", for: .normal)
+        $0.setTitleColor(.tintColor, for: .normal)
     }
     
     override func viewDidLoad() {
@@ -38,7 +40,7 @@ class HowToAlertViewController: UIViewController {
         }
         
         imageAlertButton.snp.makeConstraints {
-            $0.top.equalTo(labelAlertButton.snp.bottom)
+            $0.top.equalTo(labelAlertButton.snp.bottom).offset(20)
             $0.centerX.equalToSuperview()
         }
     }
@@ -57,7 +59,9 @@ class HowToAlertViewController: UIViewController {
         }
         
         label.snp.makeConstraints {
-            $0.center.equalToSuperview()
+            $0.centerX.equalToSuperview()
+            $0.top.equalToSuperview().offset(15)
+            $0.bottom.equalToSuperview()
         }
         
         AlertManager.presentOneButtonAlert(title: "알림", content: tempView, vc: self)
