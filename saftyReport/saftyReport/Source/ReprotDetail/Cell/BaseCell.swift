@@ -46,7 +46,7 @@ class BaseCell: UICollectionViewCell, ConfigurableCell {
         
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview().offset(16)
-            $0.leading.equalToSuperview().offset(16)
+            $0.leading.equalToSuperview()
             $0.height.equalTo(24)
         }
         

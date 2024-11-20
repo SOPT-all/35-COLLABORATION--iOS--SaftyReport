@@ -43,3 +43,7 @@ class LocationCell: BaseCell {
         textField.placeholder = item.placeholder
     }
 }
+
+#Preview {
+    ReportDetailViewController()
+}
