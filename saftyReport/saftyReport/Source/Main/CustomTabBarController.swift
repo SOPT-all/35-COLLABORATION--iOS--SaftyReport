@@ -79,7 +79,7 @@ class CustomTabBarController: UITabBarController {
 
 extension CustomTabBarController {
     
-    public func setNaviViewControllers() {
+    public func setNavViewControllers() {
         let viewControllers = CustomTabBarItem.allCases.map {
             let viewController = setUpTabBarItem(
                 title: $0.itemTitle,
@@ -97,14 +97,14 @@ extension CustomTabBarController {
                                  normalItemImage: UIImage?,
                                  selectedItemImage: UIImage?,
                                  viewController: UIViewController?) -> UIViewController {
-        let naviViewController = UINavigationController(
+        let navViewController = UINavigationController(
             rootViewController: viewController ?? ViewController()
         )
-        naviViewController.tabBarItem = UITabBarItem(
+        navViewController.tabBarItem = UITabBarItem(
             title: title ?? "",
             image: normalItemImage ?? UIImage(),
             selectedImage: selectedItemImage ?? UIImage()
         )
-        return naviViewController
+        return navViewController
     }
 }
