@@ -11,19 +11,27 @@ import SnapKit
 import Then
 
 class ContentsCell: UICollectionViewCell {
-    private let dateLabel = UILabel().then {
-        $0.attributedText = .styled(text: "2024년 11월 14일", style: .body2)
-        $0.font = .systemFont(ofSize: 16, weight: .bold)
-        $0.textColor = .gray13
+    private var isChecked = false
+    
+    private var imageView = UIImageView().then {
+        $0.clipsToBounds = true
+        $0.layer.cornerRadius = 5
+        $0.contentMode = .scaleAspectFill
+        $0.backgroundColor = .gray3
     }
     
-    private var imageListView = GalleryImageView()
+    private var checkbox = UIImageView().then {
+        $0.clipsToBounds = true
+        $0.contentMode = .scaleAspectFill
+        $0.image = .icnCheckboxISquareUnselectedWhite24Px
+    }
     
     override init(frame: CGRect) {
         super .init(frame: frame)
         
         setUI()
         setLayout()
+        addTapGesture()
     }
     
     required init?(coder: NSCoder) {
@@ -31,23 +39,36 @@ class ContentsCell: UICollectionViewCell {
     }
     
     private func setUI() {
-        contentView.addSubviews(dateLabel, imageListView)
+        contentView.addSubviews(imageView, checkbox)
     }
     
     private func setLayout() {
-        dateLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(20)
-            $0.top.equalToSuperview()
-            $0.width.equalTo(336)
-            $0.height.equalTo(20)
+        imageView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
         
-        imageListView.snp.makeConstraints {
-            $0.leading.equalTo(dateLabel)
-            $0.top.equalTo(dateLabel.snp.bottom).offset(10)
-            $0.width.equalTo(110)
-            $0.height.equalTo(110)
+        checkbox.snp.makeConstraints {
+            $0.trailing.equalTo(imageView.snp.trailing).inset(4.5)
+            $0.bottom.equalTo(imageView.snp.bottom).inset(5)
+            $0.width.height.equalTo(24)
         }
     }
+    
+    private func addTapGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(checkboxTapped))
+        self.addGestureRecognizer(tapGesture)
+        self.isUserInteractionEnabled = true
+    }
+    
+    @objc private func checkboxTapped() {
+        isChecked.toggle()
+        
+        if isChecked {
+            checkbox.image = .icnCheckboxISquareSelectedWhite24Px
+        } else {
+            checkbox.image = .icnCheckboxISquareUnselectedWhite24Px
+        }
+    }
+
     
 }

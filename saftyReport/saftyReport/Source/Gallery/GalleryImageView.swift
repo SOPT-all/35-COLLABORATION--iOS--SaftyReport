@@ -11,6 +11,8 @@ import SnapKit
 import Then
 
 class GalleryImageView: UIView {
+    private var isChecked = false
+    
     private var imageView = UIImageView().then {
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 5
@@ -21,10 +23,8 @@ class GalleryImageView: UIView {
     private var checkbox = UIImageView().then {
         $0.clipsToBounds = true
         $0.contentMode = .scaleAspectFill
-        $0.image = .icnCheckboxISquareSelectedWhite24Px
+        $0.image = .icnCheckboxISquareUnselectedWhite24Px
     }
-    
-    private var isChecked = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -52,10 +52,6 @@ class GalleryImageView: UIView {
             $0.bottom.equalTo(imageView.snp.bottom).inset(5)
             $0.width.height.equalTo(24)
         }
-    }
-    
-    func checkboxToggle(check: Bool) {
-        self.isChecked = check
     }
     
     private func addTapGesture() {
