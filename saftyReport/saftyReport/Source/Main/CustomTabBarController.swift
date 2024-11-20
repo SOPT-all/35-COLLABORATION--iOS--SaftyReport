@@ -73,7 +73,7 @@ class CustomTabBarController: UITabBarController {
     }
     
     private func setUpTabBarShadow() {
-          CustomShadow.shared.applyShadow(to: tabBar.layer, width: 0, height: 1) // 함수 사용이 유일??
+          CustomShadow.shared.applyShadow(to: tabBar.layer, width: 0, height: 1)
     }
 }
 
@@ -96,18 +96,10 @@ extension CustomTabBarController {
                                  normalItemImage: UIImage,
                                  selectedItemImage: UIImage,
                                  viewController: UIViewController) -> UIViewController {
-        
         let navViewController = UINavigationController(
             rootViewController: viewController
         )
-
-        let tabBarTitleAttributes: [NSAttributedString.Key : Any] = NSAttributedString.styled(
-            text: title,
-            style: .caption6
-        ).attributes(
-            at: 0,
-            effectiveRange: nil
-        )
+        let tabBarTitleAttributes: [NSAttributedString.Key: Any] = [.font: TextStyle.caption6.font as Any]
     
         navViewController.tabBarItem = UITabBarItem(
             title: title,
