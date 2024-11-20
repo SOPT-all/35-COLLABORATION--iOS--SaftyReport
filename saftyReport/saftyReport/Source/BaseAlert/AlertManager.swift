@@ -8,7 +8,8 @@
 import UIKit
 
 final class AlertManager {
-    static func presentOneButtonAlert(title: String, contentView: UIView,
+    static func presentOneButtonAlert(title: String,
+                                      contentView: UIView,
                                       mode: AlertMode,
                                       vc: UIViewController) {
         let alertVC = BaseOneButtonAlertViewController()
