@@ -17,12 +17,15 @@ class GalleryViewController: UIViewController {
                                                   collectionViewLayout: UICollectionViewLayout())
     
     private let usingButtoncontainerView = UIView().then {
-        $0.backgroundColor = .white
+        $0.backgroundColor = .gray1
         CustomShadow.shared.applyShadow(to: $0.layer, width: 0, height: 4)
     }
     
     private lazy var usingButton = UIButton().then {
         $0.setTitle("사용", for: .normal)
+        $0.titleLabel?.attributedText = .styled(text: "사용", style: .heading1) // 이거 안 먹히는 거 같음
+        $0.titleLabel?.font = .systemFont(ofSize: 20, weight: .semibold)
+        $0.setTitleColor(.gray1, for: .normal)
         $0.backgroundColor = .primaryOrange
         $0.layer.cornerRadius = 10
         $0.addTarget(self, action: #selector(usingButtonTapped), for: .touchUpInside)
