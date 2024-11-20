@@ -16,7 +16,7 @@ class BaseCell: UICollectionViewCell, ConfigurableCell {
     let titleLabel = UILabel().then {
         let attributedText = NSAttributedString.styled(
             text: "",
-            style: .body4
+            style: .body3
         )
         $0.attributedText = attributedText
     }
@@ -24,6 +24,12 @@ class BaseCell: UICollectionViewCell, ConfigurableCell {
     let requiredMark = UILabel().then {
         $0.text = "*"
         $0.textColor = .primaryOrange
+    }
+    
+    let infoImageView = UIImageView().then {
+        let image = UIImage(named: "icon_info_line_black_16px")
+        $0.image = image
+        $0.contentMode = .scaleAspectFit
     }
     
     override init(frame: CGRect) {
@@ -36,7 +42,7 @@ class BaseCell: UICollectionViewCell, ConfigurableCell {
     }
     
     private func setupBaseUI() {
-        [titleLabel, requiredMark].forEach { contentView.addSubview($0) }
+        [titleLabel, requiredMark, infoImageView].forEach { contentView.addSubview($0) }
         
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview().offset(16)
@@ -48,12 +54,18 @@ class BaseCell: UICollectionViewCell, ConfigurableCell {
             $0.leading.equalTo(titleLabel.snp.trailing).offset(4)
             $0.centerY.equalTo(titleLabel)
         }
+        
+        infoImageView.snp.makeConstraints {
+            $0.leading.equalTo(requiredMark.snp.trailing).offset(8) 
+            $0.centerY.equalTo(titleLabel)
+            $0.size.equalTo(14)
+        }
     }
     
     func configure(with item: ReportDetailItem) {
         let attributedText = NSAttributedString.styled(
             text: item.title,
-            style: .body4
+            style: .body3
         )
         titleLabel.attributedText = attributedText
         requiredMark.isHidden = !item.isRequired
