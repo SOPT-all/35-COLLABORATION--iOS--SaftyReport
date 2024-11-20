@@ -19,7 +19,8 @@ class BaseOneButtonAlertViewController: UIViewController {
         setAddtarget()
     }
     
-    func setAddtarget() { // 필요할 경우 오버라이딩 가능하도록 internal로 선언
+    /// confirmButton은 필요할 경우 overriding하여 액션 변경할 것.
+    func setAddtarget() {
         alertView.backgroundButton.addTarget(self,
                                              action: #selector(dismissAlert),
                                              for: .touchUpInside)
