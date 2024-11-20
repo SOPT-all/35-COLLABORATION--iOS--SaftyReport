@@ -20,12 +20,31 @@ struct ReportDetailItem: Hashable {
 
 class ReportDetailViewController: UIViewController {
     
+    private let containerView = UIView().then {
+        $0.backgroundColor = .white
+        $0.layer.cornerRadius = 8
+        CustomShadow.shared.applyShadow(to: $0.layer)
+    }
+    
+    private let submitButton = UIButton().then {
+        $0.setTitle("제출", for: .normal)
+        $0.backgroundColor = .primaryOrange
+        $0.layer.cornerRadius = 8
+    }
+    
     private var collectionView: UICollectionView!
     private var dataSource: UICollectionViewDiffableDataSource<
         ReportDetailSection,
         ReportDetailItem
     >!
+    
     private let items: [ReportDetailItem] = [
+        ReportDetailItem(
+            section: .reportType,
+            title: "",
+            isRequired: false,
+            placeholder: nil
+        ),
         ReportDetailItem(
             section: .photo,
             title: "사진",
@@ -54,7 +73,9 @@ class ReportDetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .white
         setupCollectionView()
+        setupSubmitButton()
         configureDataSource()
         applySnapshot()
     }
@@ -62,12 +83,15 @@ class ReportDetailViewController: UIViewController {
     private func setupCollectionView() {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
         view.addSubview(collectionView)
+        view.addSubview(containerView)
         
         collectionView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.left.right.equalToSuperview()
+            $0.bottom.equalTo(containerView.snp.top)
         }
         
-        [(PhotoCell.self, PhotoCell.reuseIdentifier),
+        [(ReportTypeCell.self, ReportTypeCell.reuseIdentifier),
+         (PhotoCell.self, PhotoCell.reuseIdentifier),
          (LocationCell.self, LocationCell.reuseIdentifier),
          (ContentCell.self, ContentCell.reuseIdentifier),
          (PhoneCell.self, PhoneCell.reuseIdentifier)].forEach { cellClass, identifier in
@@ -77,6 +101,34 @@ class ReportDetailViewController: UIViewController {
     
     private func createLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewCompositionalLayout { sectionIndex, _ in
+            let section = ReportDetailSection(rawValue: sectionIndex)
+            
+            if section == .reportType {
+                let itemSize = NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(1.0),
+                    heightDimension: .estimated(48)
+                )
+                let item = NSCollectionLayoutItem(layoutSize: itemSize)
+                
+                let groupSize = NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(1.0),
+                    heightDimension: .estimated(48)
+                )
+                let group = NSCollectionLayoutGroup.horizontal(
+                    layoutSize: groupSize,
+                    subitems: [item]
+                )
+                
+                let section = NSCollectionLayoutSection(group: group)
+                section.contentInsets = NSDirectionalEdgeInsets(
+                    top: 16,
+                    leading: 0,
+                    bottom: 0,
+                    trailing: 0
+                )
+                return section
+            }
+            
             let groupSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
                 heightDimension: .estimated(100)
@@ -88,7 +140,12 @@ class ReportDetailViewController: UIViewController {
             )
             
             let layoutSection = NSCollectionLayoutSection(group: group)
-            layoutSection.contentInsets = NSDirectionalEdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16)
+            layoutSection.contentInsets = NSDirectionalEdgeInsets(
+                top: 8,
+                leading: 16,
+                bottom: 16,
+                trailing: 16
+            )
             return layoutSection
         }
         return layout
@@ -108,6 +165,8 @@ class ReportDetailViewController: UIViewController {
         let reuseIdentifier: String
         
         switch section {
+        case .reportType:
+            reuseIdentifier = ReportTypeCell.reuseIdentifier
         case .photo:
             reuseIdentifier = PhotoCell.reuseIdentifier
         case .location:
@@ -136,6 +195,32 @@ class ReportDetailViewController: UIViewController {
         }
         dataSource.apply(snapshot, animatingDifferences: false)
     }
+    
+    private func setupSubmitButton() {
+        containerView.addSubview(submitButton)
+        
+        containerView.snp.makeConstraints {
+            $0.left.right.bottom.equalToSuperview()
+            $0.height.equalTo(84)
+        }
+        
+        submitButton.snp.makeConstraints {
+            $0.left.right.equalToSuperview().inset(24)
+            $0.height.equalTo(50)
+            $0.centerY.equalToSuperview()
+        }
+        
+        submitButton.addTarget(
+            self,
+            action: #selector(submitButtonTapped),
+            for: .touchUpInside
+        )
+    }
+    
+    @objc private func submitButtonTapped() {
+        print("제출 버튼이 눌렸습니다.")
+    }
+    
 }
 
 #Preview{
