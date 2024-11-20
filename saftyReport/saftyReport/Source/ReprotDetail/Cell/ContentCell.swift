@@ -181,3 +181,6 @@ extension ContentCell: UITextViewDelegate {
         }
     }
 }
+#Preview {
+    ReportDetailViewController()
+}

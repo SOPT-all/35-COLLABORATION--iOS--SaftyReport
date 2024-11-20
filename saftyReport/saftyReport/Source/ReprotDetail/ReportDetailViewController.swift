@@ -20,6 +20,18 @@ struct ReportDetailItem: Hashable {
 
 class ReportDetailViewController: UIViewController {
     
+    private let containerView = UIView().then {
+        $0.backgroundColor = .white
+        $0.layer.cornerRadius = 8
+        CustomShadow.shared.applyShadow(to: $0.layer)
+    }
+    
+    private let submitButton = UIButton().then {
+        $0.setTitle("제출", for: .normal)
+        $0.backgroundColor = .primaryOrange
+        $0.layer.cornerRadius = 8
+    }
+    
     private var collectionView: UICollectionView!
     private var dataSource: UICollectionViewDiffableDataSource<
         ReportDetailSection,
@@ -61,7 +73,9 @@ class ReportDetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .white
         setupCollectionView()
+        setupSubmitButton()
         configureDataSource()
         applySnapshot()
     }
@@ -69,9 +83,11 @@ class ReportDetailViewController: UIViewController {
     private func setupCollectionView() {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
         view.addSubview(collectionView)
+        view.addSubview(containerView)
         
         collectionView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.left.right.equalToSuperview()
+            $0.bottom.equalTo(containerView.snp.top)
         }
         
         [(ReportTypeCell.self, ReportTypeCell.reuseIdentifier),
@@ -179,6 +195,32 @@ class ReportDetailViewController: UIViewController {
         }
         dataSource.apply(snapshot, animatingDifferences: false)
     }
+    
+    private func setupSubmitButton() {
+        containerView.addSubview(submitButton)
+        
+        containerView.snp.makeConstraints {
+            $0.left.right.bottom.equalToSuperview()
+            $0.height.equalTo(84)
+        }
+        
+        submitButton.snp.makeConstraints {
+            $0.left.right.equalToSuperview().inset(24)
+            $0.height.equalTo(50)
+            $0.centerY.equalToSuperview()
+        }
+        
+        submitButton.addTarget(
+            self,
+            action: #selector(submitButtonTapped),
+            for: .touchUpInside
+        )
+    }
+    
+    @objc private func submitButtonTapped() {
+        print("제출 버튼이 눌렸습니다.")
+    }
+    
 }
 
 #Preview {
