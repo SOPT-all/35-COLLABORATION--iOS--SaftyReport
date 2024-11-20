@@ -11,6 +11,15 @@ import SnapKit
 import Then
 
 class HowToAlertViewController: UIViewController {
+    // MARK: - 📢 안내사항
+    /*
+     본 VC는 Alert을 어떻게 사용하는지 알려드리기 위해 예시로 만든 것입니다.
+    '⭐️'이 붙은 부분은 여러분들이 자신의 뷰컨에 입력해야 하는 코드입니다.
+    Alert의 ContentView만 잘 설정하고, 제가 작성한 예시의 플로우를 잘 따라가신다면 문제 없을 겁니다.
+    궁금한 점이 있다면 언제든 편하게 연락주십쇼! */
+    
+    
+    // MARK: - Properties
     
     let labelAlertButton = UIButton().then {
         $0.setTitle("Label Alert  띄우기", for: .normal)
@@ -22,10 +31,15 @@ class HowToAlertViewController: UIViewController {
         $0.setTitleColor(.tintColor, for: .normal)
     }
     
+    
+    // MARK: - Methods
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setUI()
+        
+        // ⭐️ 4. addTarget하여 버튼에 액션 설정
         labelAlertButton.addTarget(self, action: #selector(presentLabelAlert), for: .touchUpInside)
         imageAlertButton.addTarget(self, action: #selector(presentImageAlert), for: .touchUpInside)
     }
@@ -45,10 +59,15 @@ class HowToAlertViewController: UIViewController {
         }
     }
     
+    
+    // MARK: - Objc functions
+    
     @objc func presentLabelAlert() {
+        // ⭐️ 1. Alert의 ContentView에 삽입할 프로퍼티 선언
         let tempView = UIView()
         let label = UILabel()
         
+        // ⭐️ 2. ContentView에 들어가는 프로퍼티 디자인
         label.attributedText = NSAttributedString.styled(
             text: "안녕하세요 라벨 추가한 예시입니다", style: .body4)
         
@@ -64,6 +83,7 @@ class HowToAlertViewController: UIViewController {
             $0.bottom.equalToSuperview()
         }
         
+        // ⭐️ 3. AlertManager를 활용해 oneButton 또는 twoButton Alert을 소환
         AlertManager.presentOneButtonAlert(title: "알림", content: tempView, vc: self)
     }
     
