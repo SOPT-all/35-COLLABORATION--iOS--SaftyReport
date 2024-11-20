@@ -11,7 +11,7 @@ enum CustomTabBarItem: CaseIterable {
     
     case home, report, prevent, news, myPage
     
-    var navViewController: UIViewController {
+    var navViewController: UIViewController? {
         switch self {
         case .home: return MainViewController()
         case .report: return ReportViewController()
@@ -82,29 +82,41 @@ extension CustomTabBarController {
     public func setNavViewControllers() {
         let viewControllers = CustomTabBarItem.allCases.map {
             let viewController = setUpTabBarItem(
-                title: $0.itemTitle,
-                normalItemImage: $0.normalItemImage,
-                selectedItemImage: $0.selectedItemImage,
-                viewController: $0.navViewController
+                title: $0.itemTitle ?? "",
+                normalItemImage: $0.normalItemImage ?? UIImage(),
+                selectedItemImage: $0.selectedItemImage ?? UIImage(),
+                viewController: $0.navViewController ?? UIViewController()
             )
-            print(viewController)
             return viewController
         }
         setViewControllers(viewControllers, animated: true)
     }
     
-    private func setUpTabBarItem(title: String?,
-                                 normalItemImage: UIImage?,
-                                 selectedItemImage: UIImage?,
-                                 viewController: UIViewController?) -> UIViewController {
+    private func setUpTabBarItem(title: String,
+                                 normalItemImage: UIImage,
+                                 selectedItemImage: UIImage,
+                                 viewController: UIViewController) -> UIViewController {
+        
         let navViewController = UINavigationController(
-            rootViewController: viewController ?? ViewController()
+            rootViewController: viewController
         )
+
+        let tabBarTitleAttributes: [NSAttributedString.Key : Any] = NSAttributedString.styled(
+            text: title,
+            style: .caption6
+        ).attributes(
+            at: 0,
+            effectiveRange: nil
+        )
+    
         navViewController.tabBarItem = UITabBarItem(
-            title: title ?? "",
-            image: normalItemImage ?? UIImage(),
-            selectedImage: selectedItemImage ?? UIImage()
-        )
+            title: title,
+            image: normalItemImage,
+            selectedImage: selectedItemImage
+        ).then {
+            $0.setTitleTextAttributes(tabBarTitleAttributes, for: .normal)
+            $0.setTitleTextAttributes(tabBarTitleAttributes, for: .selected)
+        }
         return navViewController
     }
 }
