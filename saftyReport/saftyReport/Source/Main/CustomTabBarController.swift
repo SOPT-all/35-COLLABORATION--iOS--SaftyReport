@@ -61,22 +61,26 @@ enum CustomTabBarItem: CaseIterable {
 
 class CustomTabBarController: UITabBarController {
     
-    let tabBarAppearance = UITabBar.appearance().then {
+    let tabBarAppearance = UITabBar().then {
         $0.backgroundColor = .gray1
         $0.tintColor = .primaryOrange
-        CustomShadow.shared.applyShadow(to: $0.layer, width: 0, height: 1)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setUpViewController()
+        setNaviViewControllers()
+        setUpTabBarShadow()
+    }
+    
+    func setUpTabBarShadow() {
+        CustomShadow.shared.applyShadow(to: tabBar.layer, width: 0, height: 1)
     }
 }
 
 extension CustomTabBarController {
     
-    private func setUpViewController() {
+    private func setNaviViewControllers() {
         let viewControllers = CustomTabBarItem.allCases.map {
             let viewController = setUpTabBarItem(
                 title: $0.itemTitle,
