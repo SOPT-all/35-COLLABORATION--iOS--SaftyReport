@@ -105,45 +105,48 @@ class GalleryViewController: UIViewController {
     }
     
     private func createContentsSection() -> NSCollectionLayoutSection {
+        // 아이템 크기 설정
         let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1/3),
-            heightDimension: .fractionalHeight(1/2)
+            widthDimension: .absolute(110),
+            heightDimension: .absolute(110)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = NSDirectionalEdgeInsets(top: 3, leading: 3, bottom: 3, trailing: 3)
+
+        let nestedGroupSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .absolute(110) // 적절한 높이 설정
+        )
+        let nestedGroup = NSCollectionLayoutGroup.horizontal(layoutSize: nestedGroupSize, subitems: [item])
         
         let groupSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1),
-            heightDimension: .absolute(253)
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .absolute(223) // 적절한 높이 설정
         )
-        let group = NSCollectionLayoutGroup.horizontal(
-            layoutSize: groupSize,
-            subitems: [item]
-        )
+        
+        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [nestedGroup])
+        
+        
+        // 섹션 설정
+        let section = NSCollectionLayoutSection(group: group)
+        section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 20, bottom: 10, trailing: 20)
+        
         
         return NSCollectionLayoutSection(group: group)
     }
     
     
-    
 }
 
 extension GalleryViewController : UICollectionViewDelegate{
-    
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 3
     }
-    
+}
+
+extension GalleryViewController: UICollectionViewDataSource{
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        switch section {
-        case 0:
-            return 1
-        case 1:
-            return 1
-        case 2:
-            return 6
-        default:
-            return 0
-        }
+        1
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -160,9 +163,12 @@ extension GalleryViewController : UICollectionViewDelegate{
             }
             return cell
         case 2:
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MediaSelectCell.cellIdentifier, for: indexPath) as? MediaSelectCell else {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ContentsCell.cellIdentifier, for: indexPath) as? ContentsCell else {
                 return UICollectionViewCell(frame: .zero)
             }
+            
+            cell.configure(with: GalleryItem.dummyGalleryItem)
+            
             return cell
         default:
             return UICollectionViewCell()
@@ -170,8 +176,5 @@ extension GalleryViewController : UICollectionViewDelegate{
         }
         
     }
-}
 
-extension GalleryViewController: UICollectionViewDataSource{
-    
 }
