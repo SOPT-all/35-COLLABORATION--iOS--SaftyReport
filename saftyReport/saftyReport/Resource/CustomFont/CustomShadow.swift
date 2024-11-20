@@ -10,10 +10,10 @@ import UIKit
 class CustomShadow {
    static let shared = CustomShadow()
    
-   func applyShadow(to layer: CALayer) {
-       layer.shadowColor = UIColor.black.cgColor
-       layer.shadowOpacity = 0.1
-       layer.shadowOffset = CGSize(width: 0, height: 4)
-       layer.shadowRadius = 30
-   }
+    func applyShadow(to layer: CALayer, width: Int, height: Int) {
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowOpacity = 0.1
+        layer.shadowOffset = CGSize(width: width, height: height)
+        layer.shadowRadius = 30
+    }
 }
