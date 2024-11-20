@@ -92,6 +92,7 @@ class BaseOneButtonAlertView: UIView {
         exitButton.snp.makeConstraints {
             $0.trailing.equalToSuperview().offset(-12)
             $0.centerY.equalToSuperview()
+            $0.size.equalTo(24)
         }
         
         contentView.snp.makeConstraints {
@@ -117,10 +118,11 @@ class BaseOneButtonAlertView: UIView {
         }
         
         var config = UIButton.Configuration.plain()
+        config.contentInsets = .zero
         
         switch mode {
         case .alarm:
-            config.image = .icnCrossISelectedWhite16Px
+            config.image = .icnCrossISelectedWhite24Px
             exitButton.isEnabled = true
             
         case .info:

@@ -25,7 +25,10 @@ class BaseTwoButtonAlertView: UIView {
     private let titleLabel = UILabel()
     
     let exitButton = UIButton().then {
-        $0.setImage(.icnCrossISelectedWhite16Px, for: .normal)
+        var config = UIButton.Configuration.plain()
+        config.contentInsets = .zero
+        config.image = .icnCrossISelectedWhite24Px
+        $0.configuration = config
     }
     
     private let contentView = UIView()
@@ -106,6 +109,7 @@ class BaseTwoButtonAlertView: UIView {
         exitButton.snp.makeConstraints {
             $0.trailing.equalToSuperview().offset(-12)
             $0.centerY.equalToSuperview()
+            $0.size.equalTo(24)
         }
         
         contentView.snp.makeConstraints {
