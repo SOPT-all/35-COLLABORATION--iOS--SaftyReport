@@ -107,7 +107,7 @@ class BaseOneButtonAlertView: UIView {
         }
     }
     
-    func customAlert(_ title: String, _ customView: UIView, _ mode: AlertMode) {
+    func setAlert(_ title: String, _ customView: UIView, _ mode: AlertMode) {
         titleLabel.attributedText = NSAttributedString.styled(text: title, style: .body2)
         
         contentView.addSubview(customView)

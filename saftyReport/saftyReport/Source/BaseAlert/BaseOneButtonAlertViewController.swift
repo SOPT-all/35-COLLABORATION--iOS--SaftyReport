@@ -8,7 +8,7 @@
 import UIKit
 
 class BaseOneButtonAlertViewController: UIViewController {
-    let alertView = BaseTwoButtonAlertView()
+    let alertView = BaseOneButtonAlertView()
     
     override func loadView() {
         view = alertView
@@ -17,7 +17,14 @@ class BaseOneButtonAlertViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        alertView.setAlertTheme("알림")
+        
     }
-
+    
+    func setAlert(_ title: String, _ content: UIView, _ mode: AlertMode) {
+        alertView.setAlert(title, content, mode)
+    }
+    
+    // TODO: dismiss 액션: exitButton, backgroundButton
+    // TODO: confirm 액션: confirmButton
+    
 }
