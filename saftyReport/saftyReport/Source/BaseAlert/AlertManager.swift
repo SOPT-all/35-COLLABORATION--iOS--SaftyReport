@@ -7,7 +7,7 @@
 
 import UIKit
 
-class AlertManager {
+final class AlertManager {
     static func presentOneButtonAlert(title: String, contentView: UIView,
                                       mode: AlertMode,
                                       vc: UIViewController) {

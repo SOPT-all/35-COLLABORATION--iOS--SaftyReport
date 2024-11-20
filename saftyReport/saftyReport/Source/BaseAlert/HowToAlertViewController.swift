@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 import Then
 
-class HowToAlertViewController: UIViewController {
+final class HowToAlertViewController: UIViewController {
     // MARK: - 📢 안내사항
     /*
      본 VC는 Alert을 어떻게 사용하는지 알려드리기 위해 예시로 만든 것입니다.
