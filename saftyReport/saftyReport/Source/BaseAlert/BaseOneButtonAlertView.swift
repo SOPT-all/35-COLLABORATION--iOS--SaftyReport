@@ -17,6 +17,14 @@ enum AlertMode {
 
 class BaseOneButtonAlertView: UIView {
     // MARK: - Properties
+    private let alertView = UIView().then {
+        $0.backgroundColor = .gray1
+        $0.clipsToBounds = true
+        $0.layer.cornerRadius = 10
+    }
+    
+    private let backgroundButton = UIButton()
+    
     private let titleView = UIView().then {
         $0.backgroundColor = .primaryOrange
     }
@@ -52,17 +60,22 @@ class BaseOneButtonAlertView: UIView {
     }
     
     private func setUI() {
-        self.clipsToBounds = true
-        self.layer.cornerRadius = 10
+        self.backgroundColor = .gray13Opacity60
     }
     
     private func setHierarchy() {
-        self.addSubviews(titleView, contentView, confirmButton)
+        self.addSubviews(backgroundButton, alertView)
+        alertView.addSubviews(titleView, contentView, confirmButton)
         titleView.addSubviews(titleLabel, exitButton)
     }
     
     private func setConstraints() {
-        self.snp.makeConstraints {
+        backgroundButton.snp.makeConstraints {
+            $0.edges.equalTo(self.safeAreaLayoutGuide)
+        }
+        
+        alertView.snp.makeConstraints {
+            $0.center.equalToSuperview()
             $0.width.equalTo(335)
         }
         
@@ -105,6 +118,14 @@ class BaseOneButtonAlertView: UIView {
         case .info:
             exitButton.setImage(.icnSoundWhite24Px, for: .normal)
             exitButton.isEnabled = false
+        }
+    }
+    
+    func addContentView(_ customView: UIView) {
+        contentView.addSubview(customView)
+        
+        customView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
     }
 }
