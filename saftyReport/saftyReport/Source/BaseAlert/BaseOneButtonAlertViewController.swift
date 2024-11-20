@@ -16,15 +16,28 @@ class BaseOneButtonAlertViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setAddtarget()
+    }
+    
+    func setAddtarget() { // 필요할 경우 오버라이딩 가능하도록 internal로 선언
+        alertView.backgroundButton.addTarget(self,
+                                             action: #selector(dismissAlert),
+                                             for: .touchUpInside)
         
+        alertView.exitButton.addTarget(self,
+                                       action: #selector(dismissAlert),
+                                       for: .touchUpInside)
         
+        alertView.confirmButton.addTarget(self,
+                                          action: #selector(dismissAlert),
+                                          for: .touchUpInside)
     }
     
     func setAlert(_ title: String, _ content: UIView, _ mode: AlertMode) {
         alertView.setAlert(title, content, mode)
     }
     
-    // TODO: dismiss 액션: exitButton, backgroundButton
-    // TODO: confirm 액션: confirmButton
-    
+    @objc func dismissAlert() {
+        self.dismiss(animated: true)
+    }
 }

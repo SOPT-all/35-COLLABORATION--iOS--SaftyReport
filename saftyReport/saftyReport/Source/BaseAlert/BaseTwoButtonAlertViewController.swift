@@ -16,7 +16,26 @@ class BaseTwoButtonAlertViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setAddtarget()
+    }
+    
+    /// cancelButton, confirmButton은 필요할 경우 overriding하여 액션 변경할 것.
+    func setAddtarget() {
+        alertView.backgroundButton.addTarget(self,
+                                             action: #selector(dismissAlert),
+                                             for: .touchUpInside)
         
+        alertView.exitButton.addTarget(self,
+                                       action: #selector(dismissAlert),
+                                       for: .touchUpInside)
+        
+        alertView.cancelButton.addTarget(self,
+                                         action: #selector(dismissAlert),
+                                         for: .touchUpInside)
+        
+        alertView.confirmButton.addTarget(self,
+                                          action: #selector(dismissAlert),
+                                          for: .touchUpInside)
         
     }
     
@@ -24,7 +43,7 @@ class BaseTwoButtonAlertViewController: UIViewController {
         alertView.setAlert(title, content)
     }
     
-    // TODO: dismiss 액션: exitButton, backgroundButton
-    // TODO: confirm 액션: confirmButton
-    
+    @objc func dismissAlert() {
+        self.dismiss(animated: true)
+    }
 }
