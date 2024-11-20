@@ -69,7 +69,6 @@ class CustomTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setNaviViewControllers()
         setUpTabBarShadow()
     }
     
@@ -80,7 +79,7 @@ class CustomTabBarController: UITabBarController {
 
 extension CustomTabBarController {
     
-    private func setNaviViewControllers() {
+    public func setNaviViewControllers() {
         let viewControllers = CustomTabBarItem.allCases.map {
             let viewController = setUpTabBarItem(
                 title: $0.itemTitle,
@@ -88,6 +87,7 @@ extension CustomTabBarController {
                 selectedItemImage: $0.selectedItemImage,
                 viewController: $0.navViewController
             )
+            print(viewController)
             return viewController
         }
         setViewControllers(viewControllers, animated: true)
