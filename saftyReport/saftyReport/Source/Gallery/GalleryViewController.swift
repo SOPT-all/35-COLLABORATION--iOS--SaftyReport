@@ -16,6 +16,18 @@ class GalleryViewController: UIViewController {
     private let collectionView = UICollectionView(frame: .zero,
                                                   collectionViewLayout: UICollectionViewLayout())
     
+    private let usingButtoncontainerView = UIView().then {
+        $0.backgroundColor = .white
+        CustomShadow.shared.applyShadow(to: $0.layer, width: 0, height: 4)
+    }
+    
+    private lazy var usingButton = UIButton().then {
+        $0.setTitle("사용", for: .normal)
+        $0.backgroundColor = .primaryOrange
+        $0.layer.cornerRadius = 10
+        $0.addTarget(self, action: #selector(usingButtonTapped), for: .touchUpInside)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
@@ -24,13 +36,26 @@ class GalleryViewController: UIViewController {
     }
     
     private func setUI() {
-        self.view.addSubview(collectionView)
+        self.view.addSubviews(collectionView, usingButtoncontainerView)
+        usingButtoncontainerView.addSubview(usingButton)
     }
     
     private func setLayout() {
         collectionView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+        
+        usingButtoncontainerView.snp.makeConstraints {
+            $0.left.right.bottom.equalToSuperview()
+            $0.height.equalTo(84)
+        }
+        
+        usingButton.snp.makeConstraints {
+            $0.left.right.equalToSuperview().inset(24)
+            $0.top.equalToSuperview().inset(8)
+            $0.height.equalTo(44)
+        }
+        
     }
     
     private func setupCollectionView() {
@@ -157,7 +182,10 @@ class GalleryViewController: UIViewController {
         
         return sectionHeader
     }
-    
+
+    @objc private func usingButtonTapped() {
+        print("사용 버튼이 눌렸습니다.")
+    }
     
 }
 

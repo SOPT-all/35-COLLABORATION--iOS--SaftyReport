@@ -16,11 +16,11 @@ struct GalleryItem: Hashable {
 
 extension GalleryItem {
     static let dummyGalleryItem: [GalleryItem] = [
-        GalleryItem(url: nil, image: .test, date: "대충 시간"),
-        GalleryItem(url: nil, image: .test, date: "대충 시간"),
-        GalleryItem(url: nil, image: .test, date: "대충 시간"),
-        GalleryItem(url: nil, image: .test, date: "대충 시간"),
-        GalleryItem(url: nil, image: .test, date: "대충 시간"),
-        GalleryItem(url: nil, image: .test, date: "대충 시간"),
+        GalleryItem(url: nil, image: UIImage(systemName: "square.fill")!, date: "대충 시간"),
+        GalleryItem(url: nil, image: UIImage(systemName: "square.fill")!, date: "대충 시간"),
+        GalleryItem(url: nil, image: UIImage(systemName: "square.fill")!, date: "대충 시간"),
+        GalleryItem(url: nil, image: UIImage(systemName: "square.fill")!, date: "대충 시간"),
+        GalleryItem(url: nil, image: UIImage(systemName: "square.fill")!, date: "대충 시간"),
+        GalleryItem(url: nil, image: UIImage(systemName: "square.fill")!, date: "대충 시간"),
     ]
 }
