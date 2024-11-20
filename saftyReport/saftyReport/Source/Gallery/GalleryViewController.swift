@@ -165,7 +165,12 @@ class GalleryViewController: UIViewController {
         )
         
         let section = NSCollectionLayoutSection(group: group)
-        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 20, bottom: 20, trailing: 20)
+        section.contentInsets = NSDirectionalEdgeInsets(
+            top: 0,
+            leading: 20,
+            bottom: 20,
+            trailing: 20
+        )
         section.boundarySupplementaryItems = [self.createSectionHeader()] // 헤더 추가
                 
         return section
@@ -191,54 +196,12 @@ class GalleryViewController: UIViewController {
     
 }
 
-extension GalleryViewController: UICollectionViewDataSource, UICollectionViewDelegate{
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 4
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        switch section {
-        case 0:
-            return 1
-        case 1:
-            return 1
-        case 2:
-            return 6
-        case 3:
-            return 6
-        default:
-            return 0
-        }
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        switch indexPath.section {
-        case 0:
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MediaSelectCell.cellIdentifier, for: indexPath) as? MediaSelectCell else {
-                return UICollectionViewCell(frame: .zero)
-            }
-            return cell
-        case 1:
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WarningCell.cellIdentifier, for: indexPath) as? WarningCell else {
-                return UICollectionViewCell(frame: .zero)
-            }
-            return cell
-        case 2:
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ContentsCell.cellIdentifier, for: indexPath) as? ContentsCell else {
-                return UICollectionViewCell(frame: .zero)
-            }
-            
-            return cell
-        default:
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ContentsCell.cellIdentifier, for: indexPath) as? ContentsCell else {
-                return UICollectionViewCell(frame: .zero)
-            }
-            
-            return cell
-        }
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+extension GalleryViewController: UICollectionViewDelegate {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        viewForSupplementaryElementOfKind kind: String,
+        at indexPath: IndexPath
+    ) -> UICollectionReusableView {
         guard kind == UICollectionView.elementKindSectionHeader,
               let header = collectionView.dequeueReusableSupplementaryView(
                   ofKind: kind,
@@ -257,6 +220,67 @@ extension GalleryViewController: UICollectionViewDataSource, UICollectionViewDel
         
         return header
     }
+}
+
+extension GalleryViewController: UICollectionViewDataSource {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 4
+    }
     
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int)
+    -> Int {
+        switch section {
+        case 0:
+            return 1
+        case 1:
+            return 1
+        case 2:
+            return 6
+        case 3:
+            return 6
+        default:
+            return 0
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath)
+    -> UICollectionViewCell {
+        switch indexPath.section {
+        case 0:
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: MediaSelectCell.cellIdentifier,
+                for: indexPath
+            ) as? MediaSelectCell else {
+                return UICollectionViewCell(frame: .zero)
+            }
+            return cell
+        case 1:
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: WarningCell.cellIdentifier,
+                for: indexPath
+            ) as? WarningCell else {
+                return UICollectionViewCell(frame: .zero)
+            }
+            return cell
+        case 2:
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: ContentsCell.cellIdentifier,
+                for: indexPath
+            ) as? ContentsCell else {
+                return UICollectionViewCell(frame: .zero)
+            }
+            
+            return cell
+        default:
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: ContentsCell.cellIdentifier,
+                for: indexPath
+            ) as? ContentsCell else {
+                return UICollectionViewCell(frame: .zero)
+            }
+            
+            return cell
+        }
+    }
     
 }

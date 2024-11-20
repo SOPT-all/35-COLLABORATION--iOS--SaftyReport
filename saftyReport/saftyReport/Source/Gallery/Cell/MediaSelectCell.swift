@@ -38,8 +38,7 @@ class MediaSelectCell: UICollectionViewCell {
     }
     
     private func setUI() {
-        contentView.addSubview(photoLabel)
-        contentView.addSubview(videoLabel)
+        contentView.addSubviews(photoLabel,videoLabel)
     }
     
     private func setLayout() {

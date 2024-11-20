@@ -82,7 +82,4 @@ class WarningCell: UICollectionViewCell {
         }
     }
     
-    
-    
-    
 }
