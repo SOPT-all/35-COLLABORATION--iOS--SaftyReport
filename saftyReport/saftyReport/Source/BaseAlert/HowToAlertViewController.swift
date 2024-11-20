@@ -45,7 +45,7 @@ class HowToAlertViewController: UIViewController {
     }
     
     private func setUI() {
-        view.backgroundColor = .green
+        view.backgroundColor = .white
         
         view.addSubviews(labelAlertButton, imageAlertButton)
         
