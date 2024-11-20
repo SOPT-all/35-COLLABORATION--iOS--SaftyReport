@@ -18,8 +18,44 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // 2.
         self.window = UIWindow(windowScene: windowScene)
         // 3.
-        let navigationController = UINavigationController(rootViewController: ReportDetailViewController())
-        self.window?.rootViewController = navigationController
+        let tabBarViewcontroller = UITabBarController()
+        
+        let nav1 = UINavigationController(rootViewController: MainViewController())
+        let nav2 = UINavigationController(rootViewController: ReportViewController())
+        let nav3 = UINavigationController(rootViewController: ViewController())
+        let nav4 = UINavigationController(rootViewController: ViewController())
+        let nav5 = UINavigationController(rootViewController: ViewController())
+        
+        tabBarViewcontroller.setViewControllers([nav1, nav2, nav3, nav4, nav5], animated: true)
+        tabBarViewcontroller.tabBar.tintColor = .primaryOrange
+        
+        nav1.tabBarItem = UITabBarItem(
+            title: "홈",
+            image: UIImage.icnHomeLineGrey24Px,
+            selectedImage: UIImage.icnHomeFilledOrange24Px
+        )
+        nav2.tabBarItem = UITabBarItem(
+            title: "안전신고",
+            image: UIImage.icnSafetyLineGrey24Px,
+            selectedImage: UIImage.icnSafetyFilledOrange24Px
+        )
+        nav3.tabBarItem = UITabBarItem(
+            title: "범죄예방",
+            image: UIImage.icnDangerLineGrey24Px ,
+            selectedImage: UIImage.icnDangerFilledOrange24Px
+        )
+        nav4.tabBarItem = UITabBarItem(
+            title: "안전뉴스",
+            image: UIImage.icnNewspaperLineGrey24Px,
+            selectedImage: UIImage.icnNewspaperFilledOrange24Px
+        )
+        nav5.tabBarItem = UITabBarItem(
+            title: "마이페이지",
+            image: UIImage.icnPersonLineGrey24Px,
+            selectedImage: UIImage.icnPersonFilledOrange24Px
+        )
+        
+        self.window?.rootViewController = tabBarViewcontroller
         // 4.
         self.window?.makeKeyAndVisible()
     }
