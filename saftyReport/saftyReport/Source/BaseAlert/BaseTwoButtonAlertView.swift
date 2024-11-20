@@ -22,7 +22,9 @@ class BaseTwoButtonAlertView: UIView {
         $0.backgroundColor = .primaryOrange
     }
     
-    private let titleLabel = UILabel()
+    private let titleLabel = UILabel().then {
+        $0.textColor = .gray1
+    }
     
     let exitButton = UIButton().then {
         var config = UIButton.Configuration.plain()
