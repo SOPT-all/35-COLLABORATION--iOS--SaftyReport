@@ -1,6 +1,6 @@
 //
 //  PhoneCell.swift
-//  Solo
+//  saftyReport
 //
 //  Created by 이지훈 on 11/17/24.
 //

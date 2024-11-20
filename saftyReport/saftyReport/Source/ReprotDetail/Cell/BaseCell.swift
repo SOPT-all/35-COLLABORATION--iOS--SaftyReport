@@ -1,6 +1,6 @@
 //
 //  BaseCell.swift
-//  Solo
+//  saftyReport
 //
 //  Created by 이지훈 on 11/17/24.
 //
@@ -30,6 +30,7 @@ class BaseCell: UICollectionViewCell, ConfigurableCell {
         let image = UIImage(named: "icon_info_line_black_16px")
         $0.image = image
         $0.contentMode = .scaleAspectFit
+        $0.isHidden = true
     }
     
     override init(frame: CGRect) {
@@ -56,7 +57,7 @@ class BaseCell: UICollectionViewCell, ConfigurableCell {
         }
         
         infoImageView.snp.makeConstraints {
-            $0.leading.equalTo(requiredMark.snp.trailing).offset(8) 
+            $0.leading.equalTo(requiredMark.snp.trailing).offset(8)
             $0.centerY.equalTo(titleLabel)
             $0.size.equalTo(14)
         }
@@ -69,5 +70,6 @@ class BaseCell: UICollectionViewCell, ConfigurableCell {
         )
         titleLabel.attributedText = attributedText
         requiredMark.isHidden = !item.isRequired
+        infoImageView.isHidden = !item.showInfoIcon 
     }
 }

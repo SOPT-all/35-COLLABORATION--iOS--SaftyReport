@@ -1,6 +1,6 @@
 //
 //  LocationCell.swift
-//  Solo
+//  saftyReport
 //
 //  Created by 이지훈 on 11/17/24.
 //
@@ -23,13 +23,13 @@ class LocationCell: BaseCell {
             style: .body9
         )
         $0.attributedText = attributedText
-        $0.textColor = .gray
+        $0.textColor = .gray6
     }
     
     private let locationIcon = UIImageView().then {
-        let image = UIImage(named: "btn_i_location")?.withRenderingMode(.alwaysTemplate)
+        let image = UIImage(named: "btn_i_location")
         $0.image = image
-        $0.tintColor = .gray
+        $0.tintColor = .gray6
         $0.contentMode = .scaleAspectFit
     }
     

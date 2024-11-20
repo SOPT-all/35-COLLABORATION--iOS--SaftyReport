@@ -16,6 +16,8 @@ struct ReportDetailItem: Hashable {
     let title: String
     let isRequired: Bool
     let placeholder: String?
+    let showInfoIcon: Bool
+
 }
 
 class ReportDetailViewController: UIViewController {
@@ -43,31 +45,36 @@ class ReportDetailViewController: UIViewController {
             section: .reportType,
             title: "",
             isRequired: false,
-            placeholder: nil
+            placeholder: nil,
+            showInfoIcon: false
         ),
         ReportDetailItem(
             section: .photo,
             title: "사진",
             isRequired: true,
-            placeholder: "사진을 추가해주세요"
+            placeholder: "사진을 추가해주세요",
+            showInfoIcon: true
         ),
         ReportDetailItem(
             section: .location,
             title: "발생지역",
             isRequired: true,
-            placeholder: "지역을 입력해주세요"
+            placeholder: "지역을 입력해주세요",
+            showInfoIcon: true
         ),
         ReportDetailItem(
             section: .content,
             title: "내용",
             isRequired: true,
-            placeholder: "내용을 입력해주세요"
+            placeholder: "내용을 입력해주세요",
+            showInfoIcon: true  
         ),
         ReportDetailItem(
             section: .phone,
             title: "휴대전화",
             isRequired: true,
-            placeholder: "010-2998-0867"
+            placeholder: "010-2998-0867",
+            showInfoIcon: false
         )
     ]
     
