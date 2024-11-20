@@ -7,23 +7,27 @@
 
 import UIKit
 
-class MainViewController: UIViewController {
+import SnapKit
 
+import Then
+
+class MainViewController: UIViewController {
+    let customNavigationItem = CustomNavigationItem(title: "홈") // 반드시 타이틀 설정
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .white
 
-        // Do any additional setup after loading the view.
+        setUpNavigationBar()
     }
-    
 
-    /*
-    // MARK: - Navigation
+    private func setUpNavigationBar() {
+        navigationController?.setUpNavigationBarColor()
+        customNavigationItem.setUpNavigationBar(for: .leftRight)
+        customNavigationItem.setUpTitle(title: "")
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+        navigationItem.title = customNavigationItem.title
+        navigationItem.leftBarButtonItem = customNavigationItem.leftBarButtonItem
+        navigationItem.rightBarButtonItem = customNavigationItem.rightBarButtonItem
     }
-    */
-
 }

@@ -8,6 +8,7 @@
 import Foundation
 
 enum ReportDetailSection: Int, CaseIterable {
+    case reportType 
     case photo
     case location
     case content
