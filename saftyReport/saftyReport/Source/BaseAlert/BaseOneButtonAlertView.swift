@@ -23,7 +23,7 @@ class BaseOneButtonAlertView: UIView {
         $0.layer.cornerRadius = 10
     }
     
-    private let backgroundButton = UIButton() // 배경 클릭하면 AlertVC dismiss되는 액션 설정
+    let backgroundButton = UIButton() // 배경 클릭하면 AlertVC dismiss되는 액션 설정
     
     private let titleView = UIView().then {
         $0.backgroundColor = .primaryOrange

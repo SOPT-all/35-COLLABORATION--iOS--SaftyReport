@@ -16,7 +16,7 @@ class BaseTwoButtonAlertView: UIView {
         $0.layer.cornerRadius = 10
     }
     
-    private let backgroundButton = UIButton()
+    let backgroundButton = UIButton()
     
     private let titleView = UIView().then {
         $0.backgroundColor = .primaryOrange
@@ -24,7 +24,7 @@ class BaseTwoButtonAlertView: UIView {
     
     private let titleLabel = UILabel()
     
-    private let exitButton = UIButton().then {
+    let exitButton = UIButton().then {
         $0.setImage(.icnCrossISelectedWhite16Px, for: .normal)
     }
     
@@ -36,7 +36,7 @@ class BaseTwoButtonAlertView: UIView {
         $0.spacing = 8
     }
     
-    private let cancelButton = UIButton().then {
+    let cancelButton = UIButton().then {
         var config = UIButton.Configuration.bordered()
         config.background.cornerRadius = 10
         config.background.strokeColor = .gray5
