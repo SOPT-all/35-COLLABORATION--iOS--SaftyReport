@@ -22,8 +22,7 @@ class GalleryViewController: UIViewController {
     }
     
     private lazy var usingButton = UIButton().then {
-        $0.setTitle("사용", for: .normal)
-        $0.titleLabel?.attributedText = .styled(text: "사용", style: .heading1) // 이거 안 먹히는 거 같음
+        $0.setAttributedTitle(NSAttributedString.styled(text: "사용", style: .heading1), for: .normal)
         $0.titleLabel?.font = .systemFont(ofSize: 20, weight: .semibold)
         $0.setTitleColor(.gray1, for: .normal)
         $0.backgroundColor = .primaryOrange
