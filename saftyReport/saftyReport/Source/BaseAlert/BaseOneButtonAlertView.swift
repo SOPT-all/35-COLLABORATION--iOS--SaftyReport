@@ -23,7 +23,7 @@ class BaseOneButtonAlertView: UIView {
         $0.layer.cornerRadius = 10
     }
     
-    private let backgroundButton = UIButton()
+    private let backgroundButton = UIButton() // 배경 클릭하면 AlertVC dismiss되는 액션 설정
     
     private let titleView = UIView().then {
         $0.backgroundColor = .primaryOrange
@@ -43,7 +43,7 @@ class BaseOneButtonAlertView: UIView {
         config.baseForegroundColor = .gray8
         config.attributedTitle = AttributedString(
             NSAttributedString.styled(text: "확인", style: .body4)
-            )
+        )
         $0.configuration = config
     }
     
@@ -107,8 +107,14 @@ class BaseOneButtonAlertView: UIView {
         }
     }
     
-    func setAlertTheme(_ title: String, _ mode: AlertMode) {
+    func customAlert(_ title: String, _ customView: UIView, _ mode: AlertMode) {
         titleLabel.attributedText = NSAttributedString.styled(text: title, style: .body2)
+        
+        contentView.addSubview(customView)
+        
+        customView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
         
         switch mode {
         case .alarm:
@@ -118,14 +124,6 @@ class BaseOneButtonAlertView: UIView {
         case .info:
             exitButton.setImage(.icnSoundWhite24Px, for: .normal)
             exitButton.isEnabled = false
-        }
-    }
-    
-    func addContentView(_ customView: UIView) {
-        contentView.addSubview(customView)
-        
-        customView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
         }
     }
 }

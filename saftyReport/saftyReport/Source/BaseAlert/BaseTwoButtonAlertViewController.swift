@@ -1,5 +1,5 @@
 //
-//  BaseAlertViewController.swift
+//  BaseTwoButtonAlertViewController.swift
 //  saftyReport
 //
 //  Created by 김유림 on 11/20/24.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-class BaseAlertViewController: UIViewController {
+class BaseTwoButtonAlertViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -121,7 +121,13 @@ class BaseTwoButtonAlertView: UIView {
         }
     }
     
-    func setAlertTheme(_ title: String) {
+    func customAlert(_ title: String, _ customView: UIView) {
         titleLabel.attributedText = NSAttributedString.styled(text: title, style: .body2)
+        
+        contentView.addSubview(customView)
+        
+        customView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
     }
 }
