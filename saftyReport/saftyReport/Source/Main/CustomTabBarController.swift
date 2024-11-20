@@ -61,24 +61,24 @@ enum CustomTabBarItem: CaseIterable {
 
 class CustomTabBarController: UITabBarController {
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        setUI()
-        setLayout()
+    let tabBarAppearance = UITabBar.appearance().then {
+        $0.backgroundColor = .gray1
+        $0.tintColor = .primaryOrange
+        CustomShadow.shared.applyShadow(to: $0.layer, width: 0, height: 1)
     }
     
-    private func setUI() {
-        let tabBarAppearance = UITabBar.appearance()
-        tabBarAppearance.backgroundColor = .gray1
-        tabBarAppearance.tintColor = .primaryOrange
+    override func viewDidLoad() {
+        super.viewDidLoad()
         
-        tabBar.do {
-            CustomShadow.shared.applyShadow(to: $0.layer, width: 0, height: 1)
-        }
-        
+        setUpViewController()
+    }
+}
+
+extension CustomTabBarController {
+    
+    private func setUpViewController() {
         let viewControllers = CustomTabBarItem.allCases.map {
-            let viewController = setUpViewController(
+            let viewController = setUpTabBarItem(
                 title: $0.itemTitle,
                 normalItemImage: $0.normalItemImage,
                 selectedItemImage: $0.selectedItemImage,
@@ -89,20 +89,18 @@ class CustomTabBarController: UITabBarController {
         setViewControllers(viewControllers, animated: true)
     }
     
-    private func setUpViewController(title: String?,
-                            normalItemImage: UIImage?,
-                            selectedItemImage: UIImage?,
-                             viewController: UIViewController?) -> UIViewController {
-        let naviViewController = UINavigationController(rootViewController: viewController ?? ViewController())
+    private func setUpTabBarItem(title: String?,
+                                 normalItemImage: UIImage?,
+                                 selectedItemImage: UIImage?,
+                                 viewController: UIViewController?) -> UIViewController {
+        let naviViewController = UINavigationController(
+            rootViewController: viewController ?? ViewController()
+        )
         naviViewController.tabBarItem = UITabBarItem(
             title: title ?? "",
             image: normalItemImage ?? UIImage(),
             selectedImage: selectedItemImage ?? UIImage()
         )
         return naviViewController
-    }
-    
-    private func setLayout() {
-        
     }
 }
