@@ -7,21 +7,20 @@
 
 import UIKit
 
+import SnapKit
+import Then
+
 class ContentsCell: UICollectionViewCell {
-    private let photoLabel = UILabel().then {
-        $0.attributedText = .styled(text: "사진", style: .body4)
-        $0.font = .systemFont(ofSize: 15, weight: .bold)
-        $0.textColor = .primaryOrange
+    private let dateLabel = UILabel().then {
+        $0.attributedText = .styled(text: "2024년 11월 14일", style: .body2)
+        $0.font = .systemFont(ofSize: 16, weight: .bold)
+        $0.textColor = .gray13
     }
     
-    private let videoLabel = UILabel().then {
-        $0.attributedText = .styled(text: "동영상", style: .body4)
-        $0.font = .systemFont(ofSize: 15, weight: .bold)
-        $0.textColor = .gray1
-    }
+    private var imageListView = GalleryImageView()
     
     override init(frame: CGRect) {
-        super.init(frame: frame)
+        super .init(frame: frame)
         
         setUI()
         setLayout()
@@ -31,15 +30,24 @@ class ContentsCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    
-    private func setUI(){
-        contentView.addSubview(photoLabel)
-        contentView.addSubview(videoLabel)
+    private func setUI() {
+        contentView.addSubviews(dateLabel, imageListView)
     }
     
     private func setLayout() {
-        photoLabel.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+        dateLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(20)
+            $0.top.equalToSuperview()
+            $0.width.equalTo(336)
+            $0.height.equalTo(20)
+        }
+        
+        imageListView.snp.makeConstraints {
+            $0.leading.equalTo(dateLabel)
+            $0.top.equalTo(dateLabel.snp.bottom).offset(10)
+            $0.width.equalTo(110)
+            $0.height.equalTo(110)
         }
     }
+    
 }
