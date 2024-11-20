@@ -61,7 +61,7 @@ enum CustomTabBarItem: CaseIterable {
 
 class CustomTabBarController: UITabBarController {
     
-    let tabBarAppearance = UITabBar().then {
+    let tabBarAppearance = UITabBar.appearance().then {
         $0.backgroundColor = .gray1
         $0.tintColor = .primaryOrange
     }
@@ -73,8 +73,8 @@ class CustomTabBarController: UITabBarController {
         setUpTabBarShadow()
     }
     
-    func setUpTabBarShadow() {
-        CustomShadow.shared.applyShadow(to: tabBar.layer, width: 0, height: 1)
+    private func setUpTabBarShadow() {
+          CustomShadow.shared.applyShadow(to: tabBar.layer, width: 0, height: 1) // 함수 사용이 유일??
     }
 }
 
