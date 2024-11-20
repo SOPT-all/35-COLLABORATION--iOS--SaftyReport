@@ -53,7 +53,7 @@ class BaseTwoButtonAlertView: UIView {
         config.background.cornerRadius = 10
         config.background.strokeColor = .primaryLight
         config.baseBackgroundColor = .gray1
-        config.baseForegroundColor = .primaryRed
+        config.baseForegroundColor = .primaryOrange
         config.attributedTitle = AttributedString(
             NSAttributedString.styled(text: "확인", style: .body4)
         )
