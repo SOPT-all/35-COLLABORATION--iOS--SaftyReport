@@ -10,5 +10,6 @@ import Foundation
 enum GallerySectionType: Int, CaseIterable {
     case mediaSelect
     case warning
-    case contents
+    case contents1
+    case contents2
 }

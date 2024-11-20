@@ -20,18 +20,18 @@ class ContentsCell: UICollectionViewCell {
         $0.backgroundColor = .gray3
     }
     
-    private var checkbox = UIImageView().then {
+    private lazy var checkbox = UIButton().then {
         $0.clipsToBounds = true
         $0.contentMode = .scaleAspectFill
-        $0.image = .icnCheckboxISquareUnselectedWhite24Px
+        $0.setImage(.icnCheckboxISquareUnselectedWhite24Px, for: .normal)
+        $0.addTarget(self, action: #selector(checkboxTapped), for: .touchUpInside)
     }
     
     override init(frame: CGRect) {
         super .init(frame: frame)
-        
+                
         setUI()
         setLayout()
-        addTapGesture()
     }
     
     required init?(coder: NSCoder) {
@@ -54,19 +54,13 @@ class ContentsCell: UICollectionViewCell {
         }
     }
     
-    private func addTapGesture() {
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(checkboxTapped))
-        self.addGestureRecognizer(tapGesture)
-        self.isUserInteractionEnabled = true
-    }
-    
     @objc private func checkboxTapped() {
         isChecked.toggle()
         
         if isChecked {
-            checkbox.image = .icnCheckboxISquareSelectedWhite24Px
+            checkbox.setImage(.icnCheckboxISquareSelectedWhite24Px, for: .normal)
         } else {
-            checkbox.image = .icnCheckboxISquareUnselectedWhite24Px
+            checkbox.setImage(.icnCheckboxISquareUnselectedWhite24Px, for: .normal)
         }
     }
 

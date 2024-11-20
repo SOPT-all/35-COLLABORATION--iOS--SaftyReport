@@ -59,9 +59,12 @@ class GalleryViewController: UIViewController {
                 return self?.createMediaSelectSection()
             case .warning:
                 return self?.createWarningSection()
-            case .contents:
+            case .contents1:
+                return self?.createContentsSection()
+            case .contents2:
                 return self?.createContentsSection()
             }
+            
         }
         
         return layout
@@ -114,7 +117,7 @@ class GalleryViewController: UIViewController {
             heightDimension: .fractionalHeight(1)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = NSDirectionalEdgeInsets(top: 3, leading: 3, bottom: 3, trailing: 3)
+        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 3, trailing: 3)
         
         let nestedGroupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1),
@@ -127,7 +130,7 @@ class GalleryViewController: UIViewController {
         
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1),
-            heightDimension: .absolute(253)
+            heightDimension: .absolute(223)
         )
         let group = NSCollectionLayoutGroup.vertical(
             layoutSize: groupSize,
@@ -160,7 +163,7 @@ class GalleryViewController: UIViewController {
 
 extension GalleryViewController: UICollectionViewDataSource, UICollectionViewDelegate{
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 3
+        return 4
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -170,6 +173,8 @@ extension GalleryViewController: UICollectionViewDataSource, UICollectionViewDel
         case 1:
             return 1
         case 2:
+            return 6
+        case 3:
             return 6
         default:
             return 0
@@ -212,9 +217,13 @@ extension GalleryViewController: UICollectionViewDataSource, UICollectionViewDel
               ) as? GalleryContentsSectionHeader else {
             return UICollectionReusableView()
         }
-        
-        let sectionTitles = ["2024년 11월 14일", "2024년 11월 13일"]
-        header.configure(with: sectionTitles[0])
+        if indexPath.section == 2 {
+            let sectionTitles = "2024년 11월 14일"
+            header.configure(with: sectionTitles)
+        } else if indexPath.section == 3{
+            let sectionTitles = "2024년 11월 13일"
+            header.configure(with: sectionTitles)
+        }
         
         return header
     }
