@@ -116,14 +116,17 @@ class BaseOneButtonAlertView: UIView {
             $0.edges.equalToSuperview()
         }
         
+        var config = UIButton.Configuration.plain()
+        
         switch mode {
         case .alarm:
-            exitButton.setImage(.icnCrossISelectedWhite16Px, for: .normal)
+            config.image = .icnCrossISelectedWhite16Px
             exitButton.isEnabled = true
             
         case .info:
-            exitButton.setImage(.icnSoundWhite24Px, for: .normal)
+            config.image = .icnSoundWhite24Px
             exitButton.isEnabled = false
         }
+        exitButton.configuration = config
     }
 }

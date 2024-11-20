@@ -39,8 +39,8 @@ class BaseTwoButtonAlertViewController: UIViewController {
         
     }
     
-    func setAlert(_ title: String, _ content: UIView) {
-        alertView.setAlert(title, content)
+    func setAlert(_ title: String, _ contentView: UIView) {
+        alertView.setAlert(title, contentView)
     }
     
     @objc func dismissAlert() {

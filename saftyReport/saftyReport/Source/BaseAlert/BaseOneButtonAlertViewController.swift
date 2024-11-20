@@ -33,8 +33,8 @@ class BaseOneButtonAlertViewController: UIViewController {
                                           for: .touchUpInside)
     }
     
-    func setAlert(_ title: String, _ content: UIView, _ mode: AlertMode) {
-        alertView.setAlert(title, content, mode)
+    func setAlert(_ title: String, _ contentView: UIView, _ mode: AlertMode) {
+        alertView.setAlert(title, contentView, mode)
     }
     
     @objc func dismissAlert() {
