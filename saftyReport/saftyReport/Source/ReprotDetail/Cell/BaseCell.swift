@@ -10,16 +10,20 @@ import UIKit
 import SnapKit
 import Then
 
-class BaseCell: UICollectionViewCell, ConfigurableCell{
+class BaseCell: UICollectionViewCell, ConfigurableCell {
     static var reuseIdentifier: String { return String(describing: self) }
     
     let titleLabel = UILabel().then {
-        $0.font = .systemFont(ofSize: 16, weight: .medium)
+        let attributedText = NSAttributedString.styled(
+            text: "",
+            style: .body4
+        )
+        $0.attributedText = attributedText
     }
     
     let requiredMark = UILabel().then {
         $0.text = "*"
-        $0.textColor = .red
+        $0.textColor = .primaryOrange
     }
     
     override init(frame: CGRect) {
@@ -32,11 +36,12 @@ class BaseCell: UICollectionViewCell, ConfigurableCell{
     }
     
     private func setupBaseUI() {
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(requiredMark)
+        [titleLabel, requiredMark].forEach { contentView.addSubview($0) }
         
         titleLabel.snp.makeConstraints {
-            $0.top.leading.equalToSuperview()
+            $0.top.equalToSuperview().offset(16)
+            $0.leading.equalToSuperview().offset(16)
+            $0.height.equalTo(24)
         }
         
         requiredMark.snp.makeConstraints {
@@ -46,7 +51,11 @@ class BaseCell: UICollectionViewCell, ConfigurableCell{
     }
     
     func configure(with item: ReportDetailItem) {
-        titleLabel.text = item.title
+        let attributedText = NSAttributedString.styled(
+            text: item.title,
+            style: .body4
+        )
+        titleLabel.attributedText = attributedText
         requiredMark.isHidden = !item.isRequired
     }
 }

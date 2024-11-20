@@ -23,7 +23,7 @@ class ReportDetailViewController: UIViewController {
     private let containerView = UIView().then {
         $0.backgroundColor = .white
         $0.layer.cornerRadius = 8
-        CustomShadow.shared.applyShadow(to: $0.layer)
+        CustomShadow.shared.applyShadow(to: $0.layer, width: 0, height: 4)
     }
     
     private let submitButton = UIButton().then {
