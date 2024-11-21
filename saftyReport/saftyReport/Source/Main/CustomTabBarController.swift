@@ -47,7 +47,13 @@ extension CustomTabBarController {
         let navViewController = UINavigationController(
             rootViewController: viewController
         )
-        let tabBarTitleAttributes: [NSAttributedString.Key: Any] = [.font: TextStyle.caption6.font as Any]
+        let tabBarTitleAttributes: [NSAttributedString.Key : Any] = NSAttributedString.styled(
+            text: title,
+            style: .caption6
+        ).attributes(
+            at: 0,
+            effectiveRange: nil
+        )
         
         navViewController.tabBarItem = UITabBarItem(
             title: title,
