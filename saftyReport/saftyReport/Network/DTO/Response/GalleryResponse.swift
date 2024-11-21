@@ -6,3 +6,24 @@
 //
 
 import Foundation
+
+// MARK: - GalleryResponse
+
+struct GalleryResponse: Codable {
+    let status: Int?
+    let message: String?
+    let data: GalleryDataObject?
+}
+
+// MARK: - GalleryDataObject
+
+struct GalleryDataObject: Codable {
+    let photoList: [GalleryPhotoList]?
+}
+
+// MARK: - PhotoList
+
+struct GalleryPhotoList: Codable {
+    let photoID: Int?
+    let photoURL, createdAt: String?
+}
