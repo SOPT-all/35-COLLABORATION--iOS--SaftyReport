@@ -6,3 +6,10 @@
 //
 
 import Foundation
+
+// MARK: - FailResponse
+
+struct FailResponse: Codable {
+    let status: Int?
+    let message: String?
+}
