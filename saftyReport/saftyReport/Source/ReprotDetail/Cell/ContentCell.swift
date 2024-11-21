@@ -11,7 +11,7 @@ import SnapKit
 import Then
 
 class ContentCell: BaseCell {
-    
+    //변경내용
     private let titleStackView = UIStackView().then {
         $0.axis = .horizontal
         $0.spacing = 8
