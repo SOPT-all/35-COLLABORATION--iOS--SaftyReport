@@ -5,21 +5,19 @@
 //  Created by OneTen on 11/21/24.
 //
 
-import UIKit
+import Foundation
 
-import Alamofire
+// MARK: - HomeResponse
 
-// MARK: - HomeScreenResponse
-
-struct HomeScreenResponse: Codable {
+struct HomeResponse: Codable {
     let status: Int?
     let message: String?
-    let data: DataObject?
+    let data: HomeDataObject?
 }
 
 // MARK: - DataObject
 
-struct DataObject: Codable {
+struct HomeDataObject: Codable {
     let userID, yearReportCount, monthReportCount, mileage: Int?
     let bannerList: [BannerList]
 }
@@ -29,11 +27,4 @@ struct DataObject: Codable {
 struct BannerList: Codable {
     let bannerID: Int?
     let bannerURL: String?
-}
-
-// MARK: - FailResponse
-
-struct FailResponse: Codable {
-    let status: Int?
-    let message: String?
 }
