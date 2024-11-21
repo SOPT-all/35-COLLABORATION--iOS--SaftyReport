@@ -15,7 +15,7 @@ struct ReportResponse: Codable {
     let data: ReportDataObject?
 }
 
-// MARK: - DataClass
+// MARK: - ReportDataObject
 
 struct ReportDataObject: Codable {
     let reportID: Int?
@@ -23,7 +23,7 @@ struct ReportDataObject: Codable {
     let address, content, phoneNumber, category: String?
 }
 
-// MARK: - PhotoList
+// MARK: - ReportPhotoList
 
 struct ReportPhotoList: Codable {
     let photoID: Int?

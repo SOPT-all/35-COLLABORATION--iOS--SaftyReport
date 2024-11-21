@@ -15,7 +15,7 @@ struct HomeResponse: Codable {
     let data: HomeDataObject?
 }
 
-// MARK: - DataObject
+// MARK: - HomeDataObject
 
 struct HomeDataObject: Codable {
     let userID, yearReportCount, monthReportCount, mileage: Int?

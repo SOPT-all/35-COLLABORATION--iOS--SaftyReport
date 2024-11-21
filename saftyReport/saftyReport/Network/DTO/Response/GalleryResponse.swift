@@ -21,7 +21,7 @@ struct GalleryDataObject: Codable {
     let photoList: [GalleryPhotoList]?
 }
 
-// MARK: - PhotoList
+// MARK: - GalleryPhotoList
 
 struct GalleryPhotoList: Codable {
     let photoID: Int?

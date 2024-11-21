@@ -15,7 +15,7 @@ struct CategoryResponse: Codable {
     let data: CategoryDataObject?
 }
 
-// MARK: - DataClass
+// MARK: - CategoryDataObject
 
 struct CategoryDataObject: Codable {
     let categoryDetailList: [CategoryDetailList]?
