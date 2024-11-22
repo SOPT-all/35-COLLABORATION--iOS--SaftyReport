@@ -14,29 +14,17 @@ class GalleryDetailViewController: UIViewController {
     private var baseView = UIView().then {
         $0.backgroundColor = .gray1
     }
-
+    
     private var imageView = UIImageView().then {
         $0.contentMode = .scaleAspectFit
-        $0.image = .test
+//        $0.image = .test
+        $0.backgroundColor = .gray // 이미지 넣으면 지울 코드
     }
     
-//    private lazy var checkbox = UIButton().then {
-//        $0.clipsToBounds = true
-//        $0.contentMode = .scaleAspectFill
-//        $0.setImage(.icnCheckboxISquareUnselectedWhite24Px, for: .normal)
-//        $0.addTarget(self, action: #selector(checkboxTapped), for: .touchUpInside)
-//        $0.backgroundColor = .red
-//    }
-    
-    private lazy var checkbox = UIButton ().then {
-        var config = UIButton.Configuration.plain()
-        config.image = .icnCheckboxISquareUnselectedWhite24Px
-        config.contentInsets = .zero
-        config.baseBackgroundColor = .red
-        $0.configuration = config
+    private lazy var checkbox = UIButton().then {
+        $0.contentMode = .scaleAspectFit
+        $0.setBackgroundImage(.icnCheckboxISquareUnselectedWhite24Px, for: .normal)
         $0.addTarget(self, action: #selector(checkboxTapped), for: .touchUpInside)
-        $0.backgroundColor = .gray
-        $0.contentMode = .scaleToFill
     }
     
     private var isChecked = false
@@ -45,6 +33,7 @@ class GalleryDetailViewController: UIViewController {
         $0.layer.cornerRadius = 5
         $0.layer.borderWidth = 1
         $0.layer.borderColor = CGColor(gray: 0.8, alpha: 0.3)
+        $0.spacing = 20
     }
     
     private var createdAtLabel = UILabel().then {
@@ -57,9 +46,8 @@ class GalleryDetailViewController: UIViewController {
         $0.attributedText = .styled(text: "2024/11/13   17:59:59", style: .caption1)
         $0.font = .systemFont(ofSize: 12, weight: .bold)
         $0.textColor = .gray13
-        $0.backgroundColor = .red
     }
-
+    
     private var logoLabel = UILabel().then {
         $0.attributedText = .styled(text: "안전신문고", style: .caption1)
         $0.font = .systemFont(ofSize: 12, weight: .bold)
@@ -94,12 +82,12 @@ class GalleryDetailViewController: UIViewController {
         checkbox.snp.makeConstraints {
             $0.top.equalToSuperview().inset(16)
             $0.trailing.equalToSuperview().inset(16)
-            $0.width.height.equalTo(100)
-            $0.size.equalTo(100)
+            $0.width.height.equalTo(36)
         }
-    
+        
         imageView.snp.makeConstraints {
             $0.width.equalToSuperview()
+            $0.height.equalTo(469) // 이미지 넣으면 없앨 코드
             $0.center.equalToSuperview()
         }
         
@@ -115,7 +103,7 @@ class GalleryDetailViewController: UIViewController {
         }
         
         dateTimeLabel.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(8)
+            $0.leading.equalTo(createdAtLabel.snp.trailing).offset(20)
         }
         
         logoLabel.snp.makeConstraints {
@@ -131,9 +119,9 @@ class GalleryDetailViewController: UIViewController {
         isChecked.toggle()
         
         if isChecked {
-            checkbox.setImage(.icnCheckboxISquareSelectedWhite24Px, for: .normal)
+            checkbox.setBackgroundImage(.icnCheckboxISquareSelectedWhite24Px, for: .normal)
         } else {
-            checkbox.setImage(.icnCheckboxISquareUnselectedWhite24Px, for: .normal)
+            checkbox.setBackgroundImage(.icnCheckboxISquareUnselectedWhite24Px, for: .normal)
         }
     }
     
