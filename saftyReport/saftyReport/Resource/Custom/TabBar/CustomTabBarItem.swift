@@ -17,7 +17,7 @@ enum CustomTabBarItem: CaseIterable {
         case .report: return ReportViewController()
         case .prevent: return ViewController()
         case .news: return ViewController()
-        case .myPage: return GalleryDetailViewController()
+        case .myPage: return ViewController()
         }
     }
     var itemTitle: String? {
