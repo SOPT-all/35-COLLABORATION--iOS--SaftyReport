@@ -82,14 +82,11 @@ class ContentCell: BaseCell {
     }
     
     private func setupUI() {
-        [titleLabel, requiredMark, infoImageView, infoButton, recommendationLabel, textView, bottomStackView].forEach {
-            contentView.addSubview($0)
-        }
+ 
+        contentView.addSubviews(titleLabel, requiredMark, infoImageView, recommendationLabel, infoButton, textView, bottomStackView)
         
-        leftStackView.addArrangedSubview(textCheckButton)
-        leftStackView.addArrangedSubview(textCheckLabel)
-        bottomStackView.addArrangedSubview(leftStackView)
-        bottomStackView.addArrangedSubview(copyButton)
+        leftStackView.addArrangedSubviews(textCheckButton,textCheckLabel)
+        bottomStackView.addArrangedSubviews(leftStackView, copyButton)
         
         titleLabel.snp.makeConstraints {
             $0.top.leading.equalToSuperview()
