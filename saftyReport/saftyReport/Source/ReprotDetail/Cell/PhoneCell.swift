@@ -12,7 +12,7 @@ import Then
 
 class PhoneCell: BaseCell {
     private let textField = UITextField().then {
-        $0.backgroundColor = .systemGray6
+        $0.backgroundColor = .gray3
         $0.layer.cornerRadius = 8
         $0.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 0))
         $0.leftViewMode = .always
@@ -42,4 +42,8 @@ class PhoneCell: BaseCell {
         super.configure(with: item)
         textField.placeholder = item.placeholder
     }
+}
+
+#Preview {
+    ReportDetailViewController()
 }

@@ -63,7 +63,7 @@ class ReportDetailViewController: UIViewController {
             section: .phone,
             title: "휴대전화",
             isRequired: true,
-            placeholder: "010-2998-0867",
+            placeholder: "전화번호를 입력해주세요",
             showInfoIcon: false
         )
     ]
