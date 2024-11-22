@@ -12,23 +12,23 @@ import Then
 
 class ContentCell: BaseCell {
     private let recommendationLabel = UILabel().then {
-        $0.text = "추가/수정가능, 5~900자"
-        $0.textColor = .systemOrange
-        $0.font = .systemFont(ofSize: 14)
+        $0.textColor = .primaryOrange
+        let attributedText = NSAttributedString.styled(
+            text: "추가/수정가능, 5~900자",
+            style: .caption3
+        )
     }
     
     private let infoButton = UIImageView().then {
         let image = UIImage(named: "btn_i_mic")
         $0.image = image
         $0.contentMode = .scaleAspectFit
-        $0.tintColor = .gray6
     }
     
     private let textView = UITextView().then {
-        $0.backgroundColor = .systemGray6
-        $0.layer.cornerRadius = 8
+        $0.backgroundColor = .gray3
+        $0.layer.cornerRadius = 5
         $0.textContainerInset = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
-        $0.font = .systemFont(ofSize: 16)
     }
     
     private let bottomStackView = UIStackView().then {
@@ -44,24 +44,30 @@ class ContentCell: BaseCell {
     }
     
     private let textCheckButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "checkmark.circle.fill"), for: .normal)
+        $0.setImage(UIImage(named: "checkbox_i_report_page_square_filled_orange_16px"), for: .normal)
         $0.tintColor = .systemOrange
     }
     
     private let textCheckLabel = UILabel().then {
         $0.text = "추천 단어"
-        $0.textColor = .darkGray
-        $0.font = .systemFont(ofSize: 14)
+        $0.textColor = .gray13
+        let attributedText = NSAttributedString.styled(
+            text: "추천단어",
+            style: .caption3
+        )
     }
     
     private let copyButton = UIButton().then {
         var config = UIButton.Configuration.plain()
-        config.image = UIImage(systemName: "doc.on.doc")
+        config.image = UIImage(named: "icon_copy_line_black_16px")
         config.title = "내용복사"
         config.imagePadding = 4
-        config.baseForegroundColor = .darkGray
+        config.baseForegroundColor = .gray13
         $0.configuration = config
-        $0.titleLabel?.font = .systemFont(ofSize: 14)
+        let attributedText = NSAttributedString.styled(
+            text: "내용복사",
+            style: .caption3
+            )
     }
     
     override init(frame: CGRect) {
