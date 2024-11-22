@@ -11,6 +11,11 @@ import SnapKit
 import Then
 
 class GalleryDetailViewController: UIViewController {
+    var checkboxHandler: ((Bool, IndexPath) -> ())?
+    var indexPath: IndexPath!
+
+    var isChecked = false
+
     private var baseView = UIView().then {
         $0.backgroundColor = .gray1
     }
@@ -26,9 +31,7 @@ class GalleryDetailViewController: UIViewController {
         $0.setBackgroundImage(.icnCheckboxISquareUnselectedWhite24Px, for: .normal)
         $0.addTarget(self, action: #selector(checkboxTapped), for: .touchUpInside)
     }
-    
-    private var isChecked = false
-    
+        
     private var timeStackView = UIStackView().then {
         $0.layer.cornerRadius = 5
         $0.layer.borderWidth = 1
@@ -66,6 +69,21 @@ class GalleryDetailViewController: UIViewController {
         
         setUI()
         setLayout()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        checkbox.setBackgroundImage(
+            isChecked ? .icnCheckboxISquareSelectedWhite24Px : .icnCheckboxISquareUnselectedWhite24Px,
+            for: .normal
+        )
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        checkboxHandler?(isChecked, indexPath)
     }
     
     private func setUI() {

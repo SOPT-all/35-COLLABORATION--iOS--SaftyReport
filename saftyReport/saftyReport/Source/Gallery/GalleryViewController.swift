@@ -221,9 +221,26 @@ extension GalleryViewController: UICollectionViewDelegate {
         return header
     }
     
-    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? ContentsCell else { return }
+        
         let nextViewController = GalleryDetailViewController()
+        nextViewController.isChecked = cell.isChecked
+        nextViewController.indexPath = indexPath
+        
+        nextViewController.checkboxHandler = { [weak self] isChecked, indexPath in
+            guard let self = self else { return }
+            
+            if let cell = self.collectionView.cellForItem(at: indexPath) as? ContentsCell {
+                // 체크박스 상태 업데이트
+                cell.isChecked = isChecked
+                cell.checkbox.setImage(
+                    isChecked ? .icnCheckboxISquareSelectedWhite24Px : .icnCheckboxISquareUnselectedWhite24Px,
+                    for: .normal
+                )
+            }
+        }
+        
         self.navigationController?.pushViewController(nextViewController, animated: true)
     }
     
