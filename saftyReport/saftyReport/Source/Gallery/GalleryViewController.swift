@@ -220,6 +220,13 @@ extension GalleryViewController: UICollectionViewDelegate {
         
         return header
     }
+    
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let nextViewController = GalleryDetailViewController()
+        self.navigationController?.pushViewController(nextViewController, animated: true)
+    }
+    
 }
 
 extension GalleryViewController: UICollectionViewDataSource {
