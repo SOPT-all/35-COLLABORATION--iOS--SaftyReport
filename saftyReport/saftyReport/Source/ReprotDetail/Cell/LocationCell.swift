@@ -57,9 +57,9 @@ class LocationCell: BaseCell {
         }
         
         locationIcon.snp.makeConstraints {
-            $0.centerY.equalTo(locationLabel)
+            $0.top.equalTo(titleLabel).offset(10)
             $0.trailing.equalToSuperview()
-            $0.size.equalTo(32)
+            $0.size.equalTo(40)
         }
     }
     

@@ -10,16 +10,6 @@ import UIKit
 import SnapKit
 import Then
 
-struct ReportDetailItem: Hashable {
-    let id = UUID()
-    let section: ReportDetailSection
-    let title: String
-    let isRequired: Bool
-    let placeholder: String?
-    let showInfoIcon: Bool
-
-}
-
 class ReportDetailViewController: UIViewController {
     
     private let containerView = UIView().then {
@@ -113,13 +103,13 @@ class ReportDetailViewController: UIViewController {
             if section == .reportType {
                 let itemSize = NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .estimated(48)
+                    heightDimension: .estimated(36)
                 )
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 
                 let groupSize = NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .estimated(48)
+                    heightDimension: .estimated(36)
                 )
                 let group = NSCollectionLayoutGroup.horizontal(
                     layoutSize: groupSize,
@@ -128,7 +118,7 @@ class ReportDetailViewController: UIViewController {
                 
                 let section = NSCollectionLayoutSection(group: group)
                 section.contentInsets = NSDirectionalEdgeInsets(
-                    top: 16,
+                    top: 12,
                     leading: 0,
                     bottom: 0,
                     trailing: 0
@@ -138,7 +128,7 @@ class ReportDetailViewController: UIViewController {
             
             let groupSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .estimated(100)
+                heightDimension: .estimated(70) 
             )
             
             let group = NSCollectionLayoutGroup.horizontal(
@@ -148,16 +138,15 @@ class ReportDetailViewController: UIViewController {
             
             let layoutSection = NSCollectionLayoutSection(group: group)
             layoutSection.contentInsets = NSDirectionalEdgeInsets(
-                top: 8,
-                leading: 16,
-                bottom: 16,
-                trailing: 16
+                top: 6,     // 8 -> 6
+                leading: 12, // 16 -> 12
+                bottom: 12,  // 16 -> 12
+                trailing: 12 // 16 -> 12
             )
             return layoutSection
         }
         return layout
     }
-    
     private func configureDataSource() {
         dataSource = UICollectionViewDiffableDataSource<ReportDetailSection, ReportDetailItem>(collectionView: collectionView) { collectionView, indexPath, item in
             return self.cellForItem(collectionView: collectionView, indexPath: indexPath, item: item)
