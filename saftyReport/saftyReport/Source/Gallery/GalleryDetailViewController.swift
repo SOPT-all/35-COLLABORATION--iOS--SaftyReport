@@ -57,10 +57,7 @@ class GalleryDetailViewController: UIViewController {
         $0.textColor = .gray13
         $0.layer.cornerRadius = 5
         $0.layer.borderWidth = 1
-        
-        // border color가 기존 사용하던 UIColor가 아니라 CGColor여서 사전 세팅해 둔 색상을 사용 못 함 ㅜㅜ
-        // 그래서 일단 대충 보기에 비슷하게 만들어두긴 했는데,,, 흠
-        $0.layer.borderColor = CGColor(gray: 0.8, alpha: 0.3)
+        $0.layer.borderColor = UIColor.gray3.cgColor
         $0.textAlignment = .center
     }
     
