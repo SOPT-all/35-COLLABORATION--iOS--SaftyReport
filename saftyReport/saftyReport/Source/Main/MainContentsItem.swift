@@ -8,6 +8,9 @@
 import UIKit
 
 enum MainContentsItem {
+    case myReport
+    case finishedReport
+    
     static let mainSectionTitle = ["올해 나의 신고", "주요 처리 사례"]
     
     static func createLayout() -> UICollectionViewCompositionalLayout {

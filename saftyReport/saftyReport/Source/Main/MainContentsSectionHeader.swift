@@ -27,6 +27,8 @@ class MainContentsSectionHeader: UICollectionReusableView {
     let moreButton = UIButton().then {
         $0.backgroundColor = .gray13Opacity5
         $0.setAttributedTitle(NSAttributedString.styled(text: "더보기", style: .caption7), for: .normal)
+        $0.setTitleColor(.gray13, for: .normal)
+        $0.layer.cornerRadius = 11
     }
     
     override init(frame: CGRect) {
@@ -41,8 +43,10 @@ class MainContentsSectionHeader: UICollectionReusableView {
     }
     
     private func setUI() {
-        //self.backgroundColor = .gray10
-        self.addSubviews(headerLabel, mileageLabel)//, button)
+        self.addSubviews(headerLabel, mileageLabel, moreButton)
+        // 초기 상태 설정
+        mileageLabel.isHidden = true
+        moreButton.isHidden = true
     }
     
     private func setLayout() {
@@ -54,10 +58,24 @@ class MainContentsSectionHeader: UICollectionReusableView {
             $0.trailing.equalToSuperview()
             $0.centerY.equalToSuperview()
         }
-//        moreButton.snp.makeConstraints {
-//            $0.trailing.equalToSuperview().inset(16)
-//            $0.centerY.equalToSuperview()
-//        }
+        moreButton.snp.makeConstraints {
+            $0.trailing.equalToSuperview()
+            $0.centerY.equalToSuperview()
+            $0.height.equalTo(22)
+            $0.width.equalTo(42)
+        }
+    }
+    
+    func configure(with header: MainContentsItem) {
+        if header == .myReport {
+            headerLabel.text = "올해 나의 신고"
+            mileageLabel.isHidden = false
+            moreButton.isHidden = true
+        } else {
+            headerLabel.text = "주요 처리 사례"
+            mileageLabel.isHidden = true
+            moreButton.isHidden = false
+        }
     }
 }
 
