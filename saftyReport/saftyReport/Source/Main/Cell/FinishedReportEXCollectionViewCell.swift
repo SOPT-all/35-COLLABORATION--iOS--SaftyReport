@@ -8,9 +8,23 @@
 import UIKit
 
 class FinishedReportEXCollectionViewCell: UICollectionViewCell {
-    private let myReportView = UIView().then {
-        $0.backgroundColor = .gray3
+    private let stackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.spacing = 9
+    }
+    
+    private let beforeImageView = UIImageView().then {
+        $0.image = UIImage(named: "image_before")
+        $0.contentMode = .scaleAspectFill
         $0.layer.cornerRadius = 15
+        $0.clipsToBounds = true
+    }
+    
+    private let afterImageview = UIImageView().then {
+        $0.image = UIImage(named: "image_after")
+        $0.contentMode = .scaleAspectFill
+        $0.layer.cornerRadius = 15
+        $0.clipsToBounds = true
     }
     
     override init(frame: CGRect) {
@@ -25,12 +39,21 @@ class FinishedReportEXCollectionViewCell: UICollectionViewCell {
     }
     
     private func setUI() {
-        self.addSubview(myReportView)
+        self.addSubview(stackView)
+        stackView.addSubviews(beforeImageView, afterImageview)
     }
     
     private func setLayout() {
-        myReportView.snp.makeConstraints {
+        stackView.snp.makeConstraints {
             $0.edges.equalToSuperview()
+        }
+        beforeImageView.snp.makeConstraints {
+            $0.leading.equalToSuperview()
+            $0.verticalEdges.equalToSuperview()
+        }
+        afterImageview.snp.makeConstraints {
+            $0.verticalEdges.equalToSuperview()
+            $0.trailing.equalToSuperview()
         }
     }
 }
