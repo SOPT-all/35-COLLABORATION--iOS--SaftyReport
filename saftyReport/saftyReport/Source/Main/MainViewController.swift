@@ -94,13 +94,14 @@ extension MainViewController: UICollectionViewDataSource {
         switch indexPath.section {
         case 0:
             if indexPath.item < 2 {
-                        guard let cell = collectionView.dequeueReusableCell(
-                            withReuseIdentifier: MyReportCollectionViewCell.cellIdentifier,
-                            for: indexPath
-                        ) as? MyReportCollectionViewCell else {
-                            return UICollectionViewCell(frame: .zero)
-                        }
-                        return cell
+                guard let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: MyReportCollectionViewCell.cellIdentifier,
+                    for: indexPath
+                ) as? MyReportCollectionViewCell else {
+                    return UICollectionViewCell(frame: .zero)
+                }
+                cell.configure(with: indexPath.item)
+                return cell
             } else {
                 guard let cell = collectionView.dequeueReusableCell(
                     withReuseIdentifier: MyReportBannerCollectionViewCell.cellIdentifier,
