@@ -10,9 +10,11 @@ import UIKit
 class MyReportBannerCollectionViewCell: UICollectionViewCell {
     let cellIdentifier: String = "MyReportBannerCollectionViewCell"
     
-    private let bannerImageView = UIView().then {
-        $0.backgroundColor = .white
+    private let bannerImageView = UIImageView().then {
+        $0.image = UIImage(named: "img_promotion_1")
+        $0.contentMode = .scaleAspectFill
         $0.layer.cornerRadius = 15
+        $0.clipsToBounds = true
     }
     
     override init(frame: CGRect) {
