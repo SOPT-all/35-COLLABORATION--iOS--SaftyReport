@@ -39,6 +39,7 @@ class MainViewController: UIViewController {
                     MyReportBannerCollectionViewCell.self,
                     forCellWithReuseIdentifier: MyReportBannerCollectionViewCell.cellIdentifier
                 )
+        collectionView.register(FinishedReportEXCollectionViewCell.self, forCellWithReuseIdentifier: FinishedReportEXCollectionViewCell.cellIdentifier)
         
         collectionView.register(MainContentsSectionHeader.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
@@ -111,9 +112,9 @@ extension MainViewController: UICollectionViewDataSource {
             }
         case 1:
             guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: MyReportBannerCollectionViewCell.cellIdentifier,
+                withReuseIdentifier: FinishedReportEXCollectionViewCell.cellIdentifier,
                 for: indexPath
-            ) as? MyReportBannerCollectionViewCell else {
+            ) as? FinishedReportEXCollectionViewCell else {
                 return UICollectionViewCell(frame: .zero)
             }
             return cell
@@ -143,11 +144,9 @@ extension MainViewController: UICollectionViewDelegate {
             return UICollectionReusableView()
         }
         if indexPath.section == 0 {
-            let sectionTitles = MainContentsItem.mainSectionTitle[indexPath.section]
-            header.headerLabel.text = sectionTitles
+            header.configure(with: .myReport)
         } else if indexPath.section == 1 {
-            let sectionTitles = MainContentsItem.mainSectionTitle[indexPath.section]
-            header.headerLabel.text = sectionTitles
+            header.configure(with: .finishedReport)
         }
         
         return header
