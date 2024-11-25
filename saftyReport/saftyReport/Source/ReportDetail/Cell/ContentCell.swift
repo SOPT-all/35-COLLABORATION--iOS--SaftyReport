@@ -20,10 +20,13 @@ class ContentCell: BaseCell {
         $0.attributedText = attributedText
     }
     
-    private let infoButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "info.circle"), for: .normal)
-        $0.tintColor = .darkGray
-    }
+    private let locationIcon = UIImageView().then {
+        let image = UIImage(named: "btn_i_mic")
+        $0.image = image
+        $0.tintColor = .gray6
+        $0.contentMode = .scaleAspectFit
+        
+        }
     
     private let textView = UITextView().then {
         $0.backgroundColor = .gray3
@@ -60,9 +63,13 @@ class ContentCell: BaseCell {
     private let copyButton = UIButton().then {
         var config = UIButton.Configuration.plain()
         config.image = UIImage(named: "icon_copy_line_black_16px")
-        config.title = "내용복사"
         config.imagePadding = 4
         config.baseForegroundColor = .gray13
+        let attributedText = NSAttributedString.styled(
+            text: "내용복사",
+            style: .caption3
+        )
+        config.attributedTitle = AttributedString(attributedText)
         $0.configuration = config
     }
     
@@ -78,7 +85,7 @@ class ContentCell: BaseCell {
     }
     
     private func setupUI() {
-        contentView.addSubviews(recommendationLabel, infoButton, textView, bottomStackView)
+        contentView.addSubviews(titleLabel, requiredMark, recommendationLabel, locationIcon, textView, bottomStackView)
         
         leftStackView.addArrangedSubviews(textCheckButton, textCheckLabel)
         bottomStackView.addArrangedSubviews(leftStackView, copyButton)
@@ -88,10 +95,10 @@ class ContentCell: BaseCell {
             $0.leading.equalToSuperview()
         }
         
-        infoButton.snp.makeConstraints {
+        locationIcon.snp.makeConstraints {
             $0.centerY.equalTo(titleLabel)
             $0.trailing.equalToSuperview()
-            $0.size.equalTo(40)
+            $0.size.width.equalTo(40)
         }
         
         textView.snp.makeConstraints {
@@ -107,7 +114,9 @@ class ContentCell: BaseCell {
         }
     }
     
-    override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
+    override func preferredLayoutAttributesFitting(
+        _ layoutAttributes: UICollectionViewLayoutAttributes
+    ) -> UICollectionViewLayoutAttributes {
         let targetSize = CGSize(width: layoutAttributes.frame.width, height: UIView.layoutFittingCompressedSize.height)
         layoutAttributes.frame.size = contentView.systemLayoutSizeFitting(
             targetSize,
@@ -116,7 +125,7 @@ class ContentCell: BaseCell {
         )
         return layoutAttributes
     }
-
+    
     private func setupPlaceholder() {
         textView.text = "내용을 입력해주세요"
         textView.textColor = .lightGray
@@ -139,7 +148,7 @@ class ContentCell: BaseCell {
         } else {
             if textView.text == "안녕하세요" {
                 textView.text = "내용을 입력해주세요"
-                textView.textColor = .lightGray
+                textView.textColor = .gray13Opacity40
             }
         }
     }

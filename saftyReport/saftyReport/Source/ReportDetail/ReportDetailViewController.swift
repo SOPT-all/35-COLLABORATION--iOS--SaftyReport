@@ -112,7 +112,7 @@ class ReportDetailViewController: UIViewController {
              $0.edges.equalTo(view.safeAreaLayoutGuide).inset(UIEdgeInsets(
                  top: 0,
                  left: 0,
-                 bottom: 84, // containerView 높이만큼 bottom inset
+                 bottom: 84, 
                  right: 0
              ))
          }
@@ -147,7 +147,7 @@ class ReportDetailViewController: UIViewController {
             case .photo:
                 return makeSection(
                     height: usableHeight * 0.2,
-                    insets: .init(top: sectionSpacing, leading: 20, bottom: 0, trailing: 20)
+                    insets: .init(top: sectionSpacing + 12, leading: 20, bottom: 0, trailing: 20)
                 )
                
            case .location:

@@ -18,8 +18,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // 2.
         self.window = UIWindow(windowScene: windowScene)
         // 3.
-        let tabBarViewcontroller = CustomTabBarController()
-        tabBarViewcontroller.setNavViewControllers()
+        let tabBarViewcontroller = ReportDetailViewController()
+//        tabBarViewcontroller.setNavViewControllers()
         self.window?.rootViewController = tabBarViewcontroller
         // 4.
         self.window?.makeKeyAndVisible()
