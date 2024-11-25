@@ -43,8 +43,8 @@ class BaseCell: UICollectionViewCell, ConfigurableCell {
     }
     
     private func setupBaseUI() {
-        [titleLabel, requiredMark, infoImageView].forEach { contentView.addSubview($0) }
-        
+        contentView.addSubviews(titleLabel, requiredMark, infoImageView)
+
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview().offset(16)
             $0.leading.equalToSuperview()
