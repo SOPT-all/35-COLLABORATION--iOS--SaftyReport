@@ -8,6 +8,7 @@
 import UIKit
 
 class FinishedReportEXCollectionViewCell: UICollectionViewCell {
+    let stackViewList = [1, 2]
     private let stackView = UIStackView().then {
         $0.axis = .vertical
         $0.spacing = 9
@@ -27,6 +28,20 @@ class FinishedReportEXCollectionViewCell: UICollectionViewCell {
         $0.clipsToBounds = true
     }
     
+    lazy var pageControl = UIPageControl().then {
+        $0.isUserInteractionEnabled = false // 터치 불가
+        
+        $0.numberOfPages = stackViewList.count
+        $0.currentPage = 0
+        $0.currentPageIndicatorTintColor = .gray13
+        $0.pageIndicatorTintColor = .gray3
+        $0.backgroundColor = .clear
+        $0.layer.cornerRadius = 5
+        let dotImage = UIImage(named: "Ellipse5x5")?.withConfiguration(
+            UIImage.SymbolConfiguration(pointSize: 5)
+        )
+        $0.preferredIndicatorImage = dotImage
+    }
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -39,7 +54,7 @@ class FinishedReportEXCollectionViewCell: UICollectionViewCell {
     }
     
     private func setUI() {
-        self.addSubview(stackView)
+        self.addSubviews(stackView, pageControl)
         stackView.addSubviews(beforeImageView, afterImageview)
     }
     
@@ -55,5 +70,18 @@ class FinishedReportEXCollectionViewCell: UICollectionViewCell {
             $0.verticalEdges.equalToSuperview()
             $0.trailing.equalToSuperview()
         }
+        pageControl.snp.makeConstraints {
+            $0.bottom.equalTo(stackView.snp.bottom).offset(10)
+            $0.centerX.equalToSuperview()
+            $0.width.equalTo(50)
+            $0.height.equalTo(15)
+        }
+    }
+}
+
+extension FinishedReportEXCollectionViewCell: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let page = Int(scrollView.contentOffset.x / stackView.frame.width)
+        pageControl.currentPage = page
     }
 }
