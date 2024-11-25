@@ -11,6 +11,23 @@ import SnapKit
 import Then
 
 class ContentCell: BaseCell {
+    //변경내용
+    private let titleStackView = UIStackView().then {
+        $0.axis = .horizontal
+        $0.spacing = 8
+        $0.alignment = .center
+    }
+    
+    private let titleContentStackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.spacing = 4
+    }
+    
+    private let infoButton = UIButton().then {
+        $0.setImage(UIImage(systemName: "info.circle"), for: .normal)
+        $0.tintColor = .darkGray
+    }
+    
     private let recommendationLabel = UILabel().then {
         $0.textColor = .primaryOrange
         let attributedText = NSAttributedString.styled(

@@ -18,8 +18,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // 2.
         self.window = UIWindow(windowScene: windowScene)
         // 3.
-        let navigationController = UINavigationController(rootViewController: ReportDetailViewController())
-        self.window?.rootViewController = navigationController
+        let tabBarViewcontroller = CustomTabBarController()
+        tabBarViewcontroller.setNavViewControllers()
+        self.window?.rootViewController = tabBarViewcontroller
         // 4.
         self.window?.makeKeyAndVisible()
     }
@@ -54,4 +55,3 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 
 }
-
