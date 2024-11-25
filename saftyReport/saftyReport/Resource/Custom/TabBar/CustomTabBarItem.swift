@@ -14,7 +14,7 @@ enum CustomTabBarItem: CaseIterable {
     var navViewController: UIViewController? {
         switch self {
         case .home: return MainViewController()
-        case .report: return ReportViewController()
+        case .report: return ReportDetailViewController()
         case .prevent: return ViewController()
         case .news: return ViewController()
         case .myPage: return ViewController()
