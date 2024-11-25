@@ -53,11 +53,8 @@ class PhotoCell: BaseCell {
     }
     
     private func setupUI() {
-        [photoButton, buttonStackView].forEach { contentView.addSubview($0) }
-        
-        [cameraButton, folderButton].forEach {
-            buttonStackView.addArrangedSubview($0)
-        }
+        contentView.addSubviews(photoButton, buttonStackView)
+        buttonStackView.addArrangedSubviews(cameraButton, folderButton)
         
         titleLabel.snp.remakeConstraints {
             $0.top.equalToSuperview().offset(16)
