@@ -99,8 +99,7 @@ class ReportDetailViewController: UIViewController {
     
     private func setupCollectionView() {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
-        view.addSubview(collectionView)
-        view.addSubview(containerView)
+        view.addSubviews(collectionView, containerView)
         
         collectionView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
@@ -139,9 +138,9 @@ class ReportDetailViewController: UIViewController {
                 
                 let section = NSCollectionLayoutSection(group: group)
                 section.contentInsets = NSDirectionalEdgeInsets(
-                    top: 12,
+                    top: 0,
                     leading: 0,
-                    bottom: 0,
+                    bottom: 9,
                     trailing: 0
                 )
                 return section
@@ -149,7 +148,7 @@ class ReportDetailViewController: UIViewController {
             
             let groupSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .estimated(70)
+                heightDimension: .estimated(65)
             )
             
             let group = NSCollectionLayoutGroup.horizontal(
@@ -160,9 +159,9 @@ class ReportDetailViewController: UIViewController {
             let layoutSection = NSCollectionLayoutSection(group: group)
             layoutSection.contentInsets = NSDirectionalEdgeInsets(
                 top: 6,
-                leading: 12,
+                leading: 18,
                 bottom: 12,
-                trailing: 12
+                trailing: 18
             )
             return layoutSection
         }

@@ -134,7 +134,7 @@ class ContentCell: BaseCell {
         textView.snp.makeConstraints {
             $0.top.equalTo(recommendationLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(150)
+            $0.height.equalTo(110)
         }
         
         bottomStackView.snp.makeConstraints {

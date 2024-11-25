@@ -78,7 +78,7 @@ class PhotoCell: BaseCell {
         photoButton.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(120)
+            $0.height.equalTo(80)
             $0.bottom.equalToSuperview()
         }
     }
