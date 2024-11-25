@@ -124,13 +124,13 @@ class ReportDetailViewController: UIViewController {
             if section == .reportType {
                 let itemSize = NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .estimated(36)
+                    heightDimension: .fractionalHeight(1.0)
                 )
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 
                 let groupSize = NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .estimated(36)
+                    heightDimension: .fractionalHeight(0.1)
                 )
                 let group = NSCollectionLayoutGroup.horizontal(
                     layoutSize: groupSize,
@@ -147,14 +147,21 @@ class ReportDetailViewController: UIViewController {
                 return section
             }
             
+            // 나머지 섹션들의 아이템 사이즈
+            let itemSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .fractionalHeight(1.0)  // 변경
+            )
+            let item = NSCollectionLayoutItem(layoutSize: itemSize)
+            
             let groupSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .estimated(65)
+                heightDimension: .fractionalHeight(0.18)  // 전체 높이의 18%
             )
             
             let group = NSCollectionLayoutGroup.horizontal(
                 layoutSize: groupSize,
-                subitems: [NSCollectionLayoutItem(layoutSize: groupSize)]
+                subitems: [item]
             )
             
             let layoutSection = NSCollectionLayoutSection(group: group)
@@ -168,7 +175,6 @@ class ReportDetailViewController: UIViewController {
         }
         return layout
     }
-    
     private func configureDataSource() {
         dataSource = UICollectionViewDiffableDataSource<ReportDetailSection, ReportDetailItem>(collectionView: collectionView) { collectionView, indexPath, item in
             return self.cellForItem(collectionView: collectionView, indexPath: indexPath, item: item)
