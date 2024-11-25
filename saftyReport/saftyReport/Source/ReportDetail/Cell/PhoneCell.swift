@@ -1,6 +1,7 @@
+
 //
 //  PhoneCell.swift
-//  Solo
+//  saftyReport
 //
 //  Created by 이지훈 on 11/17/24.
 //
@@ -12,7 +13,7 @@ import Then
 
 class PhoneCell: BaseCell {
     private let textField = UITextField().then {
-        $0.backgroundColor = .systemGray6
+        $0.backgroundColor = .gray3
         $0.layer.cornerRadius = 8
         $0.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 0))
         $0.leftViewMode = .always
@@ -40,6 +41,19 @@ class PhoneCell: BaseCell {
     
     override func configure(with item: ReportDetailItem) {
         super.configure(with: item)
-        textField.placeholder = item.placeholder
+        
+        // placeholder에 스타일 적용
+        let attributedPlaceholder = NSAttributedString.styled(
+            text: item.placeholder ?? "",  // placeholder가 optional일 수 있으므로 nil 처리
+            style: .body9,
+            alignment: .left
+        )
+        
+        // attributedPlaceholder를 textField에 적용
+        textField.attributedPlaceholder = attributedPlaceholder
     }
+}
+
+#Preview {
+    ReportDetailViewController()
 }
