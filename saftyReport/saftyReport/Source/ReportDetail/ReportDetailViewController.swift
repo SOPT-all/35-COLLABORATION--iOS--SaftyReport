@@ -100,6 +100,7 @@ class ReportDetailViewController: UIViewController {
     private func setupCollectionView() {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
         view.addSubviews(collectionView, containerView)
+        collectionView.isScrollEnabled = false
         
         collectionView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
