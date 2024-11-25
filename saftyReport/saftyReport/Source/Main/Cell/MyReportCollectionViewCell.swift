@@ -31,17 +31,33 @@ class MyReportCollectionViewCell: UICollectionViewCell {
     }
     
     private var myReportCountImageView = UIImageView().then {
-        $0.image = UIImage(systemName: "chart.pie.fill")
-        //$0.image = UIImage(named: "chrat.bar.fill")
+        $0.image = UIImage(named: "graph_year_report")
         $0.contentMode = .scaleAspectFit
         $0.tintColor = .primaryOrange
     }
     
+    private var myReportSubImageView = UIImageView().then {
+        $0.image = UIImage(named: "sub_graph_month_report")
+        $0.contentMode = .scaleAspectFit
+    }
+    
     private var myMonthlyReportImageView = UIImageView().then {
-        $0.image = UIImage(systemName: "chart.pie.fill")
-        //$0.image = UIImage(named: "chart.pie.fill")
+        $0.image = UIImage(named: "graph_month_report")
         $0.contentMode = .scaleAspectFit
         $0.tintColor = .primaryOrange
+    }
+    
+    private var myMonthlyReportcount = UILabel().then {
+        $0.text = "7건"
+        $0.textColor = .primaryOrange
+        $0.attributedText = NSAttributedString.styled(text: "7건", style: .heading1)
+    }
+    
+    private var subMonthlyReportcount = UILabel().then {
+        $0.text = "수민 님의\n신고이력"
+        $0.textColor = .gray8
+        $0.attributedText = NSAttributedString.styled(text: "수민 님의\n신고이력", style: .caption9)
+        $0.numberOfLines = 0
     }
     
     override init(frame: CGRect) {
@@ -62,8 +78,11 @@ class MyReportCollectionViewCell: UICollectionViewCell {
                     titleLabel,
                     myReportCountLabel,
                     myReportCountImageView,
+                    myReportSubImageView,
                     mySubReportLabel,
-                    myMonthlyReportImageView
+                    myMonthlyReportImageView,
+                    myMonthlyReportcount,
+                    subMonthlyReportcount
                 )
     }
     
@@ -92,12 +111,22 @@ class MyReportCollectionViewCell: UICollectionViewCell {
         
         myReportCountImageView.snp.makeConstraints {
             $0.top.equalTo(mySubReportLabel.snp.bottom).offset(10)
-            $0.leading.trailing.bottom.equalToSuperview().inset(16)
+            $0.leading.trailing.equalToSuperview().inset(16)
         }
-        
+        myReportSubImageView.snp.makeConstraints {
+            $0.top.equalTo(myReportCountImageView.snp.bottom).offset(10)
+            $0.trailing.bottom.equalToSuperview().inset(16)
+        }
         myMonthlyReportImageView.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(14)
             $0.leading.trailing.bottom.equalToSuperview().inset(14)
+        }
+        myMonthlyReportcount.snp.makeConstraints {
+            $0.centerX.centerY.equalToSuperview()
+        }
+        subMonthlyReportcount.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.top.equalTo(myMonthlyReportcount.snp.bottom).offset(4)
         }
     }
     
@@ -107,8 +136,11 @@ class MyReportCollectionViewCell: UICollectionViewCell {
         let allViews: [UIView] = [
                     myReportCountLabel,
                     myReportCountImageView,
+                    myReportSubImageView,
                     mySubReportLabel,
-                    myMonthlyReportImageView
+                    myMonthlyReportImageView,
+                    myMonthlyReportcount,
+                    subMonthlyReportcount
                 ]
                 allViews.forEach { $0.isHidden = true }
         
@@ -117,10 +149,13 @@ class MyReportCollectionViewCell: UICollectionViewCell {
             titleLabel.text = "나의 올해 신고"
             myReportCountLabel.isHidden = false
             myReportCountImageView.isHidden = false
+            myReportSubImageView.isHidden = false
             mySubReportLabel.isHidden = false
         case 1:
             titleLabel.text = "2024년 10월"
             myMonthlyReportImageView.isHidden = false
+            myMonthlyReportcount.isHidden = false
+            subMonthlyReportcount.isHidden = false
         default:
             allViews.forEach { $0.isHidden = true }
         }
