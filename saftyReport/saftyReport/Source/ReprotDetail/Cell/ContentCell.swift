@@ -36,7 +36,7 @@ class ContentCell: BaseCell {
         )
     }
     
-    private let infoButton = UIImageView().then {
+    private let infoMicButton = UIImageView().then {
         let image = UIImage(named: "btn_i_mic")
         $0.image = image
         $0.contentMode = .scaleAspectFit
