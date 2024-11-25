@@ -12,40 +12,19 @@ import Then
 
 class PhotoCell: BaseCell {
     private let photoButton = UIButton().then {
-        let attributedTitle = NSAttributedString.styled(
-              text: "사진을 추가해주세요",
-              style: .body9,
-              alignment: .center
-          )
         $0.backgroundColor = .gray3
         $0.layer.cornerRadius = 8
+        let attributedTitle = NSAttributedString.styled(
+            text: "사진을 추가해주세요",
+            style: .body9
+        )
         $0.setAttributedTitle(attributedTitle, for: .normal)
-        $0.setTitleColor(.gray7, for: .normal)
-    }
-    
-    private let cameraButton = UIButton().then {
-        let image = UIImage(named: "btn_i_camera")
-        $0.setImage(image, for: .normal)
-        $0.imageView?.contentMode = .scaleAspectFit
-    }
-     
-    private let folderButton = UIButton().then {
-        let image = UIImage(named: "btn_i_folder")
-        $0.setImage(image, for: .normal)
-        $0.imageView?.contentMode = .scaleAspectFit
-    }
-    
-    private let buttonStackView = UIStackView().then {
-        $0.axis = .horizontal
-        $0.spacing = 8
-        $0.alignment = .center
-        $0.distribution = .fillEqually
-        $0.backgroundColor = .clear
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
+        setupAction()
     }
     
     required init?(coder: NSCoder) {
@@ -53,37 +32,77 @@ class PhotoCell: BaseCell {
     }
     
     private func setupUI() {
-        contentView.addSubviews(photoButton, buttonStackView)
-        buttonStackView.addArrangedSubviews(cameraButton, folderButton)
-        
-        titleLabel.snp.remakeConstraints {
-            $0.top.equalToSuperview().offset(16)
-            $0.leading.equalToSuperview()
-            $0.height.equalTo(24)
-        }
-        
-        buttonStackView.snp.makeConstraints {
-            $0.centerY.equalTo(titleLabel)
-            $0.trailing.equalToSuperview()
-            $0.height.equalTo(32)
-            $0.width.equalTo(90)
-        }
-        
-        [cameraButton, folderButton].forEach {
-            $0.snp.makeConstraints {
-                $0.size.equalTo(32)
-            }
-        }
+        contentView.addSubview(photoButton)
         
         photoButton.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(80)
+            $0.height.equalTo(44)
             $0.bottom.equalToSuperview()
         }
     }
+    
+    private func setupAction() {
+        photoButton.addTarget(
+            self,
+            action: #selector(photoButtonTapped),
+            for: .touchUpInside
+        )
+    }
+    
+    @objc private func photoButtonTapped() {
+        guard let viewController = self.findViewController() else { return }
+        
+        let alertVC = BaseOneButtonAlertViewController()
+        
+        let contentView = UIView()
+        let messageLabel = UILabel().then {
+            $0.numberOfLines = 0
+            $0.textAlignment = .center
+            $0.attributedText = NSAttributedString.styled(
+                text: "이미지가떠야되는뎅",
+                style: .body3
+            )
+        }
+        
+        contentView.addSubview(messageLabel)
+        messageLabel.snp.makeConstraints {
+            $0.edges.equalToSuperview().inset(20)
+        }
+        
+        alertVC.setAlert(
+            "미디어 선택",
+            contentView,
+            .info
+        )
+        
+        alertVC.modalPresentationStyle = .overFullScreen
+        viewController.present(alertVC, animated: false)
+    }
+    
+    override func configure(with item: ReportDetailItem) {
+        super.configure(with: item)
+        
+        let attributedTitle = NSAttributedString.styled(
+            text: item.placeholder ?? "",
+            style: .body9
+        )
+        photoButton.setAttributedTitle(attributedTitle, for: .normal)
+    }
 }
 
+// UIView 익스텐션 추가
+private extension UIView {
+    func findViewController() -> UIViewController? {
+        if let nextResponder = self.next as? UIViewController {
+            return nextResponder
+        } else if let nextResponder = self.next as? UIView {
+            return nextResponder.findViewController()
+        } else {
+            return nil
+        }
+    }
+}
 #Preview {
     ReportDetailViewController()
 }
