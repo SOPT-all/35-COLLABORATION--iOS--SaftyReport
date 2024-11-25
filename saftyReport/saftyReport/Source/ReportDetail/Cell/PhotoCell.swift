@@ -129,7 +129,12 @@ class PhotoCell: BaseCell {
 
     
     override func configure(with item: ReportDetailItem) {
-        titleLabel.text = item.title
+        super.configure(with: item)
+        let attributedText = NSAttributedString.styled(
+            text: item.title,
+            style: .body3
+        )
+        titleLabel.attributedText = attributedText
     }
 }
 

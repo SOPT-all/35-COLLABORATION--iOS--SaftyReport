@@ -15,7 +15,8 @@ class ReportDetailViewController: UIViewController {
     private let containerView = UIView().then {
         $0.backgroundColor = .white
         $0.layer.cornerRadius = 8
-        CustomShadow.shared.applyShadow(to: $0.layer, width: 0, height: 4)
+        $0.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        CustomShadow.shared.applyShadow(to: $0.layer, width: 0, height: -4)
     }
     
     private let submitButton = UIButton().then {
@@ -98,24 +99,19 @@ class ReportDetailViewController: UIViewController {
     }
     
     private func setupCollectionView() {
-         collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
-         collectionView.isScrollEnabled = false
-         view.addSubviews(collectionView, containerView)
-         
-         containerView.snp.makeConstraints {
-             $0.left.right.equalToSuperview()
-             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
-             $0.height.equalTo(84)
-         }
-         
-         collectionView.snp.makeConstraints {
-             $0.edges.equalTo(view.safeAreaLayoutGuide).inset(UIEdgeInsets(
-                 top: 0,
-                 left: 0,
-                 bottom: 84, 
-                 right: 0
-             ))
-         }
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+        collectionView.isScrollEnabled = false
+        view.addSubviews(collectionView, containerView)
+        
+        containerView.snp.makeConstraints {
+            $0.leading.trailing.bottom.equalToSuperview()
+            $0.height.equalTo(84)
+        }
+        
+        collectionView.snp.makeConstraints {
+            $0.top.leading.trailing.equalTo(view.safeAreaLayoutGuide)
+            $0.bottom.equalTo(containerView.snp.top)
+        }
         
         [(ReportTypeCell.self, ReportTypeCell.reuseIdentifier),
          (PhotoCell.self, PhotoCell.reuseIdentifier),
@@ -191,41 +187,45 @@ class ReportDetailViewController: UIViewController {
     }
     
     private func configureDataSource() {
-        dataSource = UICollectionViewDiffableDataSource<ReportDetailSection, ReportDetailItem>(collectionView: collectionView) { collectionView, indexPath, item in
-            return self.cellForItem(collectionView: collectionView, indexPath: indexPath, item: item)
+        dataSource = UICollectionViewDiffableDataSource<ReportDetailSection, ReportDetailItem>(collectionView: collectionView) { [weak self] collectionView, indexPath, item in
+            guard let self = self else { return UICollectionViewCell() }
+            
+            guard let section = ReportDetailSection(rawValue: indexPath.section) else {
+                return UICollectionViewCell()
+            }
+            
+            let reuseIdentifier: String
+            
+            switch section {
+            case .reportType:
+                reuseIdentifier = ReportTypeCell.reuseIdentifier
+            case .photo:
+                reuseIdentifier = PhotoCell.reuseIdentifier
+            case .location:
+                reuseIdentifier = LocationCell.reuseIdentifier
+            case .content:
+                reuseIdentifier = ContentCell.reuseIdentifier
+            case .phone:
+                reuseIdentifier = PhoneCell.reuseIdentifier
+            }
+            
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: reuseIdentifier,
+                for: indexPath
+            )
+            
+            if let locationCell = cell as? LocationCell {
+                locationCell.delegate = self
+            }
+            
+            if let configurableCell = cell as? ConfigurableCell {
+                configurableCell.configure(with: item)
+            }
+            
+            return cell
         }
     }
-    
-    private func cellForItem(collectionView: UICollectionView, indexPath: IndexPath, item: ReportDetailItem) -> UICollectionViewCell {
-        guard let section = ReportDetailSection(rawValue: indexPath.section) else {
-            return UICollectionViewCell()
-        }
-        
-        let reuseIdentifier: String
-        
-        switch section {
-        case .reportType:
-            reuseIdentifier = ReportTypeCell.reuseIdentifier
-        case .photo:
-            reuseIdentifier = PhotoCell.reuseIdentifier
-        case .location:
-            reuseIdentifier = LocationCell.reuseIdentifier
-        case .content:
-            reuseIdentifier = ContentCell.reuseIdentifier
-        case .phone:
-            reuseIdentifier = PhoneCell.reuseIdentifier
-        }
-        
-        let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: reuseIdentifier,
-            for: indexPath
-        )
-        if let configurableCell = cell as? ConfigurableCell {
-            configurableCell.configure(with: item)
-        }
-        return cell
-    }
-    
+
     private func applySnapshot() {
         var snapshot = NSDiffableDataSourceSnapshot<ReportDetailSection, ReportDetailItem>()
         ReportDetailSection.allCases.forEach { section in
@@ -237,12 +237,6 @@ class ReportDetailViewController: UIViewController {
     
     private func setupSubmitButton() {
         containerView.addSubview(submitButton)
-        
-        containerView.snp.makeConstraints {
-            $0.left.right.equalToSuperview()
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
-            $0.height.equalTo(84)
-        }
         
         submitButton.snp.makeConstraints {
             $0.left.right.equalToSuperview().inset(24)
@@ -259,6 +253,13 @@ class ReportDetailViewController: UIViewController {
     
     @objc private func submitButtonTapped() {
         print("제출 버튼이 눌렸습니다.")
+    }
+}
+
+extension ReportDetailViewController: LocationCellDelegate {
+    func locationIconTapped() {
+        let reportAddressVC = ReportAddressViewController()
+        navigationController?.pushViewController(reportAddressVC, animated: true)
     }
 }
 
