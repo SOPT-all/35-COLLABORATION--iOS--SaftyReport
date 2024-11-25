@@ -14,9 +14,12 @@ class MyReportBannerCollectionViewCell: UICollectionViewCell {
     
     let leftButton = UIButton().then {
         $0.setBackgroundImage(UIImage(named: "icn_arrow_left_round_white_24px"), for: .normal)
+        $0.addTarget(self, action: #selector(leftButtonTapped), for: .touchUpInside)
+        print(self)
     }
     let rightButton = UIButton().then {
         $0.setBackgroundImage(UIImage(named: "icn_arrow_right_round_white_24px"), for: .normal)
+        $0.addTarget(self, action: #selector(rightButtonTapped), for: .touchUpInside)
     }
     
     let layout = UICollectionViewFlowLayout().then {
@@ -49,6 +52,8 @@ class MyReportBannerCollectionViewCell: UICollectionViewCell {
             UIImage.SymbolConfiguration(pointSize: 5)
         )
         $0.preferredIndicatorImage = dotImage
+        
+        $0.addTarget(self, action: #selector(pageControlTapped(_:)), for: .valueChanged)
     }
     
     override init(frame: CGRect) {
@@ -74,6 +79,10 @@ class MyReportBannerCollectionViewCell: UICollectionViewCell {
     }
     
     private func setLayout() {
+        leftButton.translatesAutoresizingMaskIntoConstraints = false
+        rightButton.translatesAutoresizingMaskIntoConstraints = false
+        pageControl.translatesAutoresizingMaskIntoConstraints = false
+        
         collectionView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
@@ -92,6 +101,27 @@ class MyReportBannerCollectionViewCell: UICollectionViewCell {
             $0.centerY.equalToSuperview()
         }
     }
+    
+    private func scrollToCurrentPage() {
+        let indexPath = IndexPath(item: pageControl.currentPage, section: 0)
+        collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+    }
+    
+    @objc private func leftButtonTapped(_ sender: UIButton) {
+        pageControl.currentPage -= 1
+        scrollToCurrentPage()
+    }
+    
+    @objc private func rightButtonTapped(_ sender: UIButton) {
+        pageControl.currentPage += 1
+        scrollToCurrentPage()
+    }
+    
+    @objc private func pageControlTapped(_ sender: UIPageControl) {
+        let currentPage = sender.currentPage
+        let indexPath = IndexPath(item: currentPage, section: 0)
+        collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+    }
 }
 
 extension MyReportBannerCollectionViewCell: UIScrollViewDelegate {
@@ -101,20 +131,22 @@ extension MyReportBannerCollectionViewCell: UIScrollViewDelegate {
     }
 }
 
-extension MyReportBannerCollectionViewCell: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension MyReportBannerCollectionViewCell: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         pageControl.numberOfPages = bannerImgList.count
-        return self.bannerImgList.count
+        return self.pageControl.numberOfPages
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BannerCollectionViewCell.cellIdentifier, for: indexPath) as? BannerCollectionViewCell else {
             return UICollectionViewCell(frame: .zero)
         }
-        cell.configure(image: bannerImgList[indexPath.item])
+        cell.configure(image: bannerImgList[indexPath.row])
         return cell
     }
-    
+}
+
+extension MyReportBannerCollectionViewCell: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
       return CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
     }
