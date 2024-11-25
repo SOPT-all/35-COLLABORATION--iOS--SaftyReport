@@ -1,3 +1,4 @@
+
 //
 //  PhoneCell.swift
 //  saftyReport
@@ -40,7 +41,16 @@ class PhoneCell: BaseCell {
     
     override func configure(with item: ReportDetailItem) {
         super.configure(with: item)
-        textField.placeholder = item.placeholder
+        
+        // placeholder에 스타일 적용
+        let attributedPlaceholder = NSAttributedString.styled(
+            text: item.placeholder ?? "",  // placeholder가 optional일 수 있으므로 nil 처리
+            style: .body9,
+            alignment: .left
+        )
+        
+        // attributedPlaceholder를 textField에 적용
+        textField.attributedPlaceholder = attributedPlaceholder
     }
 }
 

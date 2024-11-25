@@ -57,7 +57,7 @@ class ReportDetailViewController: UIViewController {
             title: "내용",
             isRequired: true,
             placeholder: "내용을 입력해주세요",
-            showInfoIcon: true  
+            showInfoIcon: true
         ),
         ReportDetailItem(
             section: .phone,
@@ -128,7 +128,7 @@ class ReportDetailViewController: UIViewController {
             
             let groupSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .estimated(70) 
+                heightDimension: .estimated(70)
             )
             
             let group = NSCollectionLayoutGroup.horizontal(
@@ -138,15 +138,16 @@ class ReportDetailViewController: UIViewController {
             
             let layoutSection = NSCollectionLayoutSection(group: group)
             layoutSection.contentInsets = NSDirectionalEdgeInsets(
-                top: 6,     // 8 -> 6
-                leading: 12, // 16 -> 12
-                bottom: 12,  // 16 -> 12
-                trailing: 12 // 16 -> 12
+                top: 6,
+                leading: 12,
+                bottom: 12,
+                trailing: 12
             )
             return layoutSection
         }
         return layout
     }
+    
     private func configureDataSource() {
         dataSource = UICollectionViewDiffableDataSource<ReportDetailSection, ReportDetailItem>(collectionView: collectionView) { collectionView, indexPath, item in
             return self.cellForItem(collectionView: collectionView, indexPath: indexPath, item: item)
@@ -220,5 +221,5 @@ class ReportDetailViewController: UIViewController {
 }
 
 #Preview{
-  ReportDetailViewController()
+    ReportDetailViewController()
 }
