@@ -15,7 +15,6 @@ class MyReportBannerCollectionViewCell: UICollectionViewCell {
     let leftButton = UIButton().then {
         $0.setBackgroundImage(UIImage(named: "icn_arrow_left_round_white_24px"), for: .normal)
         $0.addTarget(self, action: #selector(leftButtonTapped), for: .touchUpInside)
-        print(self)
     }
     let rightButton = UIButton().then {
         $0.setBackgroundImage(UIImage(named: "icn_arrow_right_round_white_24px"), for: .normal)
@@ -87,7 +86,7 @@ class MyReportBannerCollectionViewCell: UICollectionViewCell {
             $0.edges.equalToSuperview()
         }
         pageControl.snp.makeConstraints {
-            $0.bottom.equalToSuperview().offset(-10)
+            $0.bottom.equalToSuperview().inset(10)
             $0.centerX.equalToSuperview()
             $0.width.equalTo(59)
             $0.height.equalTo(15)
