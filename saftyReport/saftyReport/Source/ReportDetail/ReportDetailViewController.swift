@@ -71,10 +71,30 @@ class ReportDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        setupNavigationBar()
         setupCollectionView()
         setupSubmitButton()
         configureDataSource()
         applySnapshot()
+    }
+    
+    private func setupNavigationBar() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .primaryOrange
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        navigationController?.navigationBar.compactAppearance = appearance
+        navigationController?.navigationBar.compactScrollEdgeAppearance = appearance
+        
+        let customNavigationItem = CustomNavigationItem()
+        customNavigationItem.setUpNavigationBar(for: .back)
+        navigationItem.backBarButtonItem = customNavigationItem.backBarButtonItem
+        navigationItem.title = "신고하기"
+        
+        navigationController?.setNavigationBarHidden(false, animated: false)
     }
     
     private func setupCollectionView() {
@@ -83,7 +103,8 @@ class ReportDetailViewController: UIViewController {
         view.addSubview(containerView)
         
         collectionView.snp.makeConstraints {
-            $0.top.left.right.equalToSuperview()
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            $0.left.right.equalToSuperview()
             $0.bottom.equalTo(containerView.snp.top)
         }
         
@@ -197,7 +218,8 @@ class ReportDetailViewController: UIViewController {
         containerView.addSubview(submitButton)
         
         containerView.snp.makeConstraints {
-            $0.left.right.bottom.equalToSuperview()
+            $0.left.right.equalToSuperview()
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
             $0.height.equalTo(84)
         }
         
@@ -217,9 +239,9 @@ class ReportDetailViewController: UIViewController {
     @objc private func submitButtonTapped() {
         print("제출 버튼이 눌렸습니다.")
     }
-    
 }
 
-#Preview{
-    ReportDetailViewController()
+#Preview {
+    let navigationController = UINavigationController(rootViewController: ReportDetailViewController())
+    return navigationController
 }
