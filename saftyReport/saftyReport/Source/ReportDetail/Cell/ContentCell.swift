@@ -11,35 +11,18 @@ import SnapKit
 import Then
 
 class ContentCell: BaseCell {
-
-    private let titleStackView = UIStackView().then {
-        $0.axis = .horizontal
-        $0.spacing = 8
-        $0.alignment = .center
-    }
-    
-    private let titleContentStackView = UIStackView().then {
-        $0.axis = .vertical
-        $0.spacing = 4
-    }
-    
-    private let infoButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "info.circle"), for: .normal)
-        $0.tintColor = .darkGray
-    }
-    
     private let recommendationLabel = UILabel().then {
         $0.textColor = .primaryOrange
         let attributedText = NSAttributedString.styled(
             text: "추가/수정가능, 5~900자",
             style: .caption3
         )
+        $0.attributedText = attributedText
     }
     
-    private let infoMicButton = UIImageView().then {
-        let image = UIImage(named: "btn_i_mic")
-        $0.image = image
-        $0.contentMode = .scaleAspectFit
+    private let infoButton = UIButton().then {
+        $0.setImage(UIImage(systemName: "info.circle"), for: .normal)
+        $0.tintColor = .darkGray
     }
     
     private let textView = UITextView().then {
@@ -66,12 +49,12 @@ class ContentCell: BaseCell {
     }
     
     private let textCheckLabel = UILabel().then {
-        $0.text = "추천 단어"
         $0.textColor = .gray13
         let attributedText = NSAttributedString.styled(
             text: "추천단어",
             style: .caption3
         )
+        $0.attributedText = attributedText
     }
     
     private let copyButton = UIButton().then {
@@ -81,10 +64,6 @@ class ContentCell: BaseCell {
         config.imagePadding = 4
         config.baseForegroundColor = .gray13
         $0.configuration = config
-        let attributedText = NSAttributedString.styled(
-            text: "내용복사",
-            style: .caption3
-            )
     }
     
     override init(frame: CGRect) {
@@ -99,25 +78,14 @@ class ContentCell: BaseCell {
     }
     
     private func setupUI() {
- 
-        contentView.addSubviews(titleLabel, requiredMark, infoImageView, recommendationLabel, infoButton, textView, bottomStackView)
+        contentView.addSubviews(recommendationLabel, infoButton, textView, bottomStackView)
         
-        leftStackView.addArrangedSubviews(textCheckButton,textCheckLabel)
+        leftStackView.addArrangedSubviews(textCheckButton, textCheckLabel)
         bottomStackView.addArrangedSubviews(leftStackView, copyButton)
         
-        titleLabel.snp.makeConstraints {
-            $0.top.leading.equalToSuperview()
-        }
-        
-        requiredMark.snp.makeConstraints {
-            $0.centerY.equalTo(titleLabel)
-            $0.leading.equalTo(titleLabel.snp.trailing).offset(4)
-        }
-        
-        infoImageView.snp.makeConstraints {
-            $0.centerY.equalTo(titleLabel)
-            $0.leading.equalTo(requiredMark.snp.trailing).offset(10)
-            $0.size.equalTo(14)
+        recommendationLabel.snp.makeConstraints {
+            $0.top.equalTo(titleLabel.snp.bottom).offset(4)
+            $0.leading.equalToSuperview()
         }
         
         infoButton.snp.makeConstraints {
@@ -126,22 +94,27 @@ class ContentCell: BaseCell {
             $0.size.equalTo(40)
         }
         
-        recommendationLabel.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(4)
-            $0.leading.equalToSuperview()
-        }
-        
         textView.snp.makeConstraints {
             $0.top.equalTo(recommendationLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(110)
+            $0.height.greaterThanOrEqualTo(110)
         }
         
         bottomStackView.snp.makeConstraints {
             $0.top.equalTo(textView.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview().inset(8)
-            $0.bottom.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(8)
         }
+    }
+    
+    override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
+        let targetSize = CGSize(width: layoutAttributes.frame.width, height: UIView.layoutFittingCompressedSize.height)
+        layoutAttributes.frame.size = contentView.systemLayoutSizeFitting(
+            targetSize,
+            withHorizontalFittingPriority: .required,
+            verticalFittingPriority: .fittingSizeLevel
+        )
+        return layoutAttributes
     }
 
     private func setupPlaceholder() {

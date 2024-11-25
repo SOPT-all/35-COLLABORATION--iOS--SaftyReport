@@ -98,15 +98,24 @@ class ReportDetailViewController: UIViewController {
     }
     
     private func setupCollectionView() {
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
-        view.addSubviews(collectionView, containerView)
-        collectionView.isScrollEnabled = false
-        
-        collectionView.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
-            $0.left.right.equalToSuperview()
-            $0.bottom.equalTo(containerView.snp.top)
-        }
+         collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+         collectionView.isScrollEnabled = false
+         view.addSubviews(collectionView, containerView)
+         
+         containerView.snp.makeConstraints {
+             $0.left.right.equalToSuperview()
+             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
+             $0.height.equalTo(84)
+         }
+         
+         collectionView.snp.makeConstraints {
+             $0.edges.equalTo(view.safeAreaLayoutGuide).inset(UIEdgeInsets(
+                 top: 0,
+                 left: 0,
+                 bottom: 84, // containerView 높이만큼 bottom inset
+                 right: 0
+             ))
+         }
         
         [(ReportTypeCell.self, ReportTypeCell.reuseIdentifier),
          (PhotoCell.self, PhotoCell.reuseIdentifier),
@@ -118,62 +127,69 @@ class ReportDetailViewController: UIViewController {
     }
     
     private func createLayout() -> UICollectionViewLayout {
-        let layout = UICollectionViewCompositionalLayout { sectionIndex, _ in
+        let layout = UICollectionViewCompositionalLayout { [weak self] sectionIndex, _ in
+            guard let self = self else { return nil }
+            
+            let totalTopHeight = (navigationController?.navigationBar.frame.height ?? 0) + (view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0)
+            let availableHeight = view.frame.height - totalTopHeight - 84
+            
+            let sectionSpacing: CGFloat = 28
+            let totalSpacing = sectionSpacing * 4
+            let usableHeight = availableHeight - totalSpacing
+            
             let section = ReportDetailSection(rawValue: sectionIndex)
-            
-            if section == .reportType {
-                let itemSize = NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .fractionalHeight(1.0)
+            switch section {
+            case .reportType:
+                return makeSection(
+                    height: totalTopHeight * 0.2,
+                    insets: .zero
                 )
-                let item = NSCollectionLayoutItem(layoutSize: itemSize)
-                
-                let groupSize = NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .fractionalHeight(0.1)
+            case .photo:
+                return makeSection(
+                    height: usableHeight * 0.2,
+                    insets: .init(top: sectionSpacing, leading: 20, bottom: 0, trailing: 20)
                 )
-                let group = NSCollectionLayoutGroup.horizontal(
-                    layoutSize: groupSize,
-                    subitems: [item]
-                )
-                
-                let section = NSCollectionLayoutSection(group: group)
-                section.contentInsets = NSDirectionalEdgeInsets(
-                    top: 0,
-                    leading: 0,
-                    bottom: 9,
-                    trailing: 0
-                )
-                return section
-            }
-            
-            let itemSize = NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .fractionalHeight(1.0)
-            )
-            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            
-            let groupSize = NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .fractionalHeight(0.18)
-            )
-            
-            let group = NSCollectionLayoutGroup.horizontal(
-                layoutSize: groupSize,
-                subitems: [item]
-            )
-            
-            let layoutSection = NSCollectionLayoutSection(group: group)
-            layoutSection.contentInsets = NSDirectionalEdgeInsets(
-                top: 6,
-                leading: 18,
-                bottom: 12,
-                trailing: 18
-            )
-            return layoutSection
-        }
-        return layout
+               
+           case .location:
+               return self.makeSection(
+                   height: availableHeight * 0.15,
+                   insets: .init(top: 0, leading: 20, bottom: 0, trailing: 20)
+               )
+               
+           case .content:
+               return self.makeSection(
+                   height: availableHeight * 0.35,
+                   insets: .init(top: 0, leading: 20, bottom: 0, trailing: 20)
+               )
+               
+           case .phone:
+               return self.makeSection(
+                   height: availableHeight * 0.15,
+                   insets: .init(top: 0, leading: 20, bottom: 0, trailing: 20)
+               )
+               
+           case .none:
+               return nil
+           }
+       }
+       return layout
     }
+
+    private func makeSection(height: CGFloat, insets: NSDirectionalEdgeInsets) -> NSCollectionLayoutSection {
+       let itemSize = NSCollectionLayoutSize(
+           widthDimension: .fractionalWidth(1.0),
+           heightDimension: .absolute(height)
+       )
+       let item = NSCollectionLayoutItem(layoutSize: itemSize)
+       let group = NSCollectionLayoutGroup.horizontal(
+           layoutSize: itemSize,
+           subitems: [item]
+       )
+       let section = NSCollectionLayoutSection(group: group)
+       section.contentInsets = insets
+       return section
+    }
+    
     private func configureDataSource() {
         dataSource = UICollectionViewDiffableDataSource<ReportDetailSection, ReportDetailItem>(collectionView: collectionView) { collectionView, indexPath, item in
             return self.cellForItem(collectionView: collectionView, indexPath: indexPath, item: item)
