@@ -147,16 +147,15 @@ class ReportDetailViewController: UIViewController {
                 return section
             }
             
-            // 나머지 섹션들의 아이템 사이즈
             let itemSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .fractionalHeight(1.0)  // 변경
+                heightDimension: .fractionalHeight(1.0)
             )
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
             
             let groupSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .fractionalHeight(0.18)  // 전체 높이의 18%
+                heightDimension: .fractionalHeight(0.18)
             )
             
             let group = NSCollectionLayoutGroup.horizontal(

@@ -13,10 +13,10 @@ import Then
 class PhotoCell: BaseCell {
     private let photoButton = UIButton().then {
         let attributedTitle = NSAttributedString.styled(
-              text: "사진을 추가해주세요",
-              style: .body9,
-              alignment: .center
-          )
+            text: "사진을 추가해주세요",
+            style: .body9,
+            alignment: .center
+        )
         $0.backgroundColor = .gray3
         $0.layer.cornerRadius = 8
         $0.setAttributedTitle(attributedTitle, for: .normal)
@@ -42,10 +42,22 @@ class PhotoCell: BaseCell {
         $0.distribution = .fillEqually
         $0.backgroundColor = .clear
     }
+    
+    private var parentViewController: UIViewController? {
+        var parentResponder: UIResponder? = self
+        while parentResponder != nil {
+            parentResponder = parentResponder?.next
+            if let viewController = parentResponder as? UIViewController {
+                return viewController
+            }
+        }
+        return nil
+    }
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
+        setupActions()
     }
 
     required init?(coder: NSCoder) {
@@ -81,6 +93,43 @@ class PhotoCell: BaseCell {
             $0.height.equalTo(120)
             $0.bottom.equalToSuperview()
         }
+    }
+    
+    private func setupActions() {
+        photoButton.addTarget(self, action: #selector(photoButtonTapped), for: .touchUpInside)
+    }
+    
+    @objc private func photoButtonTapped() {
+        guard let viewController = parentViewController else { return }
+        
+        let contentView = createAlertContentView(image: .howToReportDetail)
+        AlertManager.presentOneButtonAlert(
+            title: "사진 추가",
+            contentView: contentView,
+            mode: .info,
+            vc: viewController
+        )
+    }
+
+    private func createAlertContentView(image: UIImage?) -> UIView {
+        let contentView = UIView()
+        let imageView = UIImageView().then {
+            $0.image = image
+            $0.contentMode = .scaleAspectFit
+        }
+        
+        contentView.addSubview(imageView)
+        imageView.snp.makeConstraints {
+            $0.edges.equalToSuperview().inset(20)
+            $0.height.equalTo(350)  
+        }
+        
+        return contentView
+    }
+
+    
+    override func configure(with item: ReportDetailItem) {
+        titleLabel.text = item.title
     }
 }
 
