@@ -11,7 +11,7 @@ import SnapKit
 import Then
 
 class ContentsCell: UICollectionViewCell {
-    private var isChecked = false
+    var isChecked = false
     
     private var imageView = UIImageView().then {
         $0.clipsToBounds = true
@@ -20,10 +20,10 @@ class ContentsCell: UICollectionViewCell {
         $0.backgroundColor = .gray3
     }
     
-    private lazy var checkbox = UIButton().then {
+    lazy var checkbox = UIButton().then {
         $0.clipsToBounds = true
         $0.contentMode = .scaleAspectFill
-        $0.setImage(.icnCheckboxISquareUnselectedWhite24Px, for: .normal)
+        $0.setImage(isChecked ? .icnCheckboxISquareSelectedWhite24Px : .icnCheckboxISquareUnselectedWhite24Px, for: .normal)
         $0.addTarget(self, action: #selector(checkboxTapped), for: .touchUpInside)
     }
     

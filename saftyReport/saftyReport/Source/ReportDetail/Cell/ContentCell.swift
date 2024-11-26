@@ -1,6 +1,6 @@
 //
 //  ContentCell.swift
-//  Solo
+//  saftyReport
 //
 //  Created by 이지훈 on 11/17/24.
 //
@@ -29,22 +29,29 @@ class ContentCell: BaseCell {
     }
     
     private let recommendationLabel = UILabel().then {
-        $0.text = "추가/수정가능, 5~900자"
-        $0.textColor = .systemOrange
-        $0.font = .systemFont(ofSize: 14)
+        $0.textColor = .primaryOrange
+        let attributedText = NSAttributedString.styled(
+            text: "추가/수정가능, 5~900자",
+            style: .caption3
+        )
     }
     
-    private let voiceButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "mic.circle.fill"), for: .normal)
-        $0.tintColor = .gray
-        $0.backgroundColor = .clear
+    private let infoMicButton = UIImageView().then {
+        let image = UIImage(named: "btn_i_mic")
+        $0.image = image
+        $0.contentMode = .scaleAspectFit
     }
     
     private let textView = UITextView().then {
-        $0.backgroundColor = .systemGray6
-        $0.layer.cornerRadius = 8
+        $0.backgroundColor = .gray3
+        $0.layer.cornerRadius = 5
         $0.textContainerInset = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
-        $0.font = .systemFont(ofSize: 16)
+    }
+    
+    private let bottomStackView = UIStackView().then {
+        $0.axis = .horizontal
+        $0.alignment = .center
+        $0.distribution = .equalSpacing
     }
     
     private let leftStackView = UIStackView().then {
@@ -52,33 +59,32 @@ class ContentCell: BaseCell {
         $0.spacing = 4
         $0.alignment = .center
     }
-
-    private let bottomStackView = UIStackView().then {
-        $0.axis = .horizontal
-        $0.alignment = .center
-        $0.distribution = .equalSpacing
-    }
     
     private let textCheckButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "checkmark.circle.fill"), for: .normal)
+        $0.setImage(UIImage(named: "checkbox_i_report_page_square_filled_orange_16px"), for: .normal)
         $0.tintColor = .systemOrange
     }
     
     private let textCheckLabel = UILabel().then {
         $0.text = "추천 단어"
-        $0.textColor = .darkGray
-        $0.font = .systemFont(ofSize: 14)
+        $0.textColor = .gray13
+        let attributedText = NSAttributedString.styled(
+            text: "추천단어",
+            style: .caption3
+        )
     }
     
     private let copyButton = UIButton().then {
         var config = UIButton.Configuration.plain()
-        config.image = UIImage(systemName: "doc.on.doc")
+        config.image = UIImage(named: "icon_copy_line_black_16px")
         config.title = "내용복사"
         config.imagePadding = 4
-        config.baseForegroundColor = .darkGray
-        
+        config.baseForegroundColor = .gray13
         $0.configuration = config
-        $0.titleLabel?.font = .systemFont(ofSize: 14)
+        let attributedText = NSAttributedString.styled(
+            text: "내용복사",
+            style: .caption3
+            )
     }
     
     override init(frame: CGRect) {
@@ -93,49 +99,49 @@ class ContentCell: BaseCell {
     }
     
     private func setupUI() {
-        titleStackView.addArrangedSubview(titleLabel)
-        titleStackView.addArrangedSubview(requiredMark)
-        titleStackView.addArrangedSubview(infoButton)
+ 
+        contentView.addSubviews(titleLabel, requiredMark, infoImageView, recommendationLabel, infoButton, textView, bottomStackView)
         
-        titleLabel.setContentHuggingPriority(.required, for: .horizontal)
-        titleLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        leftStackView.addArrangedSubviews(textCheckButton,textCheckLabel)
+        bottomStackView.addArrangedSubviews(leftStackView, copyButton)
         
-        titleContentStackView.addArrangedSubview(titleStackView)
-        titleContentStackView.addArrangedSubview(recommendationLabel)
-        
-        contentView.addSubview(titleContentStackView)
-        contentView.addSubview(voiceButton)
-        contentView.addSubview(textView)
-        contentView.addSubview(bottomStackView)
-        leftStackView.addArrangedSubview(textCheckButton)
-        leftStackView.addArrangedSubview(textCheckLabel)
-
-        bottomStackView.addArrangedSubview(leftStackView)
-        bottomStackView.addArrangedSubview(copyButton)
-        contentView.addSubview(bottomStackView)
-        
-        titleContentStackView.snp.makeConstraints {
-            $0.top.leading.equalToSuperview().offset(8)
-            $0.trailing.equalToSuperview().inset(8)
+        titleLabel.snp.makeConstraints {
+            $0.top.leading.equalToSuperview()
         }
         
-        voiceButton.snp.makeConstraints {
-            $0.centerY.equalTo(titleStackView)
-            $0.trailing.equalToSuperview().inset(8)
-            $0.size.equalTo(24)
+        requiredMark.snp.makeConstraints {
+            $0.centerY.equalTo(titleLabel)
+            $0.leading.equalTo(titleLabel.snp.trailing).offset(4)
+        }
+        
+        infoImageView.snp.makeConstraints {
+            $0.centerY.equalTo(titleLabel)
+            $0.leading.equalTo(requiredMark.snp.trailing).offset(10)
+            $0.size.equalTo(14)
+        }
+        
+        infoButton.snp.makeConstraints {
+            $0.centerY.equalTo(titleLabel)
+            $0.trailing.equalToSuperview()
+            $0.size.equalTo(40)
+        }
+        
+        recommendationLabel.snp.makeConstraints {
+            $0.top.equalTo(titleLabel.snp.bottom).offset(4)
+            $0.leading.equalToSuperview()
         }
         
         textView.snp.makeConstraints {
-            $0.top.equalTo(titleContentStackView.snp.bottom).offset(8)
+            $0.top.equalTo(recommendationLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(150)
         }
         
         bottomStackView.snp.makeConstraints {
-             $0.top.equalTo(textView.snp.bottom).offset(8)
-             $0.leading.trailing.equalToSuperview().inset(8)
-             $0.bottom.equalToSuperview()
-         }
+            $0.top.equalTo(textView.snp.bottom).offset(8)
+            $0.leading.trailing.equalToSuperview().inset(8)
+            $0.bottom.equalToSuperview()
+        }
     }
 
     private func setupPlaceholder() {
@@ -143,11 +149,11 @@ class ContentCell: BaseCell {
         textView.textColor = .lightGray
         textView.delegate = self
     }
-
+    
     private func setupActions() {
         textCheckButton.addTarget(self, action: #selector(textCheckButtonTapped), for: .touchUpInside)
     }
-
+    
     @objc private func textCheckButtonTapped() {
         textCheckButton.isSelected.toggle()
         if textCheckButton.isSelected {
@@ -181,6 +187,7 @@ extension ContentCell: UITextViewDelegate {
         }
     }
 }
+
 #Preview {
     ReportDetailViewController()
 }

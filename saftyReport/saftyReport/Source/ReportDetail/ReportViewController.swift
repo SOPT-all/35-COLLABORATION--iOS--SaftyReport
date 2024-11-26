@@ -10,14 +10,6 @@ import UIKit
 import SnapKit
 import Then
 
-struct ReportDetailItem: Hashable {
-    let id = UUID()
-    let section: ReportDetailSection
-    let title: String
-    let isRequired: Bool
-    let placeholder: String?
-}
-
 class ReportDetailViewController: UIViewController {
     
     private let containerView = UIView().then {
@@ -43,31 +35,36 @@ class ReportDetailViewController: UIViewController {
             section: .reportType,
             title: "",
             isRequired: false,
-            placeholder: nil
+            placeholder: nil,
+            showInfoIcon: false
         ),
         ReportDetailItem(
             section: .photo,
             title: "사진",
             isRequired: true,
-            placeholder: "사진을 추가해주세요"
+            placeholder: "사진을 추가해주세요",
+            showInfoIcon: true
         ),
         ReportDetailItem(
             section: .location,
             title: "발생지역",
             isRequired: true,
-            placeholder: "지역을 입력해주세요"
+            placeholder: "지역을 입력해주세요",
+            showInfoIcon: true
         ),
         ReportDetailItem(
             section: .content,
             title: "내용",
             isRequired: true,
-            placeholder: "내용을 입력해주세요"
+            placeholder: "내용을 입력해주세요",
+            showInfoIcon: true
         ),
         ReportDetailItem(
             section: .phone,
             title: "휴대전화",
             isRequired: true,
-            placeholder: "010-2998-0867"
+            placeholder: "전화번호를 입력해주세요",
+            showInfoIcon: false
         )
     ]
     
@@ -106,13 +103,13 @@ class ReportDetailViewController: UIViewController {
             if section == .reportType {
                 let itemSize = NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .estimated(48)
+                    heightDimension: .estimated(36)
                 )
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 
                 let groupSize = NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .estimated(48)
+                    heightDimension: .estimated(36)
                 )
                 let group = NSCollectionLayoutGroup.horizontal(
                     layoutSize: groupSize,
@@ -121,7 +118,7 @@ class ReportDetailViewController: UIViewController {
                 
                 let section = NSCollectionLayoutSection(group: group)
                 section.contentInsets = NSDirectionalEdgeInsets(
-                    top: 16,
+                    top: 12,
                     leading: 0,
                     bottom: 0,
                     trailing: 0
@@ -131,7 +128,7 @@ class ReportDetailViewController: UIViewController {
             
             let groupSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .estimated(100)
+                heightDimension: .estimated(70)
             )
             
             let group = NSCollectionLayoutGroup.horizontal(
@@ -141,10 +138,10 @@ class ReportDetailViewController: UIViewController {
             
             let layoutSection = NSCollectionLayoutSection(group: group)
             layoutSection.contentInsets = NSDirectionalEdgeInsets(
-                top: 8,
-                leading: 16,
-                bottom: 16,
-                trailing: 16
+                top: 6,
+                leading: 12,
+                bottom: 12,
+                trailing: 12
             )
             return layoutSection
         }
@@ -223,6 +220,6 @@ class ReportDetailViewController: UIViewController {
     
 }
 
-#Preview {
+#Preview{
     ReportDetailViewController()
 }
