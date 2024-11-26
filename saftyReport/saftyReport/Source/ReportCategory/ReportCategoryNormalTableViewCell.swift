@@ -60,7 +60,7 @@ class ReportCategoryNormalTableViewCell: UITableViewCell {
         }
     }
     
-    func bind(title: String) {
-        titleLabel.attributedText = NSAttributedString.styled(text: title, style: .body4)
+    func bind(item: ReportCategory.Item) {
+        titleLabel.attributedText = NSAttributedString.styled(text: item.name, style: .body4)
     }
 }
