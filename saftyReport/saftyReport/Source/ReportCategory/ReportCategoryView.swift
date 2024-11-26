@@ -11,7 +11,9 @@ class ReportCategoryView: UIView {
     
     // MARK: - Properties
     
-    let tableView = UITableView()
+    let tableView = UITableView().then {
+        $0.separatorStyle = .none
+    }
     
     
     // MARK: - Methods
