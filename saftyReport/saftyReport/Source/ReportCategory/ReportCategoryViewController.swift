@@ -30,6 +30,7 @@ class ReportCategoryViewController: UIViewController {
     
     private func setTableView() {
         reportCategoryView.tableView.dataSource = self
+        reportCategoryView.tableView.delegate = self
         
         reportCategoryView.tableView.register(
             ReportCategoryNormalTableViewCell.self,
@@ -96,5 +97,19 @@ extension ReportCategoryViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         fatalError("This method shouldn't be called as the data source. It is provided by the diffable data source.")
+    }
+}
+
+extension ReportCategoryViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        guard let item = dataSource.itemIdentifier(for: indexPath)
+        else { return UITableView.automaticDimension }
+        
+        switch item.toggleState {
+        case .normal:
+            return 58 + 10
+        case .expanded:
+            return 258 + 10
+        }
     }
 }

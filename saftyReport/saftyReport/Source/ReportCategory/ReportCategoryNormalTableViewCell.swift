@@ -46,7 +46,8 @@ class ReportCategoryNormalTableViewCell: UITableViewCell {
     
     private func setConstraints() {
         grayView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview()
+            $0.verticalEdges.equalToSuperview().inset(5)
         }
         
         titleLabel.snp.makeConstraints {
