@@ -97,6 +97,7 @@ class PhotoCell: BaseCell {
     
     private func setupActions() {
         photoButton.addTarget(self, action: #selector(photoButtonTapped), for: .touchUpInside)
+        cameraButton.addTarget(self, action: #selector(photoButtonTapped), for: .touchUpInside)
     }
     
     @objc private func photoButtonTapped() {
