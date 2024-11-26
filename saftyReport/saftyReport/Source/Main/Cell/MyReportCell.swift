@@ -12,11 +12,12 @@ class MyReportCell: UICollectionViewCell {
     
     private let myReportView = UIView().then {
         $0.layer.cornerRadius = 15
-        $0.backgroundColor = .white
+        $0.backgroundColor = .gray1
     }
     
     private var titleLabel = UILabel().then {
         $0.attributedText = NSAttributedString.styled(text: "title", style: .caption5, alignment: .center)
+        $0.textColor = .gray13
     }
     
     private let totalCountStackView = UIStackView().then {
@@ -168,7 +169,7 @@ class MyReportCell: UICollectionViewCell {
         
         myMonthlyReportCountStackView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.centerY.equalTo(myMonthlyReportImageView).offset(-12.5)
+            $0.centerY.equalTo(myMonthlyReportImageView).offset(-12.5) // stackView로 합쳐야하나??
         }
         
         subMonthlyReportCount.snp.makeConstraints {
