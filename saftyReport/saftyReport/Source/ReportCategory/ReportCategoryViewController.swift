@@ -52,13 +52,21 @@ class ReportCategoryViewController: UIViewController {
                              item: ReportCategory.Item) -> UITableViewCell? in
                 guard let self = self else { return nil }
                 
-                let cell = item.toggleState == .normal
-                ? reportCategoryView.tableView.dequeueReusableCell(
-                    withIdentifier: ReportCategoryNormalTableViewCell.identifier,
-                    for: indexPath)
-                : reportCategoryView.tableView.dequeueReusableCell(withIdentifier: ReportCategoryExpandedTableViewCell.identifier, for: indexPath)
-                
-                return cell
+                switch item.toggleState {
+                case .normal:
+                    guard let cell = reportCategoryView.tableView.dequeueReusableCell(
+                        withIdentifier: ReportCategoryNormalTableViewCell.identifier,
+                        for: indexPath
+                    ) as? ReportCategoryNormalTableViewCell else { return nil }
+                    
+                    cell.bind(item: item)
+                    return cell
+                    
+                case .expanded:
+                    guard let cell = reportCategoryView.tableView.dequeueReusableCell(withIdentifier: ReportCategoryExpandedTableViewCell.identifier, for: indexPath) as? ReportCategoryExpandedTableViewCell else { return nil }
+                    cell.bind(item: item)
+                    return cell
+                }
             }
     }
     
