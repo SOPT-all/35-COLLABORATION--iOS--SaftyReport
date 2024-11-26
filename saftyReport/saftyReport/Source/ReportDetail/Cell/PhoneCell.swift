@@ -44,13 +44,11 @@ class PhoneCell: BaseCell {
         
         // placeholder에 스타일 적용
         let attributedPlaceholder = NSAttributedString.styled(
-            text: item.placeholder ?? "",  // placeholder가 optional일 수 있으므로 nil 처리
+            text: item.placeholder ?? "",
             style: .body9,
             alignment: .left
         )
-        
-        // attributedPlaceholder를 textField에 적용
-        textField.attributedPlaceholder = attributedPlaceholder
+            textField.attributedPlaceholder = attributedPlaceholder
     }
 }
 

@@ -16,7 +16,7 @@ class ReportTypeCell: BaseCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
-        setupTapGesture()
+        setupAction()
     }
     
     required init?(coder: NSCoder) {
@@ -30,15 +30,26 @@ class ReportTypeCell: BaseCell {
         }
     }
     
-    private func setupTapGesture() {
-        mockReportView.mainButton.addTarget(self, action: #selector(handleTap), for: .touchUpInside)
+    private func setupAction() {
+        mockReportView.mainButton.addTarget(
+            self,
+            action: #selector(mainButtonTapped),
+            for: .touchUpInside
+        )
     }
     
-    @objc private func handleTap() {
+
+    
+    @objc private func mainButtonTapped() {
         mockReportView.isExpanded.toggle()
     }
     
     override func configure(with item: ReportDetailItem) {
         super.configure(with: item)
+        let attributedText = NSAttributedString.styled(
+            text: "신고 유형을 선택해주세요",
+            style: .body3
+        )
+        titleLabel.attributedText = attributedText
     }
 }

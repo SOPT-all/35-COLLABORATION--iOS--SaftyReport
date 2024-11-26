@@ -11,36 +11,22 @@ import SnapKit
 import Then
 
 class ContentCell: BaseCell {
-    //변경내용
-    private let titleStackView = UIStackView().then {
-        $0.axis = .horizontal
-        $0.spacing = 8
-        $0.alignment = .center
-    }
-    
-    private let titleContentStackView = UIStackView().then {
-        $0.axis = .vertical
-        $0.spacing = 4
-    }
-    
-    private let infoButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "info.circle"), for: .normal)
-        $0.tintColor = .darkGray
-    }
-    
     private let recommendationLabel = UILabel().then {
         $0.textColor = .primaryOrange
         let attributedText = NSAttributedString.styled(
             text: "추가/수정가능, 5~900자",
             style: .caption3
         )
+        $0.attributedText = attributedText
     }
     
-    private let infoMicButton = UIImageView().then {
+    private let locationIcon = UIImageView().then {
         let image = UIImage(named: "btn_i_mic")
         $0.image = image
+        $0.tintColor = .gray6
         $0.contentMode = .scaleAspectFit
-    }
+        
+        }
     
     private let textView = UITextView().then {
         $0.backgroundColor = .gray3
@@ -66,25 +52,25 @@ class ContentCell: BaseCell {
     }
     
     private let textCheckLabel = UILabel().then {
-        $0.text = "추천 단어"
         $0.textColor = .gray13
         let attributedText = NSAttributedString.styled(
             text: "추천단어",
             style: .caption3
         )
+        $0.attributedText = attributedText
     }
     
     private let copyButton = UIButton().then {
         var config = UIButton.Configuration.plain()
         config.image = UIImage(named: "icon_copy_line_black_16px")
-        config.title = "내용복사"
         config.imagePadding = 4
         config.baseForegroundColor = .gray13
-        $0.configuration = config
         let attributedText = NSAttributedString.styled(
             text: "내용복사",
             style: .caption3
-            )
+        )
+        config.attributedTitle = AttributedString(attributedText)
+        $0.configuration = config
     }
     
     override init(frame: CGRect) {
@@ -99,51 +85,47 @@ class ContentCell: BaseCell {
     }
     
     private func setupUI() {
- 
-        contentView.addSubviews(titleLabel, requiredMark, infoImageView, recommendationLabel, infoButton, textView, bottomStackView)
+        contentView.addSubviews(titleLabel, requiredMark, recommendationLabel, locationIcon, textView, bottomStackView)
         
-        leftStackView.addArrangedSubviews(textCheckButton,textCheckLabel)
+        leftStackView.addArrangedSubviews(textCheckButton, textCheckLabel)
         bottomStackView.addArrangedSubviews(leftStackView, copyButton)
-        
-        titleLabel.snp.makeConstraints {
-            $0.top.leading.equalToSuperview()
-        }
-        
-        requiredMark.snp.makeConstraints {
-            $0.centerY.equalTo(titleLabel)
-            $0.leading.equalTo(titleLabel.snp.trailing).offset(4)
-        }
-        
-        infoImageView.snp.makeConstraints {
-            $0.centerY.equalTo(titleLabel)
-            $0.leading.equalTo(requiredMark.snp.trailing).offset(10)
-            $0.size.equalTo(14)
-        }
-        
-        infoButton.snp.makeConstraints {
-            $0.centerY.equalTo(titleLabel)
-            $0.trailing.equalToSuperview()
-            $0.size.equalTo(40)
-        }
         
         recommendationLabel.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(4)
             $0.leading.equalToSuperview()
         }
         
+        locationIcon.snp.makeConstraints {
+            $0.centerY.equalTo(titleLabel)
+            $0.trailing.equalToSuperview()
+            $0.size.width.equalTo(40)
+        }
+        
         textView.snp.makeConstraints {
             $0.top.equalTo(recommendationLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(150)
+            $0.height.greaterThanOrEqualTo(110)
         }
         
         bottomStackView.snp.makeConstraints {
             $0.top.equalTo(textView.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview().inset(8)
-            $0.bottom.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(8)
         }
     }
-
+    
+    override func preferredLayoutAttributesFitting(
+        _ layoutAttributes: UICollectionViewLayoutAttributes
+    ) -> UICollectionViewLayoutAttributes {
+        let targetSize = CGSize(width: layoutAttributes.frame.width, height: UIView.layoutFittingCompressedSize.height)
+        layoutAttributes.frame.size = contentView.systemLayoutSizeFitting(
+            targetSize,
+            withHorizontalFittingPriority: .required,
+            verticalFittingPriority: .fittingSizeLevel
+        )
+        return layoutAttributes
+    }
+    
     private func setupPlaceholder() {
         textView.text = "내용을 입력해주세요"
         textView.textColor = .lightGray
@@ -166,7 +148,7 @@ class ContentCell: BaseCell {
         } else {
             if textView.text == "안녕하세요" {
                 textView.text = "내용을 입력해주세요"
-                textView.textColor = .lightGray
+                textView.textColor = .gray13Opacity40
             }
         }
     }
