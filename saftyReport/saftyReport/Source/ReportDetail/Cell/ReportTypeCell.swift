@@ -16,7 +16,7 @@ class ReportTypeCell: BaseCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
-        setupTapGesture()
+        setupAction()
     }
     
     required init?(coder: NSCoder) {
@@ -30,11 +30,17 @@ class ReportTypeCell: BaseCell {
         }
     }
     
-    private func setupTapGesture() {
-        mockReportView.mainButton.addTarget(self, action: #selector(handleTap), for: .touchUpInside)
+    private func setupAction() {
+        mockReportView.mainButton.addTarget(
+            self,
+            action: #selector(mainButtonTapped),
+            for: .touchUpInside
+        )
     }
     
-    @objc private func handleTap() {
+
+    
+    @objc private func mainButtonTapped() {
         mockReportView.isExpanded.toggle()
     }
     
