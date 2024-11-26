@@ -9,25 +9,58 @@ import UIKit
 
 class ReportCategoryNormalTableViewCell: UITableViewCell {
     
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        contentView.backgroundColor = .red
+    // MARK: - Properties
+    
+    private let grayView = UIView().then {
+        $0.clipsToBounds = true
+        $0.layer.backgroundColor = UIColor.gray3.cgColor
+        $0.layer.cornerRadius = 10
     }
     
+    private let titleLabel = UILabel().then {
+        $0.textColor = .gray13
+    }
+    
+    private let infoImageView = UIImageView().then {
+        $0.contentMode = .scaleAspectFit
+        $0.image = .iconInfoLineBlack16Px
+    }
+    
+    
+    // MARK: - Methods
+    
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setHierarchy()
+        setConstraints()
+    }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
+    private func setHierarchy() {
+        contentView.addSubview(grayView)
+        grayView.addSubviews(titleLabel, infoImageView)
     }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
+    
+    private func setConstraints() {
+        grayView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        titleLabel.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.leading.equalToSuperview().offset(20)
+        }
+        
+        infoImageView.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.trailing.equalToSuperview().offset(-20)
+        }
     }
-
+    
+    func bind(title: String) {
+        titleLabel.attributedText = NSAttributedString.styled(text: title, style: .body4)
+    }
 }
