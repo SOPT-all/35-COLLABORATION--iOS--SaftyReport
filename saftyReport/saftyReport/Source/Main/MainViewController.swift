@@ -13,8 +13,10 @@ import Then
 class MainViewController: UIViewController {
     let customNavigationItem = CustomNavigationItem(title: "홈") // 반드시 타이틀 설정
     
-    private let collectionView = UICollectionView(frame: .zero,
-                                                  collectionViewLayout: MainContentsItem.createLayout()).then {
+    private let collectionView = UICollectionView(
+        frame: .zero,
+        collectionViewLayout: MainContentsItem.createLayout()
+    ).then {
         $0.backgroundColor = .clear
         $0.isScrollEnabled = false
         $0.clipsToBounds = false
@@ -32,16 +34,19 @@ class MainViewController: UIViewController {
         collectionView.delegate = self
 
         collectionView.register(
-                    MyReportCollectionViewCell.self,
-                    forCellWithReuseIdentifier: MyReportCollectionViewCell.cellIdentifier
+                    MyReportCell.self,
+                    forCellWithReuseIdentifier: MyReportCell.cellIdentifier
                 )
         collectionView.register(
-                    MyReportBannerCollectionViewCell.self,
-                    forCellWithReuseIdentifier: MyReportBannerCollectionViewCell.cellIdentifier
+                    MyReportBannerCell.self,
+                    forCellWithReuseIdentifier: MyReportBannerCell.cellIdentifier
                 )
-        collectionView.register(FinishedReportEXCollectionViewCell.self, forCellWithReuseIdentifier: FinishedReportEXCollectionViewCell.cellIdentifier)
-        
-        collectionView.register(MainContentsSectionHeader.self,
+        collectionView.register(
+            FinishedReportEXCell.self,
+            forCellWithReuseIdentifier: FinishedReportEXCell.cellIdentifier
+        )
+        collectionView.register(
+            MainContentsSectionHeader.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
             withReuseIdentifier: MainContentsSectionHeader.identifier
         )
@@ -95,41 +100,42 @@ extension MainViewController: UICollectionViewDataSource {
         case 0:
             if indexPath.item < 2 {
                 guard let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: MyReportCollectionViewCell.cellIdentifier,
+                    withReuseIdentifier: MyReportCell.cellIdentifier,
                     for: indexPath
-                ) as? MyReportCollectionViewCell else {
+                ) as? MyReportCell else {
                     return UICollectionViewCell(frame: .zero)
                 }
                 cell.configure(with: indexPath.item)
                 return cell
             } else {
                 guard let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: MyReportBannerCollectionViewCell.cellIdentifier,
+                    withReuseIdentifier: MyReportBannerCell.cellIdentifier,
                     for: indexPath
-                ) as? MyReportBannerCollectionViewCell else {
+                ) as? MyReportBannerCell else {
                     return UICollectionViewCell(frame: .zero)
                 }
                 return cell
             }
         case 1:
             guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: FinishedReportEXCollectionViewCell.cellIdentifier,
+                withReuseIdentifier: FinishedReportEXCell.cellIdentifier,
                 for: indexPath
-            ) as? FinishedReportEXCollectionViewCell else {
+            ) as? FinishedReportEXCell else {
                 return UICollectionViewCell(frame: .zero)
             }
             return cell
         default:
             guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: MyReportCollectionViewCell.cellIdentifier,
+                withReuseIdentifier: MyReportCell.cellIdentifier,
                 for: indexPath
-            ) as? MyReportCollectionViewCell else {
+            ) as? MyReportCell else {
                 return UICollectionViewCell(frame: .zero)
             }
             return cell
         }
     }
 }
+
 extension MainViewController: UICollectionViewDelegate {
     func collectionView(
         _ collectionView: UICollectionView,
@@ -152,8 +158,4 @@ extension MainViewController: UICollectionViewDelegate {
         
         return header
     }
-}
-
-#Preview {
-    MainViewController()
 }

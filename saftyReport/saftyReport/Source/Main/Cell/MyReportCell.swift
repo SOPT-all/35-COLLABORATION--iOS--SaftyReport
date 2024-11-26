@@ -1,5 +1,5 @@
 //
-//  MyReportCollectionViewCell.swift
+//  MyReportCell.swift
 //  saftyReport
 //
 //  Created by 김희은 on 11/24/24.
@@ -7,8 +7,8 @@
 
 import UIKit
 
-class MyReportCollectionViewCell: UICollectionViewCell {
-    let cellIdentifier: String = "MyReportCollectionViewCell"
+class MyReportCell: UICollectionViewCell {
+    let cellIdentifier: String = "MyReportCell"
     
     private let myReportView = UIView().then {
         $0.layer.cornerRadius = 15
@@ -210,7 +210,7 @@ class MyReportCollectionViewCell: UICollectionViewCell {
     }
 }
 
-extension MyReportCollectionViewCell {
+extension MyReportCell {
     private func setShadow(toLayer: CALayer) {
         CustomShadow.shared.applyShadow(to: toLayer, width: 1, height: 1)
     }

@@ -1,5 +1,5 @@
 //
-//  MyReportBannerCollectionViewCell.swift
+//  MyReportBannerCell.swift
 //  saftyReport
 //
 //  Created by 김희은 on 11/25/24.
@@ -7,8 +7,8 @@
 
 import UIKit
 
-class MyReportBannerCollectionViewCell: UICollectionViewCell {
-    let cellIdentifier: String = "MyReportBannerCollectionViewCell"
+class MyReportBannerCell: UICollectionViewCell {
+    let cellIdentifier: String = "MyReportBannerCell"
     
     let bannerImgList = ["img_promotion_1", "img_promotion_2", "img_promotion_3"]
     
@@ -64,7 +64,7 @@ class MyReportBannerCollectionViewCell: UICollectionViewCell {
         collectionView.dataSource = self
         collectionView.delegate = self
         
-        collectionView.register(BannerCollectionViewCell.self, forCellWithReuseIdentifier: BannerCollectionViewCell.cellIdentifier)
+        collectionView.register(BannerCell.self, forCellWithReuseIdentifier: BannerCell.cellIdentifier)
     }
     
     required init?(coder: NSCoder) {
@@ -123,21 +123,21 @@ class MyReportBannerCollectionViewCell: UICollectionViewCell {
     }
 }
 
-extension MyReportBannerCollectionViewCell: UIScrollViewDelegate {
+extension MyReportBannerCell: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let page = Int(scrollView.contentOffset.x / collectionView.frame.width)
         pageControl.currentPage = page
     }
 }
 
-extension MyReportBannerCollectionViewCell: UICollectionViewDataSource {
+extension MyReportBannerCell: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         pageControl.numberOfPages = bannerImgList.count
         return self.pageControl.numberOfPages
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BannerCollectionViewCell.cellIdentifier, for: indexPath) as? BannerCollectionViewCell else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BannerCell.cellIdentifier, for: indexPath) as? BannerCell else {
             return UICollectionViewCell(frame: .zero)
         }
         cell.configure(image: bannerImgList[indexPath.row])
@@ -145,7 +145,7 @@ extension MyReportBannerCollectionViewCell: UICollectionViewDataSource {
     }
 }
 
-extension MyReportBannerCollectionViewCell: UICollectionViewDelegateFlowLayout {
+extension MyReportBannerCell: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
       return CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
     }

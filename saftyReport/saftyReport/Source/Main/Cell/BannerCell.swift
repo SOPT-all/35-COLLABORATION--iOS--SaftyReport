@@ -1,5 +1,5 @@
 //
-//  BannerCollectionViewCell.swift
+//  BannerCell.swift
 //  saftyReport
 //
 //  Created by 김희은 on 11/25/24.
@@ -7,8 +7,8 @@
 
 import UIKit
 
-class BannerCollectionViewCell: UICollectionViewCell {
-    let cellIdentifier: String = "BannerCollectionViewCell"
+class BannerCell: UICollectionViewCell {
+    let cellIdentifier: String = "BannerCell"
     
     let bannerImageView = UIImageView().then {
         $0.contentMode = .scaleAspectFill

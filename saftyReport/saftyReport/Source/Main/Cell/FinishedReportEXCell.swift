@@ -1,5 +1,5 @@
 //
-//  FinishedReportEXCollectionViewCell.swift
+//  FinishedReportEXCell.swift
 //  saftyReport
 //
 //  Created by 김희은 on 11/25/24.
@@ -7,7 +7,9 @@
 
 import UIKit
 
-class FinishedReportEXCollectionViewCell: UICollectionViewCell {
+class FinishedReportEXCell: UICollectionViewCell {
+    let cellIdentifier = "FinishedReportEXCell"
+    
     let stackViewList = [1, 2]
     private let stackView = UIStackView().then {
         $0.axis = .vertical
@@ -79,7 +81,7 @@ class FinishedReportEXCollectionViewCell: UICollectionViewCell {
     }
 }
 
-extension FinishedReportEXCollectionViewCell: UIScrollViewDelegate {
+extension FinishedReportEXCell: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let page = Int(scrollView.contentOffset.x / stackView.frame.width)
         pageControl.currentPage = page
