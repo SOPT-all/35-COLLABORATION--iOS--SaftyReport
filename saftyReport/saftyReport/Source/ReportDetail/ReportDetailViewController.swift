@@ -9,6 +9,7 @@ import UIKit
 
 import SnapKit
 import Then
+import Alamofire
 
 class ReportDetailViewController: UIViewController {
     
@@ -261,75 +262,63 @@ extension ReportDetailViewController: LocationCellDelegate {
 
 extension ReportDetailViewController {
     @objc private func submitButtonTapped() {
-        // 1. URL 생성
-        guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BASE_URL") as? String,
-              let url = URL(string: baseURL + "/api/v1/report") else {
+        //  1: URL 주소 생성
+        guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BASE_URL") as? String else {
             showAlert(message: NetworkError.invalidURL.errorMessage)
             return
         }
         
-        // 2. Request 생성
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("1", forHTTPHeaderField: "userId")
+        let endPoint = "/api/v1/report"
+        let fullURL = baseURL + endPoint
         
-        // 3. Request Body 생성
+        //  2: 전송할 데이터 준비 (원래는 내부 내용이 들어가야하는데 여기서는 목데이터로)
         let reportRequest = ReportRequest(
             photoList: [
                 PhotoRequest(photoId: 1, photoUrl: "www.example1.com"),
                 PhotoRequest(photoId: 2, photoUrl: "www.example2.com")
             ],
-            address: "서울시 강남구",
-            content: "신고 내용 테스트",
-            phoneNumber: "010-1234-5678",
+            address: "사랑시 고백구 행복동",
+            content: "널 너무나 많이 사랑한죄",
+            phoneNumber: "010-2998-0867",
             category: "PARKING"
         )
         
-        // 4. Request Body를 JSON으로 변환
-        do {
-            let jsonData = try JSONEncoder().encode(reportRequest)
-            request.httpBody = jsonData
-        } catch {
-            showAlert(message: NetworkError.invalidRequest.errorMessage)
-            return
-        }
+        //  3: HTTP 헤더 설정
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/json",
+            "userId": "1"
+        ]
         
-        // 5. 네트워크 요청 보내기
-        DispatchQueue.global().async {
-            let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-                DispatchQueue.main.async {
-                    if let error = error {
-                        self?.showAlert(message: NetworkError.networkError(error).errorMessage)
-                        return
+        //  4: 네트워크 요청 보내기
+        AF.request(
+            fullURL,
+            method: .post,
+            parameters: reportRequest,
+            encoder: JSONParameterEncoder.default,
+            headers: headers
+        )
+        .validate()
+        .responseDecodable(of: ReportResponse.self) { [weak self] response in
+            switch response.result {
+            case .success(let reportResponse):
+                if reportResponse.status == 201 {
+                    self?.showAlert(message: "신고가 성공적으로 접수되었습니다") {
+                        self?.navigationController?.popViewController(animated: true)
                     }
-                    
-                    guard let httpResponse = response as? HTTPURLResponse else {
-                        self?.showAlert(message: NetworkError.invalidResponse.errorMessage)
-                        return
-                    }
-                    
-                    guard let data = data else {
-                        self?.showAlert(message: NetworkError.invalidResponse.errorMessage)
-                        return
-                    }
-                    
-                    do {
-                        let response = try JSONDecoder().decode(ReportResponse.self, from: data)
-                        
-                        if response.status == 201 {
-                            self?.showAlert(message: "신고가 성공적으로 접수되었습니다") {
-                                self?.navigationController?.popViewController(animated: true)
-                            }
-                        } else {
-                            self?.showAlert(message: response.message ?? NetworkError.serverError.errorMessage)
-                        }
-                    } catch {
-                        self?.showAlert(message: NetworkError.decodingError.errorMessage)
-                    }
+                } else {
+                    self?.showAlert(message: reportResponse.message ?? NetworkError.serverError.errorMessage)
+                }
+                
+            case .failure(_):
+                // 이미 정의된 NetworkError의 에러 메시지 사용
+                if let data = response.data {
+                    self?.showAlert(message: NetworkError.decodingError.errorMessage)
+                } else if response.response == nil {
+                    self?.showAlert(message: NetworkError.networkError(response.error!).errorMessage)
+                } else {
+                    self?.showAlert(message: NetworkError.serverError.errorMessage)
                 }
             }
-            task.resume()
         }
     }
     
@@ -348,7 +337,6 @@ extension ReportDetailViewController {
         present(alert, animated: true)
     }
 }
-
 
 #Preview {
     let navigationController = UINavigationController(rootViewController: ReportDetailViewController())
