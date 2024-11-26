@@ -14,6 +14,8 @@ class MockReportView: UIView {
     let mainButton = UIButton().then {
         $0.backgroundColor = .systemGray6
         $0.contentHorizontalAlignment = .left
+        $0.layer.cornerRadius = 8
+        $0.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         
         var configuration = UIButton.Configuration.plain()
         configuration.contentInsets = NSDirectionalEdgeInsets(
@@ -27,21 +29,19 @@ class MockReportView: UIView {
         $0.configuration = configuration
     }
     
+    private let optionsContainer = UIView().then {
+        $0.backgroundColor = .white
+        $0.layer.cornerRadius = 8
+        $0.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        CustomShadow.shared.applyShadow(to: $0.layer, width: 0, height: 4)
+        $0.isHidden = true
+    }
+    
     private let arrowImageView = UIImageView().then {
         $0.image = UIImage.icnArrowDownLineBlack24Px
         $0.tintColor = .darkGray
     }
-    
-    private let optionsContainer = UIView().then {
-        $0.backgroundColor = .white
-        $0.layer.cornerRadius = 8
-        $0.layer.shadowColor = UIColor.black.cgColor
-        $0.layer.shadowOpacity = 0.1
-        $0.layer.shadowRadius = 4
-        $0.layer.shadowOffset = CGSize(width: 0, height: 2)
-        $0.isHidden = true
-    }
-    
+
     private let optionsStackView = UIStackView().then {
         $0.axis = .vertical
         $0.spacing = 12

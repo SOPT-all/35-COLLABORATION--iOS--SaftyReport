@@ -103,12 +103,23 @@ class PhotoCell: BaseCell {
         guard let viewController = parentViewController else { return }
         
         let contentView = createAlertContentView(image: .howToReportDetail)
-        AlertManager.presentOneButtonAlert(
-            title: "사진 추가",
-            contentView: contentView,
-            mode: .info,
-            vc: viewController
+        let alertVC = BaseOneButtonAlertViewController()
+        alertVC.modalPresentationStyle = .overFullScreen
+        alertVC.modalTransitionStyle = .crossDissolve
+        
+        alertVC.setAlert("사진 추가", contentView, .info)
+        
+        alertVC.alertView.confirmButton.addAction(
+            UIAction { [weak alertVC, weak viewController] _ in
+                alertVC?.dismiss(animated: true) {
+                    let galleryVC = GalleryViewController()
+                    viewController?.navigationController?.pushViewController(galleryVC, animated: true)
+                }
+            },
+            for: .touchUpInside
         )
+        
+        viewController.present(alertVC, animated: true)
     }
 
     private func createAlertContentView(image: UIImage?) -> UIView {
