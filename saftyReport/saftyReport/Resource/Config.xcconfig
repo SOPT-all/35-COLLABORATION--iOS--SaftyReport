@@ -14,4 +14,4 @@
 // [GET] 54.180.192.157:8080/api/v1/report/photo
 // URL은 BASE 하나만 만들어 두는 거라고 해서 BASE_URL만 만들었습니다!
 
-BASE_URL = http:/$()/54.180.192.157
+BASE_URL = http:/$()/54.180.192.157:8080

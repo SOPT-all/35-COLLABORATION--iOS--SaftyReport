@@ -145,45 +145,45 @@ class ReportDetailViewController: UIViewController {
                     height: usableHeight * 0.2,
                     insets: .init(top: sectionSpacing + 12, leading: 20, bottom: 0, trailing: 20)
                 )
-               
-           case .location:
-               return self.makeSection(
-                   height: availableHeight * 0.15,
-                   insets: .init(top: sectionSpacing, leading: 20, bottom: 0, trailing: 20)
-               )
-               
-           case .content:
-               return self.makeSection(
-                   height: availableHeight * 0.35,
-                   insets: .init(top: 0, leading: 20, bottom: 0, trailing: 20)
-               )
-               
-           case .phone:
-               return self.makeSection(
-                   height: availableHeight * 0.15,
-                   insets: .init(top: 0, leading: 20, bottom: 0, trailing: 20)
-               )
-               
-           case .none:
-               return nil
-           }
-       }
-       return layout
+                
+            case .location:
+                return self.makeSection(
+                    height: availableHeight * 0.15,
+                    insets: .init(top: sectionSpacing, leading: 20, bottom: 0, trailing: 20)
+                )
+                
+            case .content:
+                return self.makeSection(
+                    height: availableHeight * 0.35,
+                    insets: .init(top: 0, leading: 20, bottom: 0, trailing: 20)
+                )
+                
+            case .phone:
+                return self.makeSection(
+                    height: availableHeight * 0.15,
+                    insets: .init(top: 0, leading: 20, bottom: 0, trailing: 20)
+                )
+                
+            case .none:
+                return nil
+            }
+        }
+        return layout
     }
-
+    
     private func makeSection(height: CGFloat, insets: NSDirectionalEdgeInsets) -> NSCollectionLayoutSection {
-       let itemSize = NSCollectionLayoutSize(
-           widthDimension: .fractionalWidth(1.0),
-           heightDimension: .absolute(height)
-       )
-       let item = NSCollectionLayoutItem(layoutSize: itemSize)
-       let group = NSCollectionLayoutGroup.horizontal(
-           layoutSize: itemSize,
-           subitems: [item]
-       )
-       let section = NSCollectionLayoutSection(group: group)
-       section.contentInsets = insets
-       return section
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .absolute(height)
+        )
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        let group = NSCollectionLayoutGroup.horizontal(
+            layoutSize: itemSize,
+            subitems: [item]
+        )
+        let section = NSCollectionLayoutSection(group: group)
+        section.contentInsets = insets
+        return section
     }
     
     private func configureDataSource() {
@@ -225,7 +225,7 @@ class ReportDetailViewController: UIViewController {
             return cell
         }
     }
-
+    
     private func applySnapshot() {
         var snapshot = NSDiffableDataSourceSnapshot<ReportDetailSection, ReportDetailItem>()
         ReportDetailSection.allCases.forEach { section in
@@ -250,10 +250,6 @@ class ReportDetailViewController: UIViewController {
             for: .touchUpInside
         )
     }
-    
-    @objc private func submitButtonTapped() {
-        print("제출 버튼이 눌렸습니다.")
-    }
 }
 
 extension ReportDetailViewController: LocationCellDelegate {
@@ -262,6 +258,97 @@ extension ReportDetailViewController: LocationCellDelegate {
         navigationController?.pushViewController(reportAddressVC, animated: true)
     }
 }
+
+extension ReportDetailViewController {
+    @objc private func submitButtonTapped() {
+        // 1. URL 생성
+        guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BASE_URL") as? String,
+              let url = URL(string: baseURL + "/api/v1/report") else {
+            showAlert(message: NetworkError.invalidURL.errorMessage)
+            return
+        }
+        
+        // 2. Request 생성
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("1", forHTTPHeaderField: "userId")
+        
+        // 3. Request Body 생성
+        let reportRequest = ReportRequest(
+            photoList: [
+                PhotoRequest(photoId: 1, photoUrl: "www.example1.com"),
+                PhotoRequest(photoId: 2, photoUrl: "www.example2.com")
+            ],
+            address: "서울시 강남구",
+            content: "신고 내용 테스트",
+            phoneNumber: "010-1234-5678",
+            category: "PARKING"
+        )
+        
+        // 4. Request Body를 JSON으로 변환
+        do {
+            let jsonData = try JSONEncoder().encode(reportRequest)
+            request.httpBody = jsonData
+        } catch {
+            showAlert(message: NetworkError.invalidRequest.errorMessage)
+            return
+        }
+        
+        // 5. 네트워크 요청 보내기
+        DispatchQueue.global().async {
+            let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+                DispatchQueue.main.async {
+                    if let error = error {
+                        self?.showAlert(message: NetworkError.networkError(error).errorMessage)
+                        return
+                    }
+                    
+                    guard let httpResponse = response as? HTTPURLResponse else {
+                        self?.showAlert(message: NetworkError.invalidResponse.errorMessage)
+                        return
+                    }
+                    
+                    guard let data = data else {
+                        self?.showAlert(message: NetworkError.invalidResponse.errorMessage)
+                        return
+                    }
+                    
+                    do {
+                        let response = try JSONDecoder().decode(ReportResponse.self, from: data)
+                        
+                        if response.status == 201 {
+                            self?.showAlert(message: "신고가 성공적으로 접수되었습니다") {
+                                self?.navigationController?.popViewController(animated: true)
+                            }
+                        } else {
+                            self?.showAlert(message: response.message ?? NetworkError.serverError.errorMessage)
+                        }
+                    } catch {
+                        self?.showAlert(message: NetworkError.decodingError.errorMessage)
+                    }
+                }
+            }
+            task.resume()
+        }
+    }
+    
+    private func showAlert(message: String, completion: (() -> Void)? = nil) {
+        let alert = UIAlertController(
+            title: nil,
+            message: message,
+            preferredStyle: .alert
+        )
+        
+        let okAction = UIAlertAction(title: "확인", style: .default) { _ in
+            completion?()
+        }
+        
+        alert.addAction(okAction)
+        present(alert, animated: true)
+    }
+}
+
 
 #Preview {
     let navigationController = UINavigationController(rootViewController: ReportDetailViewController())
