@@ -15,7 +15,8 @@ class ReportDetailViewController: UIViewController {
     private let containerView = UIView().then {
         $0.backgroundColor = .white
         $0.layer.cornerRadius = 8
-        CustomShadow.shared.applyShadow(to: $0.layer, width: 0, height: 4)
+        $0.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        CustomShadow.shared.applyShadow(to: $0.layer, width: 0, height: -4)
     }
     
     private let submitButton = UIButton().then {
@@ -71,19 +72,44 @@ class ReportDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        setupNavigationBar()
         setupCollectionView()
         setupSubmitButton()
         configureDataSource()
         applySnapshot()
     }
     
+    private func setupNavigationBar() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .primaryOrange
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        navigationController?.navigationBar.compactAppearance = appearance
+        navigationController?.navigationBar.compactScrollEdgeAppearance = appearance
+        
+        let customNavigationItem = CustomNavigationItem()
+        customNavigationItem.setUpNavigationBar(for: .back)
+        navigationItem.backBarButtonItem = customNavigationItem.backBarButtonItem
+        navigationItem.title = "신고하기"
+        
+        navigationController?.setNavigationBarHidden(false, animated: false)
+    }
+    
     private func setupCollectionView() {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
-        view.addSubview(collectionView)
-        view.addSubview(containerView)
+        collectionView.isScrollEnabled = false
+        view.addSubviews(collectionView, containerView)
+        
+        containerView.snp.makeConstraints {
+            $0.leading.trailing.bottom.equalToSuperview()
+            $0.height.equalTo(84)
+        }
         
         collectionView.snp.makeConstraints {
-            $0.top.left.right.equalToSuperview()
+            $0.top.leading.trailing.equalTo(view.safeAreaLayoutGuide)
             $0.bottom.equalTo(containerView.snp.top)
         }
         
@@ -97,93 +123,109 @@ class ReportDetailViewController: UIViewController {
     }
     
     private func createLayout() -> UICollectionViewLayout {
-        let layout = UICollectionViewCompositionalLayout { sectionIndex, _ in
+        let layout = UICollectionViewCompositionalLayout { [weak self] sectionIndex, _ in
+            guard let self = self else { return nil }
+            
+            let totalTopHeight = (navigationController?.navigationBar.frame.height ?? 0) + (view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0)
+            let availableHeight = view.frame.height - totalTopHeight - 84
+            
+            let sectionSpacing: CGFloat = 28
+            let totalSpacing = sectionSpacing * 4
+            let usableHeight = availableHeight - totalSpacing
+            
             let section = ReportDetailSection(rawValue: sectionIndex)
-            
-            if section == .reportType {
-                let itemSize = NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .estimated(36)
+            switch section {
+            case .reportType:
+                return makeSection(
+                    height: totalTopHeight * 0.2,
+                    insets: .zero
                 )
-                let item = NSCollectionLayoutItem(layoutSize: itemSize)
-                
-                let groupSize = NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .estimated(36)
+            case .photo:
+                return makeSection(
+                    height: usableHeight * 0.2,
+                    insets: .init(top: sectionSpacing + 12, leading: 20, bottom: 0, trailing: 20)
                 )
-                let group = NSCollectionLayoutGroup.horizontal(
-                    layoutSize: groupSize,
-                    subitems: [item]
-                )
-                
-                let section = NSCollectionLayoutSection(group: group)
-                section.contentInsets = NSDirectionalEdgeInsets(
-                    top: 12,
-                    leading: 0,
-                    bottom: 0,
-                    trailing: 0
-                )
-                return section
-            }
-            
-            let groupSize = NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .estimated(70)
-            )
-            
-            let group = NSCollectionLayoutGroup.horizontal(
-                layoutSize: groupSize,
-                subitems: [NSCollectionLayoutItem(layoutSize: groupSize)]
-            )
-            
-            let layoutSection = NSCollectionLayoutSection(group: group)
-            layoutSection.contentInsets = NSDirectionalEdgeInsets(
-                top: 6,
-                leading: 12,
-                bottom: 12,
-                trailing: 12
-            )
-            return layoutSection
-        }
-        return layout
+               
+           case .location:
+               return self.makeSection(
+                   height: availableHeight * 0.15,
+                   insets: .init(top: sectionSpacing, leading: 20, bottom: 0, trailing: 20)
+               )
+               
+           case .content:
+               return self.makeSection(
+                   height: availableHeight * 0.35,
+                   insets: .init(top: 0, leading: 20, bottom: 0, trailing: 20)
+               )
+               
+           case .phone:
+               return self.makeSection(
+                   height: availableHeight * 0.15,
+                   insets: .init(top: 0, leading: 20, bottom: 0, trailing: 20)
+               )
+               
+           case .none:
+               return nil
+           }
+       }
+       return layout
+    }
+
+    private func makeSection(height: CGFloat, insets: NSDirectionalEdgeInsets) -> NSCollectionLayoutSection {
+       let itemSize = NSCollectionLayoutSize(
+           widthDimension: .fractionalWidth(1.0),
+           heightDimension: .absolute(height)
+       )
+       let item = NSCollectionLayoutItem(layoutSize: itemSize)
+       let group = NSCollectionLayoutGroup.horizontal(
+           layoutSize: itemSize,
+           subitems: [item]
+       )
+       let section = NSCollectionLayoutSection(group: group)
+       section.contentInsets = insets
+       return section
     }
     
     private func configureDataSource() {
-        dataSource = UICollectionViewDiffableDataSource<ReportDetailSection, ReportDetailItem>(collectionView: collectionView) { collectionView, indexPath, item in
-            return self.cellForItem(collectionView: collectionView, indexPath: indexPath, item: item)
+        dataSource = UICollectionViewDiffableDataSource<ReportDetailSection, ReportDetailItem>(collectionView: collectionView) { [weak self] collectionView, indexPath, item in
+            guard let self = self else { return UICollectionViewCell() }
+            
+            guard let section = ReportDetailSection(rawValue: indexPath.section) else {
+                return UICollectionViewCell()
+            }
+            
+            let reuseIdentifier: String
+            
+            switch section {
+            case .reportType:
+                reuseIdentifier = ReportTypeCell.reuseIdentifier
+            case .photo:
+                reuseIdentifier = PhotoCell.reuseIdentifier
+            case .location:
+                reuseIdentifier = LocationCell.reuseIdentifier
+            case .content:
+                reuseIdentifier = ContentCell.reuseIdentifier
+            case .phone:
+                reuseIdentifier = PhoneCell.reuseIdentifier
+            }
+            
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: reuseIdentifier,
+                for: indexPath
+            )
+            
+            if let locationCell = cell as? LocationCell {
+                locationCell.delegate = self
+            }
+            
+            if let configurableCell = cell as? ConfigurableCell {
+                configurableCell.configure(with: item)
+            }
+            
+            return cell
         }
     }
-    
-    private func cellForItem(collectionView: UICollectionView, indexPath: IndexPath, item: ReportDetailItem) -> UICollectionViewCell {
-        guard let section = ReportDetailSection(rawValue: indexPath.section) else {
-            return UICollectionViewCell()
-        }
-        
-        let reuseIdentifier: String
-        
-        switch section {
-        case .reportType:
-            reuseIdentifier = ReportTypeCell.reuseIdentifier
-        case .photo:
-            reuseIdentifier = PhotoCell.reuseIdentifier
-        case .location:
-            reuseIdentifier = LocationCell.reuseIdentifier
-        case .content:
-            reuseIdentifier = ContentCell.reuseIdentifier
-        case .phone:
-            reuseIdentifier = PhoneCell.reuseIdentifier
-        }
-        
-        let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: reuseIdentifier,
-            for: indexPath
-        )
-        if let configurableCell = cell as? ConfigurableCell {
-            configurableCell.configure(with: item)
-        }
-        return cell
-    }
-    
+
     private func applySnapshot() {
         var snapshot = NSDiffableDataSourceSnapshot<ReportDetailSection, ReportDetailItem>()
         ReportDetailSection.allCases.forEach { section in
@@ -195,11 +237,6 @@ class ReportDetailViewController: UIViewController {
     
     private func setupSubmitButton() {
         containerView.addSubview(submitButton)
-        
-        containerView.snp.makeConstraints {
-            $0.left.right.bottom.equalToSuperview()
-            $0.height.equalTo(84)
-        }
         
         submitButton.snp.makeConstraints {
             $0.left.right.equalToSuperview().inset(24)
@@ -217,9 +254,16 @@ class ReportDetailViewController: UIViewController {
     @objc private func submitButtonTapped() {
         print("제출 버튼이 눌렸습니다.")
     }
-    
 }
 
-#Preview{
-    ReportDetailViewController()
+extension ReportDetailViewController: LocationCellDelegate {
+    func locationIconTapped() {
+        let reportAddressVC = ReportAddressViewController()
+        navigationController?.pushViewController(reportAddressVC, animated: true)
+    }
+}
+
+#Preview {
+    let navigationController = UINavigationController(rootViewController: ReportDetailViewController())
+    return navigationController
 }

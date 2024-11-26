@@ -10,7 +10,14 @@ import UIKit
 import SnapKit
 import Then
 
+protocol LocationCellDelegate: AnyObject {
+    func locationIconTapped()
+}
+
 class LocationCell: BaseCell {
+    
+    weak var delegate: LocationCellDelegate?
+
     private let smallLocationIcon = UIImageView().then {
         let image = UIImage(named: "icn_location_line_black_24px")
         $0.image = image
@@ -33,9 +40,15 @@ class LocationCell: BaseCell {
         $0.contentMode = .scaleAspectFit
     }
     
+    private let tapAreaView = UIView().then {
+        $0.backgroundColor = .clear
+        $0.isUserInteractionEnabled = true
+    }
+        
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
+        setupGesture()
     }
     
     required init?(coder: NSCoder) {
@@ -43,7 +56,7 @@ class LocationCell: BaseCell {
     }
     
     private func setupUI() {
-        contentView.addSubviews(smallLocationIcon, locationLabel, locationIcon)
+        contentView.addSubviews(smallLocationIcon, locationLabel, locationIcon, tapAreaView)
         
         smallLocationIcon.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(8)
@@ -61,6 +74,19 @@ class LocationCell: BaseCell {
             $0.trailing.equalToSuperview()
             $0.size.equalTo(40)
         }
+        
+        tapAreaView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+    }
+    
+    private func setupGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(locationIconTapped))
+        tapAreaView.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func locationIconTapped() {
+        delegate?.locationIconTapped()
     }
     
     override func configure(with item: ReportDetailItem) {
