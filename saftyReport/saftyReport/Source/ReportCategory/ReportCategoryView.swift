@@ -8,13 +8,38 @@
 import UIKit
 
 class ReportCategoryView: UIView {
-
-    /*
-    // Only override draw() if you perform custom drawing.
-    // An empty implementation adversely affects performance during animation.
-    override func draw(_ rect: CGRect) {
-        // Drawing code
+    
+    // MARK: - Properties
+    
+    let tableView = UITableView()
+    
+    
+    // MARK: - Methods
+    
+    override init(frame: CGRect) {
+        super.init(frame: .zero)
+        setUI()
+        setHierarchy()
+        setConstraints()
     }
-    */
-
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setUI() {
+        self.backgroundColor = .gray1
+    }
+    
+    private func setHierarchy() {
+        self.addSubview(tableView)
+    }
+    
+    private func setConstraints() {
+        tableView.snp.makeConstraints {
+            $0.top.equalTo(self.safeAreaLayoutGuide).offset(20)
+            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.bottom.equalToSuperview()
+        }
+    }
 }
