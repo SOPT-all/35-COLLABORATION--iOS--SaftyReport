@@ -12,11 +12,11 @@ class MyReportBannerCollectionViewCell: UICollectionViewCell {
     
     let bannerImgList = ["img_promotion_1", "img_promotion_2", "img_promotion_3"]
     
-    let leftButton = UIButton().then {
+    lazy var leftButton = UIButton().then {
         $0.setBackgroundImage(UIImage(named: "icn_arrow_left_round_white_24px"), for: .normal)
         $0.addTarget(self, action: #selector(leftButtonTapped), for: .touchUpInside)
     }
-    let rightButton = UIButton().then {
+    lazy var rightButton = UIButton().then {
         $0.setBackgroundImage(UIImage(named: "icn_arrow_right_round_white_24px"), for: .normal)
         $0.addTarget(self, action: #selector(rightButtonTapped), for: .touchUpInside)
     }
