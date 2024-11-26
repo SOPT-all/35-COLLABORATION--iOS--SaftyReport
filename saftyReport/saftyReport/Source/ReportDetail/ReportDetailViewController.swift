@@ -149,7 +149,7 @@ class ReportDetailViewController: UIViewController {
            case .location:
                return self.makeSection(
                    height: availableHeight * 0.15,
-                   insets: .init(top: 0, leading: 20, bottom: 0, trailing: 20)
+                   insets: .init(top: sectionSpacing, leading: 20, bottom: 0, trailing: 20)
                )
                
            case .content:
