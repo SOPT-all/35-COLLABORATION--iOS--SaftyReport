@@ -93,6 +93,7 @@ class ReportDetailViewController: UIViewController {
         let customNavigationItem = CustomNavigationItem()
         customNavigationItem.setUpNavigationBar(for: .back)
         navigationItem.backBarButtonItem = customNavigationItem.backBarButtonItem
+        navigationItem.backBarButtonItem?.tintColor = .gray1
         navigationItem.title = "신고하기"
         
         navigationController?.setNavigationBarHidden(false, animated: false)

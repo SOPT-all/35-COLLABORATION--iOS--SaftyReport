@@ -66,11 +66,13 @@ class GalleryDetailViewController: UIViewController {
         
         setUI()
         setLayout()
+        setupNavigationBar()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        tabBarController?.tabBar.isHidden = true
         checkbox.setBackgroundImage(
             isChecked ? .icnCheckboxISquareSelectedWhite24Px : .icnCheckboxISquareUnselectedWhite24Px,
             for: .normal
@@ -128,6 +130,14 @@ class GalleryDetailViewController: UIViewController {
             $0.height.equalTo(22)
         }
         
+    }
+    
+    private func setupNavigationBar() {
+        let customNavigationItem = CustomNavigationItem()
+        customNavigationItem.setUpNavigationBar(for: .back)
+        navigationItem.backBarButtonItem = customNavigationItem.backBarButtonItem
+        navigationItem.backBarButtonItem?.tintColor = .gray1
+        navigationItem.title = "상세 보기"
     }
     
     @objc private func checkboxTapped() {
