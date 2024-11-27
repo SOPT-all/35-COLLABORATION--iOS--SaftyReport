@@ -22,6 +22,15 @@ class MainViewController: UIViewController {
         $0.clipsToBounds = false
     }
     
+    private lazy var floatingButton = UIButton().then {
+        $0.setImage(UIImage(named: "icn_cross_i_normal_white_16px"), for: .normal)
+        $0.setTitle("신고하기", for: .normal)
+        $0.titleLabel?.font = TextStyle.body3.font
+        $0.setTitleColor(.white, for: .normal)
+        $0.tintColor = .white
+        $0.backgroundColor = .primaryOrange
+        $0.layer.cornerRadius = 20
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,7 +64,7 @@ class MainViewController: UIViewController {
     }
     
     private func setUI() {
-        self.view.addSubviews(collectionView)
+        self.view.addSubviews(collectionView, floatingButton)
     }
     
     private func setLayout() {
@@ -63,6 +72,12 @@ class MainViewController: UIViewController {
             $0.top.equalTo(self.view.safeAreaLayoutGuide).inset(24)
             $0.bottom.equalTo(self.view.safeAreaLayoutGuide).inset(24)
             $0.leading.trailing.equalToSuperview().inset(16)
+        }
+        floatingButton.snp.makeConstraints {
+            $0.bottom.equalTo(self.view.safeAreaLayoutGuide).inset(14)
+            $0.height.equalTo(40)
+            $0.width.equalTo(104)
+            $0.trailing.equalToSuperview().inset(13)
         }
     }
     
@@ -172,4 +187,8 @@ extension MainViewController: UICollectionViewDelegate {
         }
         return header
     }
+}
+
+#Preview {
+    MainViewController()
 }
