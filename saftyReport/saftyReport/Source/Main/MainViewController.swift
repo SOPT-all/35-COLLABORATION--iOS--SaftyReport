@@ -79,22 +79,39 @@ class MainViewController: UIViewController {
     
     @objc private func floatingButtonTapped(_ sender: UIButton) {
         isToggled.toggle()
+        
+        
+        updateAnimation()
         updateFloaingButtonUI()
     }
     
+    private func updateAnimation() {
+        let newWidth: CGFloat = isToggled ? 40 : 104
+        let newAngle: CGFloat = isToggled ? CGFloat.pi / 4 : 0
+        
+        floatingButton.snp.updateConstraints {
+            $0.width.equalTo(newWidth)
+        }
+
+        UIView.animate(withDuration: 0.15) {
+            self.view.layoutIfNeeded() // 레이아웃 업데이트를 애니메이션으로 적용
+            self.floatingButton.transform = CGAffineTransform(rotationAngle: newAngle) // 45도 회전
+        }
+    }
+    
     private func updateFloaingButtonUI() {
+        let image = UIImage(named: "icn_cross_i_normal_white_16px")?.withRenderingMode(.alwaysTemplate)
+        floatingButton.setImage(image, for: .normal)
+        
         if isToggled {
-            floatingButton.setImage(UIImage(named: "icn_cross_i_selected_black_16px"), for: .normal)
             floatingButton.setTitle("", for: .normal)
             floatingButton.tintColor = .gray13
             floatingButton.backgroundColor = .gray1
             floatingButton.layer.cornerRadius = 20
         } else {
-            floatingButton.setImage(UIImage(named: "icn_cross_i_normal_white_16px"), for: .normal)
             floatingButton.setTitle("신고하기", for: .normal)
             floatingButton.titleLabel?.font = TextStyle.body3.font
-            floatingButton.setTitleColor(.white, for: .normal)
-            floatingButton.tintColor = .white
+            floatingButton.tintColor = .gray1
             floatingButton.backgroundColor = .primaryOrange
             floatingButton.layer.cornerRadius = 20
         }
