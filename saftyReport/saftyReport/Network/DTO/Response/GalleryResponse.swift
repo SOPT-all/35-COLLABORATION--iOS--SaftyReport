@@ -26,4 +26,10 @@ struct GalleryData: Codable {
 struct GalleryPhotoList: Codable {
     let photoID: Int?
     let photoURL, createdAt: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case photoID = "photoId"
+        case photoURL = "photoUrl"
+        case createdAt
+    }
 }

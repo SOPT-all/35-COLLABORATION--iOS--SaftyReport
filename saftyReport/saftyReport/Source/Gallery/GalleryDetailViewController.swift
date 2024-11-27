@@ -22,7 +22,6 @@ class GalleryDetailViewController: UIViewController {
     
     private var imageView = UIImageView().then {
         $0.contentMode = .scaleAspectFit
-//        $0.image = .test
         $0.backgroundColor = .gray // 이미지 넣으면 지울 코드
     }
     
@@ -131,6 +130,10 @@ class GalleryDetailViewController: UIViewController {
         }
         
     }
+    
+//    func configure(item: GalleryPhotoList){
+//        imageView.image = item.
+//    }
     
     private func setupNavigationBar() {
         let customNavigationItem = CustomNavigationItem()
