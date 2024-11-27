@@ -25,39 +25,47 @@ class MainViewController: UIViewController {
         $0.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
     }
     
-    private lazy var categoryStackView = UIStackView().then {
+    private lazy var topStackView = UIStackView().then {
         $0.axis = .vertical
         $0.spacing = 0
+        $0.layer.cornerRadius = 15
+        $0.backgroundColor = .gray1
+        $0.distribution = .fillEqually
     }
     
-    private lazy var stackView = UIStackView().then {
+    private lazy var bottomStackView = UIStackView().then {
         $0.axis = .vertical
         $0.spacing = 0
+        $0.layer.cornerRadius = 15
+        $0.backgroundColor = .gray1
+        $0.distribution = .fillEqually
     }
     
     let safetyButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "shield"), for: .normal)
-        $0.setTitle("안전", for: .normal)
+        $0.setImage(UIImage(named: "icn_safety_line_black_24px"), for: .normal)
+        $0.setAttributedTitle(NSAttributedString.styled(text: "안전", style: .body9, alignment: .left), for: .normal)
+        $0.setTitleColor(.gray13, for: .normal)
     }
     let parkingButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "shield"), for: .normal)
-        $0.setTitle("안전", for: .normal)
+        $0.setImage(UIImage(named: "icn_carwheel_line_black_24px"), for: .normal)
+        $0.setAttributedTitle(NSAttributedString.styled(text: "불법주정차", style: .body9, alignment: .left), for: .normal)
+        $0.tintColor = .gray13
     }
     let reportButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "shield"), for: .normal)
-        $0.setTitle("안전", for: .normal)
+        $0.setImage(UIImage(named: "icn_car_line_black_24px"), for: .normal)
+        $0.setAttributedTitle(NSAttributedString.styled(text: "자동차/교통위반", style: .body9, alignment: .left), for: .normal)
     }
     let lifeButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "shield"), for: .normal)
-        $0.setTitle("안전", for: .normal)
+        $0.setImage(UIImage(named: "icn_danger_line_black_24px"), for: .normal)
+        $0.setAttributedTitle(NSAttributedString.styled(text: "생활불편", style: .body9, alignment: .left), for: .normal)
     }
     let allCategoryButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "shield"), for: .normal)
-        $0.setTitle("안전", for: .normal)
+        $0.setImage(UIImage(named: "icn_fullmenu_line_black_24px"), for: .normal)
+        $0.setAttributedTitle(NSAttributedString.styled(text: "전체 메뉴 보기", style: .body9, alignment: .left), for: .normal)
     }
     let cameraButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "shield"), for: .normal)
-        $0.setTitle("안전", for: .normal)
+        $0.setImage(UIImage(named: "icn_camera_line_black_24px"), for: .normal)
+        $0.setAttributedTitle(NSAttributedString.styled(text: "촬영하기", style: .body9, alignment: .left), for: .normal)
     }
     
     private let collectionView = UICollectionView(
@@ -73,6 +81,7 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .gray1
         
+        CustomShadow.shared.applyShadow(to: allStackView.layer, width: 5, height: 5)
         setUI()
         setLayout()
         updateFloaingButtonUI()
@@ -103,9 +112,9 @@ class MainViewController: UIViewController {
     
     private func setUI() {
         self.view.addSubviews(collectionView, floatingButton, allStackView)
-        allStackView.addArrangedSubviews(categoryStackView, stackView)
-        categoryStackView.addArrangedSubviews(safetyButton, parkingButton, reportButton, lifeButton)
-        stackView.addArrangedSubviews(allCategoryButton, cameraButton)
+        allStackView.addArrangedSubviews(topStackView, bottomStackView)
+        topStackView.addArrangedSubviews(safetyButton, parkingButton, reportButton, lifeButton)
+        bottomStackView.addArrangedSubviews(allCategoryButton, cameraButton)
     }
     
     private func setLayout() {
@@ -123,12 +132,15 @@ class MainViewController: UIViewController {
         allStackView.snp.makeConstraints {
             $0.trailing.equalTo(floatingButton.snp.trailing)
             $0.bottom.equalTo(floatingButton.snp.top).offset(-16)
+            $0.width.equalTo(175)
         }
-        categoryStackView.snp.makeConstraints {
+        topStackView.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(175)
         }
-        stackView.snp.makeConstraints {
+        bottomStackView.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(95)
         }
     }
     
