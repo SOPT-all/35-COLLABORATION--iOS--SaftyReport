@@ -44,7 +44,6 @@ class ReportCategoryViewController: UIViewController {
     }
     
     private func setDataSource() {
-//        reportCategoryView.tableView.dataSource = UITableViewDiffableDataSource
         dataSource = UITableViewDiffableDataSource
             <ReportCategory.Section, ReportCategory.Item>(tableView:
                                                             reportCategoryView.tableView) {
@@ -53,18 +52,16 @@ class ReportCategoryViewController: UIViewController {
                              item: ReportCategory.Item) -> UITableViewCell? in
                 guard let self = self else { return nil }
                 
-                switch item.toggleState {
-                case .normal:
+                if item.isExpanded {
+                    guard let cell = reportCategoryView.tableView.dequeueReusableCell(withIdentifier: ReportCategoryExpandedTableViewCell.identifier, for: indexPath) as? ReportCategoryExpandedTableViewCell else { return nil }
+                    cell.bind(item: item)
+                    return cell
+                } else {
                     guard let cell = reportCategoryView.tableView.dequeueReusableCell(
                         withIdentifier: ReportCategoryNormalTableViewCell.identifier,
                         for: indexPath
                     ) as? ReportCategoryNormalTableViewCell else { return nil }
                     
-                    cell.bind(item: item)
-                    return cell
-                    
-                case .expanded:
-                    guard let cell = reportCategoryView.tableView.dequeueReusableCell(withIdentifier: ReportCategoryExpandedTableViewCell.identifier, for: indexPath) as? ReportCategoryExpandedTableViewCell else { return nil }
                     cell.bind(item: item)
                     return cell
                 }
@@ -105,11 +102,29 @@ extension ReportCategoryViewController: UITableViewDelegate {
         guard let item = dataSource.itemIdentifier(for: indexPath)
         else { return UITableView.automaticDimension }
         
-        switch item.toggleState {
-        case .normal:
-            return 58 + 10
-        case .expanded:
+        if item.isExpanded {
             return 258 + 10
+        } else {
+            return 58 + 10
         }
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        guard var item = dataSource.itemIdentifier(for: indexPath) as? ExpandableJobDetail else {
+//                    return
+//                }
+//                item.isExpanded.toggle()
+//
+//                var snapshot = dataSource.snapshot()
+//
+//                // 항목 업데이트
+//                snapshot.insertItems([item], beforeItem: snapshot.itemIdentifiers(inSection: .expandable)[indexPath.row])
+//                snapshot.deleteItems([dataSource.itemIdentifier(for: indexPath)!])
+//                
+//                dataSource.apply(snapshot, animatingDifferences: true)
+//                
+//                collectionView.performBatchUpdates({
+//                    collectionView.layoutIfNeeded()
+//                }, completion: nil)
     }
 }
