@@ -14,9 +14,12 @@ class NetworkManager {
     func photoAPI(compleation: @escaping (Result<[GalleryPhotoList], NetworkError>) -> Void) {
         guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BASE_URL") as? String else { return }
         
-        let url = baseURL + "/api/v1/report/photo"
+        let url = "\(baseURL)/api/v1/report/photo"
         
-        AF.request(url, method: .get, headers: ["Content-Type": "application/json"])
+        let headers: HTTPHeaders = ["Content-Type": "application/json",
+                                    "userId": "1"]
+        
+        AF.request(url, method: .get, headers: headers)
             .validate()
             .response { [weak self] response in
                 guard let statusCode = response.response?.statusCode,
@@ -34,6 +37,7 @@ class NetworkManager {
                     compleation(.success(photoList))
                 case .failure:
                     let error = self.handleStatusCode(statusCode, data: data)
+                    print(error.localizedDescription)
                     compleation(.failure(error))
                 }
                 

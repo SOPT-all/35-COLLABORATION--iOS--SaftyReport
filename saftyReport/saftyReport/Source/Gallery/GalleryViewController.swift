@@ -11,6 +11,7 @@ import SnapKit
 import Then
 
 class GalleryViewController: UIViewController {
+    private let networkManager = NetworkManager()
     private var photoList: [GalleryPhotoList] = []
     
     private let collectionView = UICollectionView(frame: .zero,
@@ -36,6 +37,7 @@ class GalleryViewController: UIViewController {
         setLayout()
         setupCollectionView()
         setupNavigationBar()
+        connectAPI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -81,6 +83,25 @@ class GalleryViewController: UIViewController {
 
     @objc private func usingButtonTapped() {
         print("사용 버튼이 눌렸습니다.")
+    }
+    
+    private func connectAPI() {
+        
+        DispatchQueue.main.async {
+            self.networkManager.photoAPI { [weak self] result in
+                guard let self = self else { return }
+                
+                switch result {
+                case let .success(list):
+                    self.photoList = list
+                case let .failure(error):
+                    print(error.localizedDescription)
+                }
+                
+                
+            }
+        }
+        
     }
     
 }
