@@ -8,8 +8,5 @@
 import Foundation
 
 enum Environment {
-    static let HomeURL: String = Bundle.main.infoDictionary?["URL명 적을 곳"] as! String
-    static let CategoryURL: String = Bundle.main.infoDictionary?["URL명 적을 곳"] as! String
-    static let ReportURL: String = Bundle.main.infoDictionary?["URL명 적을 곳"] as! String
-    static let GalleryURL: String = Bundle.main.infoDictionary?["URL명 적을 곳"] as! String
+    static let baseURL: String = Bundle.main.infoDictionary?["BASE_URL"] as! String
 }

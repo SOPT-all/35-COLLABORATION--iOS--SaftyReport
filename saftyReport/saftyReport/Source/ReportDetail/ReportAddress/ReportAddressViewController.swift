@@ -123,7 +123,7 @@ class ReportAddressViewController: UIViewController {
         
         searchAddressButton.snp.makeConstraints {
             $0.top.equalTo(addressView.snp.bottom).offset(20)
-            $0.leading.equalTo(searchKeywordButton.snp.trailing).offset(9)
+            $0.trailing.equalToSuperview().inset(15)
             $0.width.equalTo(168)
             $0.height.equalTo(50)
         }
