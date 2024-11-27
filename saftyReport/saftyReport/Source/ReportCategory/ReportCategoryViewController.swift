@@ -53,9 +53,14 @@ class ReportCategoryViewController: UIViewController {
                 guard let self = self else { return nil }
                 
                 if item.isExpanded {
-                    guard let cell = reportCategoryView.tableView.dequeueReusableCell(withIdentifier: ReportCategoryExpandedTableViewCell.identifier, for: indexPath) as? ReportCategoryExpandedTableViewCell else { return nil }
+                    guard let cell = reportCategoryView.tableView.dequeueReusableCell(
+                        withIdentifier: ReportCategoryExpandedTableViewCell.identifier,
+                        for: indexPath
+                    ) as? ReportCategoryExpandedTableViewCell else { return nil }
+                    
                     cell.bind(item: item)
                     return cell
+                    
                 } else {
                     guard let cell = reportCategoryView.tableView.dequeueReusableCell(
                         withIdentifier: ReportCategoryNormalTableViewCell.identifier,
@@ -88,7 +93,6 @@ extension ReportCategoryViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        print("rows: \(dataSource.snapshot().itemIdentifiers(inSection: ReportCategory.Section.allCases[section]).count)개")
         return dataSource.snapshot().itemIdentifiers(inSection: ReportCategory.Section.allCases[section]).count
     }
     
@@ -110,21 +114,15 @@ extension ReportCategoryViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        guard var item = dataSource.itemIdentifier(for: indexPath) as? ExpandableJobDetail else {
-//                    return
-//                }
-//                item.isExpanded.toggle()
-//
-//                var snapshot = dataSource.snapshot()
-//
-//                // 항목 업데이트
-//                snapshot.insertItems([item], beforeItem: snapshot.itemIdentifiers(inSection: .expandable)[indexPath.row])
-//                snapshot.deleteItems([dataSource.itemIdentifier(for: indexPath)!])
-//                
-//                dataSource.apply(snapshot, animatingDifferences: true)
-//                
-//                collectionView.performBatchUpdates({
-//                    collectionView.layoutIfNeeded()
-//                }, completion: nil)
+        guard var item = dataSource.itemIdentifier(for: indexPath) else { return }
+        
+        item.isExpanded.toggle()
+        
+        var snapshot = dataSource.snapshot()
+        
+        snapshot.insertItems([item], beforeItem: snapshot.itemIdentifiers(inSection: item.section)[indexPath.row])
+        snapshot.deleteItems([dataSource.itemIdentifier(for: indexPath)!])
+        
+        dataSource.apply(snapshot, animatingDifferences: false)
     }
 }
