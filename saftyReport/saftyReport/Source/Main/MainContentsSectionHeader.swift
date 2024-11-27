@@ -15,7 +15,6 @@ class MainContentsSectionHeader: UICollectionReusableView {
     
     let headerLabel = UILabel().then {
         $0.numberOfLines = 0
-        $0.text = " "
         $0.attributedText = NSAttributedString.styled(text: "header title", style: .body2)
     }
     
@@ -66,23 +65,19 @@ class MainContentsSectionHeader: UICollectionReusableView {
         }
     }
     
-    func configure(with header: MainContentsItem) {
-        if header == .myReport {
-            headerLabel.text = "올해 나의 신고"
+    func configure(with mainHeaderItem: MainHeaderItem) {
+        headerLabel.text = mainHeaderItem.title
+        
+        switch mainHeaderItem.rightHeaderItem {
+        case .mileageLabel:
             mileageLabel.isHidden = false
             moreButton.isHidden = true
-        } else if header == .finishedReport {
-            headerLabel.text = "주요 처리 사례"
+        case .moreButton:
             mileageLabel.isHidden = true
             moreButton.isHidden = false
-        } else {
-            headerLabel.isHidden = true
+        default:
             mileageLabel.isHidden = true
             moreButton.isHidden = true
         }
     }
-}
-
-#Preview {
-    MainContentsSectionHeader()
 }

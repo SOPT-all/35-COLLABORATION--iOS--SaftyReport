@@ -15,7 +15,7 @@ class MainViewController: UIViewController {
     
     private let collectionView = UICollectionView(
         frame: .zero,
-        collectionViewLayout: MainContentsItem.createLayout()
+        collectionViewLayout: MainContentsItemLayout.createLayout()
     ).then {
         $0.backgroundColor = .clear
         $0.isScrollEnabled = false
@@ -150,12 +150,26 @@ extension MainViewController: UICollectionViewDelegate {
               ) as? MainContentsSectionHeader else {
             return UICollectionReusableView()
         }
-        if indexPath.section == 0 {
-            header.configure(with: .myReport)
-        } else if indexPath.section == 2 {
-            header.configure(with: .finishedReport)
-        }
         
+        switch indexPath.section {
+        case 0:
+            header.configure(with: MainHeaderItem(
+                section: .myReport,
+                title: "올해 나의 신고",
+                rightHeaderItem: .mileageLabel))
+        case 1:
+            header.configure(with: MainHeaderItem(
+                section: .banner,
+                title: nil,
+                rightHeaderItem: nil))
+        case 2:
+            header.configure(with: MainHeaderItem(
+                section: .finishedReport,
+                title: "주요 처리 사례",
+                rightHeaderItem: .moreButton))
+        default :
+            break
+        }
         return header
     }
 }

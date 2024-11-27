@@ -7,13 +7,7 @@
 
 import UIKit
 
-enum MainContentsItem {
-    case myReport
-    case banner
-    case finishedReport
-    
-    static let mainSectionTitle = ["올해 나의 신고", nil, "주요 처리 사례"]
-    
+enum MainContentsItemLayout {
     static func createLayout() -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout { (sectionNumber, _ environment) -> NSCollectionLayoutSection? in
             let section: NSCollectionLayoutSection
