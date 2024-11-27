@@ -18,54 +18,14 @@ class MainViewController: UIViewController {
         $0.addTarget(self, action: #selector(floatingButtonTapped), for: .touchUpInside)
     }
     
-    private lazy var allStackView = UIStackView().then {
-        $0.axis = .vertical
-        $0.spacing = 8
+    private lazy var tableView = UITableView().then {
+        $0.separatorStyle = .none
+        $0.isScrollEnabled = false
+//        $0.clipsToBounds = false
+        $0.backgroundColor = .gray1
         $0.alpha = 0.0
-        $0.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
-    }
-    
-    private lazy var topStackView = UIStackView().then {
-        $0.axis = .vertical
-        $0.spacing = 0
+        $0.transform = CGAffineTransform.identity
         $0.layer.cornerRadius = 15
-        $0.backgroundColor = .gray1
-        $0.distribution = .fillEqually
-    }
-    
-    private lazy var bottomStackView = UIStackView().then {
-        $0.axis = .vertical
-        $0.spacing = 0
-        $0.layer.cornerRadius = 15
-        $0.backgroundColor = .gray1
-        $0.distribution = .fillEqually
-    }
-    
-    let safetyButton = UIButton().then {
-        $0.setImage(UIImage(named: "icn_safety_line_black_24px"), for: .normal)
-        $0.setAttributedTitle(NSAttributedString.styled(text: "안전", style: .body9, alignment: .left), for: .normal)
-        $0.setTitleColor(.gray13, for: .normal)
-    }
-    let parkingButton = UIButton().then {
-        $0.setImage(UIImage(named: "icn_carwheel_line_black_24px"), for: .normal)
-        $0.setAttributedTitle(NSAttributedString.styled(text: "불법주정차", style: .body9, alignment: .left), for: .normal)
-        $0.tintColor = .gray13
-    }
-    let reportButton = UIButton().then {
-        $0.setImage(UIImage(named: "icn_car_line_black_24px"), for: .normal)
-        $0.setAttributedTitle(NSAttributedString.styled(text: "자동차/교통위반", style: .body9, alignment: .left), for: .normal)
-    }
-    let lifeButton = UIButton().then {
-        $0.setImage(UIImage(named: "icn_danger_line_black_24px"), for: .normal)
-        $0.setAttributedTitle(NSAttributedString.styled(text: "생활불편", style: .body9, alignment: .left), for: .normal)
-    }
-    let allCategoryButton = UIButton().then {
-        $0.setImage(UIImage(named: "icn_fullmenu_line_black_24px"), for: .normal)
-        $0.setAttributedTitle(NSAttributedString.styled(text: "전체 메뉴 보기", style: .body9, alignment: .left), for: .normal)
-    }
-    let cameraButton = UIButton().then {
-        $0.setImage(UIImage(named: "icn_camera_line_black_24px"), for: .normal)
-        $0.setAttributedTitle(NSAttributedString.styled(text: "촬영하기", style: .body9, alignment: .left), for: .normal)
     }
     
     private let collectionView = UICollectionView(
@@ -81,10 +41,15 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .gray1
         
-        CustomShadow.shared.applyShadow(to: allStackView.layer, width: 5, height: 5)
+        CustomShadow.shared.applyShadow(to: tableView.layer, width: 5, height: 5)
         setUI()
         setLayout()
         updateFloaingButtonUI()
+        
+        tableView.dataSource = self
+        tableView.delegate = self
+        
+        tableView.register(ButtonTableCell.self, forCellReuseIdentifier: ButtonTableCell.identifier)
         
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -111,10 +76,7 @@ class MainViewController: UIViewController {
     }
     
     private func setUI() {
-        self.view.addSubviews(collectionView, floatingButton, allStackView)
-        allStackView.addArrangedSubviews(topStackView, bottomStackView)
-        topStackView.addArrangedSubviews(safetyButton, parkingButton, reportButton, lifeButton)
-        bottomStackView.addArrangedSubviews(allCategoryButton, cameraButton)
+        self.view.addSubviews(collectionView, floatingButton, tableView)
     }
     
     private func setLayout() {
@@ -129,18 +91,11 @@ class MainViewController: UIViewController {
             $0.width.equalTo(104)
             $0.trailing.equalToSuperview().inset(13)
         }
-        allStackView.snp.makeConstraints {
+        tableView.snp.makeConstraints {
             $0.trailing.equalTo(floatingButton.snp.trailing)
             $0.bottom.equalTo(floatingButton.snp.top).offset(-16)
             $0.width.equalTo(175)
-        }
-        topStackView.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(175)
-        }
-        bottomStackView.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(95)
+            $0.height.equalTo(270)
         }
     }
     
@@ -178,8 +133,8 @@ class MainViewController: UIViewController {
                 initialSpringVelocity: 0.5,
                 options: [.curveEaseInOut],
                 animations: {
-                    self.allStackView.alpha = 1.0
-                    self.allStackView.transform = CGAffineTransform.identity
+                    self.tableView.alpha = 1.0
+                    self.tableView.transform = CGAffineTransform.identity
                 }
             )
         } else {
@@ -190,8 +145,8 @@ class MainViewController: UIViewController {
                 initialSpringVelocity: 0.5,
                 options: [.curveEaseInOut],
                 animations: {
-                    self.allStackView.alpha = 0.0
-                    self.allStackView.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
+                    self.tableView.alpha = 0.0
+                    self.tableView.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
                 }
             )
         }
@@ -227,6 +182,33 @@ class MainViewController: UIViewController {
         navigationItem.rightBarButtonItem = customNavigationItem.rightBarButtonItem
     }
 }
+
+
+// MARK: - Extension TableView
+
+extension MainViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return tableItems.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: ButtonTableCell.identifier, for: indexPath) as? ButtonTableCell else {
+            return UITableViewCell()
+        }
+        cell.configure(with: tableItems[indexPath.row])
+        cell.frame.self.size.height = 40
+        cell.backgroundColor = .clear
+        return cell
+    }
+}
+
+extension MainViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    }
+}
+
+
+// MARK: - Extension CollectionView
 
 extension MainViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
