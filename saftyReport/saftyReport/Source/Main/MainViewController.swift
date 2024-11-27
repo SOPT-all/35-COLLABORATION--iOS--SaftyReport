@@ -79,44 +79,44 @@ class MainViewController: UIViewController {
 
 extension MainViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 2
+        return 3
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         switch section {
         case 0:
-            return 3
+            return 2
         case 1:
+            return 1
+        case 2:
             return 1
         default :
             return 0
         }
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath)
     -> UICollectionViewCell {
         
         switch indexPath.section {
         case 0:
-            if indexPath.item < 2 {
-                guard let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: MyReportCell.cellIdentifier,
-                    for: indexPath
-                ) as? MyReportCell else {
-                    return UICollectionViewCell(frame: .zero)
-                }
-                cell.configure(with: indexPath.item)
-                return cell
-            } else {
-                guard let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: MyReportBannerCell.cellIdentifier,
-                    for: indexPath
-                ) as? MyReportBannerCell else {
-                    return UICollectionViewCell(frame: .zero)
-                }
-                return cell
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: MyReportCell.cellIdentifier,
+                for: indexPath
+            ) as? MyReportCell else {
+                return UICollectionViewCell(frame: .zero)
             }
+            cell.configure(with: indexPath.item)
+            return cell
         case 1:
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: MyReportBannerCell.cellIdentifier,
+                for: indexPath
+            ) as? MyReportBannerCell else {
+                return UICollectionViewCell(frame: .zero)
+            }
+            return cell
+        case 2:
             guard let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: FinishedReportEXCell.cellIdentifier,
                 for: indexPath
@@ -144,15 +144,15 @@ extension MainViewController: UICollectionViewDelegate {
     ) -> UICollectionReusableView {
         guard kind == UICollectionView.elementKindSectionHeader,
               let header = collectionView.dequeueReusableSupplementaryView(
-                  ofKind: kind,
-                  withReuseIdentifier: MainContentsSectionHeader.identifier,
-                  for: indexPath
+                ofKind: kind,
+                withReuseIdentifier: MainContentsSectionHeader.identifier,
+                for: indexPath
               ) as? MainContentsSectionHeader else {
             return UICollectionReusableView()
         }
         if indexPath.section == 0 {
             header.configure(with: .myReport)
-        } else if indexPath.section == 1 {
+        } else if indexPath.section == 2 {
             header.configure(with: .finishedReport)
         }
         
