@@ -12,6 +12,7 @@ import Then
 
 class MainViewController: UIViewController {
     let customNavigationItem = CustomNavigationItem(title: "홈") // 반드시 타이틀 설정
+    private var isToggled = false
     
     private let collectionView = UICollectionView(
         frame: .zero,
@@ -23,13 +24,7 @@ class MainViewController: UIViewController {
     }
     
     private lazy var floatingButton = UIButton().then {
-        $0.setImage(UIImage(named: "icn_cross_i_normal_white_16px"), for: .normal)
-        $0.setTitle("신고하기", for: .normal)
-        $0.titleLabel?.font = TextStyle.body3.font
-        $0.setTitleColor(.white, for: .normal)
-        $0.tintColor = .white
-        $0.backgroundColor = .primaryOrange
-        $0.layer.cornerRadius = 20
+        $0.addTarget(self, action: #selector(floatingButtonTapped), for: .touchUpInside)
     }
     
     override func viewDidLoad() {
@@ -38,18 +33,19 @@ class MainViewController: UIViewController {
         
         setUI()
         setLayout()
+        updateFloaingButtonUI()
         
         collectionView.dataSource = self
         collectionView.delegate = self
-
+        
         collectionView.register(
-                    MyReportCell.self,
-                    forCellWithReuseIdentifier: MyReportCell.cellIdentifier
-                )
+            MyReportCell.self,
+            forCellWithReuseIdentifier: MyReportCell.cellIdentifier
+        )
         collectionView.register(
-                    MyReportBannerCell.self,
-                    forCellWithReuseIdentifier: MyReportBannerCell.cellIdentifier
-                )
+            MyReportBannerCell.self,
+            forCellWithReuseIdentifier: MyReportBannerCell.cellIdentifier
+        )
         collectionView.register(
             FinishedReportEXCell.self,
             forCellWithReuseIdentifier: FinishedReportEXCell.cellIdentifier
@@ -81,6 +77,29 @@ class MainViewController: UIViewController {
         }
     }
     
+    @objc private func floatingButtonTapped(_ sender: UIButton) {
+        isToggled.toggle()
+        updateFloaingButtonUI()
+    }
+    
+    private func updateFloaingButtonUI() {
+        if isToggled {
+            floatingButton.setImage(UIImage(named: "icn_cross_i_selected_black_16px"), for: .normal)
+            floatingButton.setTitle("", for: .normal)
+            floatingButton.tintColor = .gray13
+            floatingButton.backgroundColor = .gray1
+            floatingButton.layer.cornerRadius = 20
+        } else {
+            floatingButton.setImage(UIImage(named: "icn_cross_i_normal_white_16px"), for: .normal)
+            floatingButton.setTitle("신고하기", for: .normal)
+            floatingButton.titleLabel?.font = TextStyle.body3.font
+            floatingButton.setTitleColor(.white, for: .normal)
+            floatingButton.tintColor = .white
+            floatingButton.backgroundColor = .primaryOrange
+            floatingButton.layer.cornerRadius = 20
+        }
+    }
+
     private func setUpNavigationBar() {
         navigationController?.setUpNavigationBarColor()
         customNavigationItem.setUpNavigationBar(for: .leftRight)
