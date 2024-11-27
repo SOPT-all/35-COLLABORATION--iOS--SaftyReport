@@ -9,9 +9,9 @@ import UIKit
 
 import SnapKit
 import Then
-import Kingfisher
 
 class GalleryViewController: UIViewController {
+    private var photoList: [GalleryPhotoList] = []
     
     private let collectionView = UICollectionView(frame: .zero,
                                                   collectionViewLayout: UICollectionViewLayout())

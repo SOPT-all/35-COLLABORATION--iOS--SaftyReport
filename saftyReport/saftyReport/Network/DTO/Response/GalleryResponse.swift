@@ -12,12 +12,12 @@ import Foundation
 struct GalleryResponse: Codable {
     let status: Int?
     let message: String?
-    let data: GalleryDataObject?
+    let data: GalleryData?
 }
 
-// MARK: - GalleryDataObject
+// MARK: - GalleryData
 
-struct GalleryDataObject: Codable {
+struct GalleryData: Codable {
     let photoList: [GalleryPhotoList]?
 }
 
