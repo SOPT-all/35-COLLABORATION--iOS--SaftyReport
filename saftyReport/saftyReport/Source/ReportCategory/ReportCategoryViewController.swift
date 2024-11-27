@@ -11,8 +11,14 @@ class ReportCategoryViewController: UIViewController {
     
     // MARK: - Properties
     
+    private var dataSource: UITableViewDiffableDataSource<ReportCategory.Section,
+                                                            ReportCategory.Item>! = nil
     private let reportCategoryView = ReportCategoryView()
-    private var dataSource: UITableViewDiffableDataSource<ReportCategory.Section, ReportCategory.Item>! = nil
+    
+    private lazy var navigationBackButton = UIButton().then {
+        $0.setImage(.icnArrowLeftLineWhite24Px, for: .normal)
+        $0.addTarget(self, action: #selector(popSelf), for: .touchUpInside)
+    }
     
     
     // MARK: - Methods
@@ -23,9 +29,22 @@ class ReportCategoryViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setUpNavigationBar()
         setTableView()
         setDataSource()
         applyInitialSnapshots()
+    }
+    
+    private func setUpNavigationBar() {
+        let customNavigationItem = CustomNavigationItem(title: "전체 보기")
+        customNavigationItem.setUpNavigationBar(for: .backRight)
+        
+        let backBarButtonItem = UIBarButtonItem(customView: navigationBackButton)
+        
+        navigationController?.setUpNavigationBarColor()
+        navigationItem.title = customNavigationItem.title
+        navigationItem.leftBarButtonItem = backBarButtonItem
+        navigationItem.rightBarButtonItem = customNavigationItem.rightBarButtonItem
     }
     
     private func setTableView() {
@@ -83,6 +102,10 @@ class ReportCategoryViewController: UIViewController {
         snapshot.appendItems(ReportCategory.Dummy.environment, toSection: .environment)
         
         dataSource.apply(snapshot, animatingDifferences: false)
+    }
+    
+    @objc private func popSelf() {
+        self.navigationController?.popViewController(animated: true)
     }
 }
 
