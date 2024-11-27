@@ -18,6 +18,48 @@ class MainViewController: UIViewController {
         $0.addTarget(self, action: #selector(floatingButtonTapped), for: .touchUpInside)
     }
     
+    private lazy var allStackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.spacing = 8
+        $0.alpha = 0.0
+        $0.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
+    }
+    
+    private lazy var categoryStackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.spacing = 0
+    }
+    
+    private lazy var stackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.spacing = 0
+    }
+    
+    let safetyButton = UIButton().then {
+        $0.setImage(UIImage(systemName: "shield"), for: .normal)
+        $0.setTitle("안전", for: .normal)
+    }
+    let parkingButton = UIButton().then {
+        $0.setImage(UIImage(systemName: "shield"), for: .normal)
+        $0.setTitle("안전", for: .normal)
+    }
+    let reportButton = UIButton().then {
+        $0.setImage(UIImage(systemName: "shield"), for: .normal)
+        $0.setTitle("안전", for: .normal)
+    }
+    let lifeButton = UIButton().then {
+        $0.setImage(UIImage(systemName: "shield"), for: .normal)
+        $0.setTitle("안전", for: .normal)
+    }
+    let allCategoryButton = UIButton().then {
+        $0.setImage(UIImage(systemName: "shield"), for: .normal)
+        $0.setTitle("안전", for: .normal)
+    }
+    let cameraButton = UIButton().then {
+        $0.setImage(UIImage(systemName: "shield"), for: .normal)
+        $0.setTitle("안전", for: .normal)
+    }
+    
     private let collectionView = UICollectionView(
         frame: .zero,
         collectionViewLayout: MainContentsItemLayout.createLayout()
@@ -60,7 +102,10 @@ class MainViewController: UIViewController {
     }
     
     private func setUI() {
-        self.view.addSubviews(collectionView, floatingButton)
+        self.view.addSubviews(collectionView, floatingButton, allStackView)
+        allStackView.addArrangedSubviews(categoryStackView, stackView)
+        categoryStackView.addArrangedSubviews(safetyButton, parkingButton, reportButton, lifeButton)
+        stackView.addArrangedSubviews(allCategoryButton, cameraButton)
     }
     
     private func setLayout() {
@@ -75,6 +120,16 @@ class MainViewController: UIViewController {
             $0.width.equalTo(104)
             $0.trailing.equalToSuperview().inset(13)
         }
+        allStackView.snp.makeConstraints {
+            $0.trailing.equalTo(floatingButton.snp.trailing)
+            $0.bottom.equalTo(floatingButton.snp.top).offset(-16)
+        }
+        categoryStackView.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview()
+        }
+        stackView.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview()
+        }
     }
     
     
@@ -83,6 +138,7 @@ class MainViewController: UIViewController {
     @objc private func floatingButtonTapped(_ sender: UIButton) {
         isToggled.toggle()
         
+        popStackView()
         updateAnimation()
         updateFloaingButtonUI()
     }
@@ -98,6 +154,34 @@ class MainViewController: UIViewController {
         UIView.animate(withDuration: 0.15) {
             self.view.layoutIfNeeded() // 레이아웃 업데이트를 애니메이션으로 적용
             self.floatingButton.transform = CGAffineTransform(rotationAngle: newAngle) // 45도 회전
+        }
+    }
+    
+    private func popStackView() {
+        if isToggled {
+            UIView.animate(
+                withDuration: 0.3,
+                delay: 0,
+                usingSpringWithDamping: 0.7,
+                initialSpringVelocity: 0.5,
+                options: [.curveEaseInOut],
+                animations: {
+                    self.allStackView.alpha = 1.0
+                    self.allStackView.transform = CGAffineTransform.identity
+                }
+            )
+        } else {
+            UIView.animate(
+                withDuration: 0.3,
+                delay: 0,
+                usingSpringWithDamping: 0.7,
+                initialSpringVelocity: 0.5,
+                options: [.curveEaseInOut],
+                animations: {
+                    self.allStackView.alpha = 0.0
+                    self.allStackView.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
+                }
+            )
         }
     }
     
