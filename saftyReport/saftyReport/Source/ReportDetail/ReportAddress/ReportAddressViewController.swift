@@ -74,6 +74,17 @@ class ReportAddressViewController: UIViewController {
         
         setUI()
         setLayout()
+        setupNavigationBar()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tabBarController?.tabBar.isHidden = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        tabBarController?.tabBar.isHidden = false
     }
     
     private func setUI() {
@@ -135,6 +146,15 @@ class ReportAddressViewController: UIViewController {
             $0.width.equalTo(343)
         }
     }
+    
+    private func setupNavigationBar() {
+        let customNavigationItem = CustomNavigationItem()
+        customNavigationItem.setUpNavigationBar(for: .back)
+        navigationItem.backBarButtonItem = customNavigationItem.backBarButtonItem
+        navigationItem.backBarButtonItem?.tintColor = .gray1
+        navigationItem.title = "주소 입력"
+    }
+
     
     @objc private func searchKeywordButtonTapped() {
         print("키워드 검색 버튼이 눌렸습니다.")
