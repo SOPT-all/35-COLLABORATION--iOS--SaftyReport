@@ -71,10 +71,14 @@ class MainContentsSectionHeader: UICollectionReusableView {
             headerLabel.text = "올해 나의 신고"
             mileageLabel.isHidden = false
             moreButton.isHidden = true
-        } else {
+        } else if header == .finishedReport {
             headerLabel.text = "주요 처리 사례"
             mileageLabel.isHidden = true
             moreButton.isHidden = false
+        } else {
+            headerLabel.isHidden = true
+            mileageLabel.isHidden = true
+            moreButton.isHidden = true
         }
     }
 }

@@ -31,15 +31,21 @@ enum MainContentsItem {
     }
 
     static func createMyReportSection() -> NSCollectionLayoutSection {
-        let item1Size = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5), heightDimension: .fractionalHeight(1))
-        let item1 = NSCollectionLayoutItem(layoutSize: item1Size)
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
-        let group1Size = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(0.287))
-        let group1 = NSCollectionLayoutGroup.horizontal(layoutSize: group1Size, subitems: [item1, item1])
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5), heightDimension: .fractionalHeight(1))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
-        group1.interItemSpacing = .fixed(10)
+        let containerGroupSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .fractionalHeight(0.287)
+        )
+        let containerGroup =  NSCollectionLayoutGroup.horizontal(layoutSize: containerGroupSize, subitems: [group, group])
+        containerGroup.interItemSpacing = .fixed(10)
         
-        let section = NSCollectionLayoutSection(group: group1)
+        let section = NSCollectionLayoutSection(group: containerGroup)
+        
         section.boundarySupplementaryItems = [createSectionHeader()]
         section.contentInsets = NSDirectionalEdgeInsets(top: 16, leading: 0, bottom: 0, trailing: 0)
         return section
@@ -74,7 +80,7 @@ enum MainContentsItem {
     static func createSectionHeader() -> NSCollectionLayoutBoundarySupplementaryItem {
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .fractionalHeight(0.03)
+            heightDimension: .fractionalHeight(0.02)
         )
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: headerSize,
