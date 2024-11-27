@@ -14,6 +14,10 @@ class MainViewController: UIViewController {
     let customNavigationItem = CustomNavigationItem(title: "홈") // 반드시 타이틀 설정
     private var isToggled = false
     
+    private lazy var floatingButton = UIButton().then {
+        $0.addTarget(self, action: #selector(floatingButtonTapped), for: .touchUpInside)
+    }
+    
     private let collectionView = UICollectionView(
         frame: .zero,
         collectionViewLayout: MainContentsItemLayout.createLayout()
@@ -21,10 +25,6 @@ class MainViewController: UIViewController {
         $0.backgroundColor = .clear
         $0.isScrollEnabled = false
         $0.clipsToBounds = false
-    }
-    
-    private lazy var floatingButton = UIButton().then {
-        $0.addTarget(self, action: #selector(floatingButtonTapped), for: .touchUpInside)
     }
     
     override func viewDidLoad() {
@@ -77,9 +77,11 @@ class MainViewController: UIViewController {
         }
     }
     
+    
+    // MARK: - Floating Button and Animation
+    
     @objc private func floatingButtonTapped(_ sender: UIButton) {
         isToggled.toggle()
-        
         
         updateAnimation()
         updateFloaingButtonUI()
@@ -116,7 +118,9 @@ class MainViewController: UIViewController {
             floatingButton.layer.cornerRadius = 20
         }
     }
-
+    
+    
+    // MARK: - Navigation Bar
     private func setUpNavigationBar() {
         navigationController?.setUpNavigationBarColor()
         customNavigationItem.setUpNavigationBar(for: .leftRight)
