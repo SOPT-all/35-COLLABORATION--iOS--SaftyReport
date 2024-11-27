@@ -7,23 +7,32 @@
 
 import UIKit
 
+import SnapKit
+import Then
+
+// 추후 삭제할 파일임
 class ReportViewController: UIViewController {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+    
+    lazy var pushButton = UIButton().then {
+        $0.setTitleColor(.primaryOrange, for: .normal)
+        $0.setTitle("신고 카테고리 선택 뷰 보기", for: .normal)
+        $0.addTarget(self, action: #selector(pushVC), for: .touchUpInside)
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        view.backgroundColor = .gray1
+        
+        view.addSubview(pushButton)
+        
+        pushButton.snp.makeConstraints {
+            $0.center.equalToSuperview()
+        }
     }
-    */
-
+    
+    @objc func pushVC() {
+        let vc = ReportCategoryViewController()
+        navigationController?.pushViewController(vc, animated: true)
+    }
 }
