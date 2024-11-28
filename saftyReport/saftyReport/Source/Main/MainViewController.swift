@@ -15,7 +15,7 @@ class MainViewController: UIViewController {
     
     var yearReportCount: Int = 0
     var monthReportCount: Int = 0
-    var milieage: Int = 0
+    var mileage: Int?
     var bannerList: [BannerList] = []
     var bannerListImgUrl: [String] = []
     
@@ -125,6 +125,7 @@ class MainViewController: UIViewController {
         )
     }
     
+    
     // MARK: - Floating Button and Animation
     
     @objc private func floatingButtonTapped(_ sender: UIButton) {
@@ -218,14 +219,13 @@ class MainViewController: UIViewController {
             case let .success(response):
                 yearReportCount = response.yearReportCount ?? 0
                 monthReportCount = response.monthReportCount ?? 0
-                milieage = response.mileage ?? 0
+                mileage = response.mileage ?? 0
                 bannerList = response.bannerList
                 for banner in bannerList {
                     bannerListImgUrl.append(banner.bannerUrl ?? "")
                 }
             case let .failure(error):
                 print(error.localizedDescription)
-                
             }
             DispatchQueue.main.async {
                 self.collectionView.reloadData()
@@ -348,17 +348,17 @@ extension MainViewController: UICollectionViewDelegate {
             header.configure(with: MainHeaderItem(
                 section: .myReport,
                 title: "올해 나의 신고",
-                rightHeaderItem: .mileageLabel))
+                rightHeaderItem: .mileageLabel), mileage: mileage)
         case 1:
             header.configure(with: MainHeaderItem(
                 section: .banner,
                 title: nil,
-                rightHeaderItem: nil))
+                rightHeaderItem: nil), mileage: nil)
         case 2:
             header.configure(with: MainHeaderItem(
                 section: .finishedReport,
                 title: "주요 처리 사례",
-                rightHeaderItem: .moreButton))
+                rightHeaderItem: .moreButton), mileage: nil)
         default :
             break
         }

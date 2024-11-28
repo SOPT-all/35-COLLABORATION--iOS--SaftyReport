@@ -14,13 +14,29 @@ class MainContentsSectionHeader: UICollectionReusableView {
     static let identifier = "MainContentsSectionHeader"
     
     let headerLabel = UILabel().then {
-        $0.numberOfLines = 0
+        $0.numberOfLines = 1
         $0.attributedText = NSAttributedString.styled(text: "header title", style: .body2)
     }
-    
-    let mileageLabel = UILabel().then {
-        $0.numberOfLines = 0
-        $0.attributedText = NSAttributedString.styled(text: "마일리지 : 5,000,000 P", style: .caption7)
+    var mileageStack = UIStackView().then {
+        $0.axis = .horizontal
+        $0.alignment = .trailing
+        $0.distribution = .equalSpacing
+        $0.distribution = .fill
+    }
+    let leftLabel = UILabel().then {
+        $0.numberOfLines = 1
+        $0.attributedText = NSAttributedString.styled(text: "마일리지 : ", style: .caption7, alignment: .right)
+        $0.textColor = .gray13
+    }
+    var mileageLabel = UILabel().then {
+        $0.numberOfLines = 1
+        $0.attributedText = NSAttributedString.styled(text: "", style: .caption7, alignment: .right)
+        $0.textColor = .gray13
+    }
+    let rightLabel = UILabel().then {
+        $0.numberOfLines = 1
+        $0.attributedText = NSAttributedString.styled(text: "P", style: .caption7, alignment: .right)
+        $0.textColor = .gray13
     }
     
     let moreButton = UIButton().then {
@@ -42,9 +58,11 @@ class MainContentsSectionHeader: UICollectionReusableView {
     }
     
     private func setUI() {
-        self.addSubviews(headerLabel, mileageLabel, moreButton)
+        self.addSubviews(headerLabel, mileageStack, moreButton)
+        mileageStack.addArrangedSubviews(leftLabel, mileageLabel, rightLabel)
+        
         // 초기 상태 설정
-        mileageLabel.isHidden = true
+        mileageStack.isHidden = true
         moreButton.isHidden = true
     }
     
@@ -53,9 +71,19 @@ class MainContentsSectionHeader: UICollectionReusableView {
             $0.leading.equalToSuperview()
             $0.centerY.equalToSuperview()
         }
-        mileageLabel.snp.makeConstraints {
+        mileageStack.snp.makeConstraints {
             $0.trailing.equalToSuperview()
             $0.centerY.equalToSuperview()
+        }
+        leftLabel.snp.makeConstraints {
+            $0.width.equalTo(40)
+            $0.trailing.equalTo(mileageLabel.snp.leading).offset(-7)
+        }
+        mileageLabel.snp.makeConstraints {
+            $0.trailing.equalTo(rightLabel.snp.leading).offset(-3)
+        }
+        rightLabel.snp.makeConstraints {
+            $0.width.equalTo(12)
         }
         moreButton.snp.makeConstraints {
             $0.trailing.equalToSuperview()
@@ -65,19 +93,37 @@ class MainContentsSectionHeader: UICollectionReusableView {
         }
     }
     
-    func configure(with mainHeaderItem: MainHeaderItem) {
+    func configure(with mainHeaderItem: MainHeaderItem, mileage: Int?) {
         headerLabel.text = mainHeaderItem.title
         
         switch mainHeaderItem.rightHeaderItem {
         case .mileageLabel:
-            mileageLabel.isHidden = false
+            mileageStack.isHidden = false
             moreButton.isHidden = true
+            
+            let text = formatNumber(mileage ?? 0)
+            mileageLabel.attributedText = NSAttributedString.styled(
+                text: text,
+                style: .caption7,
+                alignment: .right
+            )
         case .moreButton:
-            mileageLabel.isHidden = true
+            mileageStack.isHidden = true
             moreButton.isHidden = false
         default:
-            mileageLabel.isHidden = true
+            mileageStack.isHidden = true
             moreButton.isHidden = true
         }
     }
+    
+    func formatNumber(_ number: Int) -> String {
+        let beforeNum: Int = number
+        let formatter: NumberFormatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter.string(for: beforeNum) ?? "\(number)"
+    }
+}
+
+#Preview {
+    MainViewController()
 }
