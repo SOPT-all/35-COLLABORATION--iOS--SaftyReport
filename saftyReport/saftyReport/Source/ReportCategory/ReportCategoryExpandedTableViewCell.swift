@@ -46,6 +46,7 @@ class ReportCategoryExpandedTableViewCell: UITableViewCell {
     
     private let descriptionContentLabel = UILabel().then {
         $0.textColor = .gray13
+        $0.numberOfLines = 0
     }
     
     // MARK: - Methods
