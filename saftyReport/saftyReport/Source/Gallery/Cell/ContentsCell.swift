@@ -9,6 +9,7 @@ import UIKit
 
 import SnapKit
 import Then
+import Kingfisher
 
 class ContentsCell: UICollectionViewCell {
     var isChecked = false
@@ -23,13 +24,13 @@ class ContentsCell: UICollectionViewCell {
     lazy var checkbox = UIButton().then {
         $0.clipsToBounds = true
         $0.contentMode = .scaleAspectFill
-        $0.setImage(isChecked ? .icnCheckboxISquareSelectedWhite24Px : .icnCheckboxISquareUnselectedWhite24Px, for: .normal)
+        $0.setImage(.icnCheckboxISquareUnselectedWhite24Px, for: .normal)
         $0.addTarget(self, action: #selector(checkboxTapped), for: .touchUpInside)
     }
     
     override init(frame: CGRect) {
         super .init(frame: frame)
-                
+        
         setUI()
         setLayout()
     }
@@ -63,5 +64,18 @@ class ContentsCell: UICollectionViewCell {
             checkbox.setImage(.icnCheckboxISquareUnselectedWhite24Px, for: .normal)
         }
     }
-
+    
+    func configure(item: GalleryPhotoList, isChecked: Bool = false){
+        if let imageURL = URL(string: item.photoUrl ?? "") {
+            imageView.kf.setImage(with: imageURL)
+        }
+        
+        self.isChecked = isChecked
+        self.checkbox.setImage(
+            isChecked ? .icnCheckboxISquareSelectedWhite24Px : .icnCheckboxISquareUnselectedWhite24Px,
+            for: .normal
+        )
+        
+    }
+    
 }
