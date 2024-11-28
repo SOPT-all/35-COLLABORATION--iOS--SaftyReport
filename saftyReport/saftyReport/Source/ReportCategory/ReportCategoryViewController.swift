@@ -105,9 +105,10 @@ class ReportCategoryViewController: UIViewController {
     }
 }
 
+
 // MARK: - Objc functions
+
 extension ReportCategoryViewController {
-    
     @objc private func popSelf() {
         self.navigationController?.popViewController(animated: true)
     }
@@ -118,6 +119,9 @@ extension ReportCategoryViewController {
     }
     
 }
+
+
+// MARK: - TableView Extensions
 
 extension ReportCategoryViewController: UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
