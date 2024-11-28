@@ -21,8 +21,7 @@ class GalleryDetailViewController: UIViewController {
     }
     
     private var imageView = UIImageView().then {
-        $0.contentMode = .scaleAspectFit
-        $0.backgroundColor = .gray // 이미지 넣으면 지울 코드
+        $0.contentMode = .scaleToFill
     }
     
     private lazy var checkbox = UIButton().then {
@@ -39,7 +38,7 @@ class GalleryDetailViewController: UIViewController {
     }
     
     private var createdAtLabel = UILabel().then {
-        $0.attributedText = .styled(text: "촬영일시", style: .caption1)
+        $0.attributedText = .styled(text: "촬영일시 :", style: .caption1)
         $0.font = .systemFont(ofSize: 12, weight: .bold)
         $0.textColor = .gray13
     }
@@ -116,10 +115,11 @@ class GalleryDetailViewController: UIViewController {
         
         createdAtLabel.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(8)
+            $0.width.equalTo(50)
         }
         
         dateTimeLabel.snp.makeConstraints {
-            $0.leading.equalTo(createdAtLabel.snp.trailing).offset(20)
+            $0.leading.equalTo(createdAtLabel.snp.trailing).offset(10)
         }
         
         logoLabel.snp.makeConstraints {
@@ -131,9 +131,19 @@ class GalleryDetailViewController: UIViewController {
         
     }
     
-//    func configure(item: GalleryPhotoList){
-//        imageView.image = item.
-//    }
+    func configure(item: GalleryPhotoList){
+        if let imageURL = URL(string: item.photoUrl ?? "") {
+            imageView.kf.setImage(with: imageURL)
+            
+            print("[갤러리 디테일뷰]")
+            print("[URL] \(imageURL)")
+            print("[ID] \(item.photoId!)")
+            print("[CreatedAt] \(item.createdAt!)")
+        }
+        
+        let dateTime = formatDateTime(item.createdAt ?? "")
+        dateTimeLabel.text = dateTime
+    }
     
     private func setupNavigationBar() {
         let customNavigationItem = CustomNavigationItem()
@@ -153,4 +163,22 @@ class GalleryDetailViewController: UIViewController {
         }
     }
     
+}
+
+extension GalleryDetailViewController {
+    private func formatDateTime(_ dateTime: String) -> String {
+        let inputFormatter = DateFormatter()
+        inputFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss" // 서버에서 받은 날짜 형식
+        
+        let outputFormatter = DateFormatter()
+        outputFormatter.dateFormat = "yyyy/MM/dd HH:mm:ss" // 원하는 출력 형식
+        
+        // 입력 문자열을 Date로 변환한 후, 다시 문자열로 변환
+        if let date = inputFormatter.date(from: dateTime) {
+            return outputFormatter.string(from: date)
+        } else {
+            print("[Error] Invalid date format: \(dateTime)")
+            return dateTime // 변환 실패 시 원본 문자열 반환
+        }
+    }
 }

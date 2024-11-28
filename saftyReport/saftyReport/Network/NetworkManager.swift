@@ -11,10 +11,8 @@ class NetworkManager {
         }
         
         let url = "\(baseURL)/api/v1/report/photo"
-        print("[Request] URL: \(url)")
         
         let headers: HTTPHeaders = ["userId": "1"]
-        print("[Request] Headers: \(headers)")
         
         AF.request(url, method: .get, headers: headers)
             .validate()
@@ -28,12 +26,10 @@ class NetworkManager {
                     return
                 }
                 
-                print("[Response] Status Code: \(statusCode)")
                 
                 switch response.result {
                 case .success:
                     let photoList = self.decodePhoto(data: data)
-                    print("[Success] Photo List Decoded: \(photoList)")
                     compleation(.success(photoList))
                 case .failure(let error):
                     print("[Error] Request Failed: \(error.localizedDescription)")
@@ -46,7 +42,6 @@ class NetworkManager {
     func decodePhoto(data: Data) -> [GalleryPhotoList] {
         do {
             let response = try JSONDecoder().decode(GalleryResponse.self, from: data)
-            print("[Decode Success] GalleryResponse Decoded Successfully")
             return response.data?.photoList ?? []
         } catch {
             print("[Decode Error] Failed to Decode GalleryResponse: \(error)")

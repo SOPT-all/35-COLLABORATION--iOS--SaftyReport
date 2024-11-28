@@ -12,7 +12,9 @@ import Then
 
 class GalleryViewController: UIViewController {
     private let networkManager = NetworkManager()
-    private var photoList: [GalleryPhotoList] = []
+    
+    private var firstSectionPhotoList: [GalleryPhotoList] = []
+    private var secondSectionPhotoList: [GalleryPhotoList] = []
     
     private let collectionView = UICollectionView(frame: .zero,
                                                   collectionViewLayout: UICollectionViewLayout())
@@ -26,9 +28,9 @@ class GalleryViewController: UIViewController {
         $0.setAttributedTitle(NSAttributedString.styled(text: "사용", style: .heading1), for: .normal)
         $0.titleLabel?.font = .systemFont(ofSize: 20, weight: .semibold)
         $0.setTitleColor(.gray1, for: .normal)
-        $0.backgroundColor = .primaryOrange
         $0.layer.cornerRadius = 10
         $0.addTarget(self, action: #selector(usingButtonTapped), for: .touchUpInside)
+        $0.backgroundColor = .primaryLight
     }
     
     override func viewDidLoad() {
@@ -37,12 +39,12 @@ class GalleryViewController: UIViewController {
         setLayout()
         setupCollectionView()
         setupNavigationBar()
-        connectAPI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tabBarController?.tabBar.isHidden = true
+        connectAPI()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -80,28 +82,37 @@ class GalleryViewController: UIViewController {
         navigationItem.backBarButtonItem?.tintColor = .gray1
         navigationItem.title = "안전신문고 갤러리"
     }
-
+    
     @objc private func usingButtonTapped() {
         print("사용 버튼이 눌렸습니다.")
     }
     
     private func connectAPI() {
-        
         DispatchQueue.main.async {
             self.networkManager.photoAPI { [weak self] result in
                 guard let self = self else { return }
                 
                 switch result {
                 case let .success(list):
-                    self.photoList = list
+                    
+                    self.firstSectionPhotoList = list.filter({
+                        self.formatDateTime($0.createdAt!) == "2024년 10월 26일"
+                    })
+                    .dropLast()
+                    
+                    
+                    self.secondSectionPhotoList = list.filter({
+                        self.formatDateTime($0.createdAt!) == "2024년 11월 26일"
+                    })
+                    .dropLast()
+                    
+                    self.collectionView.reloadData()
                 case let .failure(error):
                     print(error.localizedDescription)
                 }
                 
-                
             }
         }
-        
     }
     
 }
@@ -114,17 +125,17 @@ extension GalleryViewController: UICollectionViewDelegate {
     ) -> UICollectionReusableView {
         guard kind == UICollectionView.elementKindSectionHeader,
               let header = collectionView.dequeueReusableSupplementaryView(
-                  ofKind: kind,
-                  withReuseIdentifier: GalleryContentsSectionHeader.identifier,
-                  for: indexPath
+                ofKind: kind,
+                withReuseIdentifier: GalleryContentsSectionHeader.identifier,
+                for: indexPath
               ) as? GalleryContentsSectionHeader else {
             return UICollectionReusableView()
         }
         if indexPath.section == 2 {
-            let sectionTitles = "2024년 11월 14일"
+            let sectionTitles = "2024년 10월 26일"
             header.configure(with: sectionTitles)
         } else if indexPath.section == 3{
-            let sectionTitles = "2024년 11월 13일"
+            let sectionTitles = "2024년 11월 26일"
             header.configure(with: sectionTitles)
         }
         
@@ -151,6 +162,14 @@ extension GalleryViewController: UICollectionViewDelegate {
             }
         }
         
+        if indexPath.section == 2 {
+            nextViewController.configure(item: firstSectionPhotoList[indexPath.row])
+            
+        } else {
+            nextViewController.configure(item: secondSectionPhotoList[indexPath.row])
+        }
+        
+        
         self.navigationController?.pushViewController(nextViewController, animated: true)
     }
     
@@ -169,9 +188,9 @@ extension GalleryViewController: UICollectionViewDataSource {
         case 1:
             return 1
         case 2:
-            return 6
+            return firstSectionPhotoList.count
         case 3:
-            return 6
+            return secondSectionPhotoList.count
         default:
             return 0
         }
@@ -204,14 +223,18 @@ extension GalleryViewController: UICollectionViewDataSource {
                 return UICollectionViewCell(frame: .zero)
             }
             
+            cell.configure(item: firstSectionPhotoList[indexPath.row])
+            
             return cell
         default:
             guard let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: ContentsCell.cellIdentifier,
-                for: indexPath
+                for: indexPath.appending(9)
             ) as? ContentsCell else {
                 return UICollectionViewCell(frame: .zero)
             }
+            
+            cell.configure(item: secondSectionPhotoList[indexPath.row])
             
             return cell
         }
@@ -232,8 +255,8 @@ extension GalleryViewController {
         collectionView.register(ContentsCell.self,
                                 forCellWithReuseIdentifier: ContentsCell.cellIdentifier)
         collectionView.register(GalleryContentsSectionHeader.self,
-            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-            withReuseIdentifier: GalleryContentsSectionHeader.identifier
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                withReuseIdentifier: GalleryContentsSectionHeader.identifier
         )
     }
     
@@ -332,7 +355,7 @@ extension GalleryViewController {
             trailing: 20
         )
         section.boundarySupplementaryItems = [self.createSectionHeader()] // 헤더 추가
-                
+        
         return section
     }
     
@@ -348,5 +371,23 @@ extension GalleryViewController {
         )
         
         return sectionHeader
+    }
+}
+
+extension GalleryViewController {
+    private func formatDateTime(_ dateTime: String) -> String {
+        let inputFormatter = DateFormatter()
+        inputFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss" // 서버에서 받은 날짜 형식
+        
+        let outputFormatter = DateFormatter()
+        outputFormatter.dateFormat = "yyyy년 MM월 dd일" // 원하는 출력 형식
+        
+        // 입력 문자열을 Date로 변환한 후, 다시 문자열로 변환
+        if let date = inputFormatter.date(from: dateTime) {
+            return outputFormatter.string(from: date)
+        } else {
+            print("[Error] Invalid date format: \(dateTime)")
+            return dateTime // 변환 실패 시 원본 문자열 반환
+        }
     }
 }

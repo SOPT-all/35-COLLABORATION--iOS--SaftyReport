@@ -9,6 +9,7 @@ import UIKit
 
 import SnapKit
 import Then
+import Kingfisher
 
 class ContentsCell: UICollectionViewCell {
     var isChecked = false
@@ -61,6 +62,12 @@ class ContentsCell: UICollectionViewCell {
             checkbox.setImage(.icnCheckboxISquareSelectedWhite24Px, for: .normal)
         } else {
             checkbox.setImage(.icnCheckboxISquareUnselectedWhite24Px, for: .normal)
+        }
+    }
+    
+    func configure(item: GalleryPhotoList){
+        if let imageURL = URL(string: item.photoUrl ?? "") {
+            imageView.kf.setImage(with: imageURL)
         }
     }
 
