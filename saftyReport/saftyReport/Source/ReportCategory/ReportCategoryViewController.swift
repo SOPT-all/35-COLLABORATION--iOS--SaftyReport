@@ -11,8 +11,14 @@ class ReportCategoryViewController: UIViewController {
     
     // MARK: - Properties
     
+    private var dataSource: UITableViewDiffableDataSource<ReportCategory.Section,
+                                                            ReportCategory.Item>! = nil
     private let reportCategoryView = ReportCategoryView()
-    private var dataSource: UITableViewDiffableDataSource<ReportCategory.Section, ReportCategory.Item>! = nil
+    
+    private lazy var navigationBackButton = UIButton().then {
+        $0.setImage(.icnArrowLeftLineWhite24Px, for: .normal)
+        $0.addTarget(self, action: #selector(popSelf), for: .touchUpInside)
+    }
     
     
     // MARK: - Methods
@@ -23,9 +29,22 @@ class ReportCategoryViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setUpNavigationBar()
         setTableView()
         setDataSource()
         applyInitialSnapshots()
+    }
+    
+    private func setUpNavigationBar() {
+        let customNavigationItem = CustomNavigationItem(title: "전체 보기")
+        customNavigationItem.setUpNavigationBar(for: .backRight)
+        
+        let backBarButtonItem = UIBarButtonItem(customView: navigationBackButton)
+        
+        navigationController?.setUpNavigationBarColor()
+        navigationItem.title = customNavigationItem.title
+        navigationItem.leftBarButtonItem = backBarButtonItem
+        navigationItem.rightBarButtonItem = customNavigationItem.rightBarButtonItem
     }
     
     private func setTableView() {
@@ -44,7 +63,6 @@ class ReportCategoryViewController: UIViewController {
     }
     
     private func setDataSource() {
-//        reportCategoryView.tableView.dataSource = UITableViewDiffableDataSource
         dataSource = UITableViewDiffableDataSource
             <ReportCategory.Section, ReportCategory.Item>(tableView:
                                                             reportCategoryView.tableView) {
@@ -53,18 +71,21 @@ class ReportCategoryViewController: UIViewController {
                              item: ReportCategory.Item) -> UITableViewCell? in
                 guard let self = self else { return nil }
                 
-                switch item.toggleState {
-                case .normal:
+                if item.isExpanded {
+                    guard let cell = reportCategoryView.tableView.dequeueReusableCell(
+                        withIdentifier: ReportCategoryExpandedTableViewCell.identifier,
+                        for: indexPath
+                    ) as? ReportCategoryExpandedTableViewCell else { return nil }
+                    
+                    cell.bind(item: item)
+                    return cell
+                    
+                } else {
                     guard let cell = reportCategoryView.tableView.dequeueReusableCell(
                         withIdentifier: ReportCategoryNormalTableViewCell.identifier,
                         for: indexPath
                     ) as? ReportCategoryNormalTableViewCell else { return nil }
                     
-                    cell.bind(item: item)
-                    return cell
-                    
-                case .expanded:
-                    guard let cell = reportCategoryView.tableView.dequeueReusableCell(withIdentifier: ReportCategoryExpandedTableViewCell.identifier, for: indexPath) as? ReportCategoryExpandedTableViewCell else { return nil }
                     cell.bind(item: item)
                     return cell
                 }
@@ -82,6 +103,10 @@ class ReportCategoryViewController: UIViewController {
         
         dataSource.apply(snapshot, animatingDifferences: false)
     }
+    
+    @objc private func popSelf() {
+        self.navigationController?.popViewController(animated: true)
+    }
 }
 
 extension ReportCategoryViewController: UITableViewDataSource {
@@ -91,7 +116,6 @@ extension ReportCategoryViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        print("rows: \(dataSource.snapshot().itemIdentifiers(inSection: ReportCategory.Section.allCases[section]).count)개")
         return dataSource.snapshot().itemIdentifiers(inSection: ReportCategory.Section.allCases[section]).count
     }
     
@@ -105,11 +129,23 @@ extension ReportCategoryViewController: UITableViewDelegate {
         guard let item = dataSource.itemIdentifier(for: indexPath)
         else { return UITableView.automaticDimension }
         
-        switch item.toggleState {
-        case .normal:
-            return 58 + 10
-        case .expanded:
+        if item.isExpanded {
             return 258 + 10
+        } else {
+            return 58 + 10
         }
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard var item = dataSource.itemIdentifier(for: indexPath) else { return }
+        
+        item.isExpanded.toggle()
+        
+        var snapshot = dataSource.snapshot()
+        
+        snapshot.insertItems([item], beforeItem: snapshot.itemIdentifiers(inSection: item.section)[indexPath.row])
+        snapshot.deleteItems([dataSource.itemIdentifier(for: indexPath)!])
+        
+        dataSource.apply(snapshot, animatingDifferences: false)
     }
 }
