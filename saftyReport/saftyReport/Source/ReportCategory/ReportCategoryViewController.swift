@@ -86,7 +86,6 @@ class ReportCategoryViewController: UIViewController {
                     let description = String.bullet + " " + $0.categoryDescription
                         .replaceEscapeSequences()
                         .removeQuotes()
-                    print("원본: \($0), 수정: \(description)")
                     customCategoryItems.append(
                         CustomCategory.Item(
                             section: CustomCategory.configureSection(categoryID: $0.categoryId),
@@ -152,18 +151,6 @@ class ReportCategoryViewController: UIViewController {
         data.forEach {
             snapshot.appendItems([$0], toSection: $0.section)
         }
-        
-        dataSource.apply(snapshot, animatingDifferences: false)
-    }
-    
-    private func applyInitialSnapshots2(data: CategoryDetailList) {
-        var snapshot = NSDiffableDataSourceSnapshot<CustomCategory.Section, CustomCategory.Item>()
-        snapshot.appendSections([.safety, .parking, .traffic, .environment])
-        
-        snapshot.appendItems(CustomCategory.Dummy.safety, toSection: .safety)
-        snapshot.appendItems(CustomCategory.Dummy.parking, toSection: .parking)
-        snapshot.appendItems(CustomCategory.Dummy.traffic, toSection: .traffic)
-        snapshot.appendItems(CustomCategory.Dummy.environment, toSection: .environment)
         
         dataSource.apply(snapshot, animatingDifferences: false)
     }
