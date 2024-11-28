@@ -77,7 +77,7 @@ class ReportCategoryViewController: UIViewController {
                         for: indexPath
                     ) as? ReportCategoryExpandedTableViewCell else { return nil }
                     
-                    cell.bind(item: item)
+                    cell.bind(item: item, at: self, reportButtonAction: #selector(pushReportDetailVC))
                     return cell
                     
                 } else {
@@ -103,10 +103,20 @@ class ReportCategoryViewController: UIViewController {
         
         dataSource.apply(snapshot, animatingDifferences: false)
     }
+}
+
+// MARK: - Objc functions
+extension ReportCategoryViewController {
     
     @objc private func popSelf() {
         self.navigationController?.popViewController(animated: true)
     }
+    
+    @objc private func pushReportDetailVC() {
+        let nextVC = ReportDetailViewController()
+        self.navigationController?.pushViewController(nextVC, animated: true)
+    }
+    
 }
 
 extension ReportCategoryViewController: UITableViewDataSource {

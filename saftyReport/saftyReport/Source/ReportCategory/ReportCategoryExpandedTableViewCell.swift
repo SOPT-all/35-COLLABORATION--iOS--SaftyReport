@@ -97,7 +97,7 @@ class ReportCategoryExpandedTableViewCell: UITableViewCell {
         }
     }
     
-    func bind(item: ReportCategory.Item) {
+    func bind(item: ReportCategory.Item, at target: Any?, reportButtonAction: Selector) {
         titleLabel.attributedText = NSAttributedString.styled(
             text: item.name,
             style: .body4)
@@ -105,5 +105,7 @@ class ReportCategoryExpandedTableViewCell: UITableViewCell {
         descriptionContentLabel.attributedText = NSAttributedString.styled(
             text: item.description,
             style: .caption4)
+        
+        reportButton.addTarget(target, action: reportButtonAction, for: .touchUpInside)
     }
 }
