@@ -64,8 +64,6 @@ class MainViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         connectAPI()
-        
-        collectionView.reloadData()
     }
     
     private func setUI() {
@@ -224,6 +222,7 @@ class MainViewController: UIViewController {
                 for banner in bannerList {
                     bannerListImgUrl.append(banner.bannerUrl ?? "")
                 }
+                collectionView.reloadData()
             case let .failure(error):
                 print(error.localizedDescription)
             }
@@ -364,8 +363,4 @@ extension MainViewController: UICollectionViewDelegate {
         }
         return header
     }
-}
-
-#Preview {
-    MainViewController()
 }
