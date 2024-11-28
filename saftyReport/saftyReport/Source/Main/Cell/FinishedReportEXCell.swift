@@ -15,14 +15,14 @@ class FinishedReportEXCell: UICollectionViewCell {
     }
     
     private let beforeImageView = UIImageView().then {
-        $0.image = UIImage(named: "image_before")
+        $0.image = UIImage.imageBefore
         $0.contentMode = .scaleAspectFill
         $0.layer.cornerRadius = 15
         $0.clipsToBounds = true
     }
     
     private let afterImageview = UIImageView().then {
-        $0.image = UIImage(named: "image_after")
+        $0.image = UIImage.imageAfter
         $0.contentMode = .scaleAspectFill
         $0.layer.cornerRadius = 15
         $0.clipsToBounds = true
@@ -37,7 +37,7 @@ class FinishedReportEXCell: UICollectionViewCell {
         $0.pageIndicatorTintColor = .gray3
         $0.backgroundColor = .clear
         $0.layer.cornerRadius = 5
-        let dotImage = UIImage(named: "Ellipse5x5")?.withConfiguration(
+        let dotImage = UIImage.ellipse5X5.withConfiguration(
             UIImage.SymbolConfiguration(pointSize: 5)
         )
         $0.preferredIndicatorImage = dotImage

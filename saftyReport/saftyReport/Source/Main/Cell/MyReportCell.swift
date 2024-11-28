@@ -52,18 +52,18 @@ class MyReportCell: UICollectionViewCell {
     }
     
     private var myReportCountImageView = UIImageView().then {
-        $0.image = UIImage(named: "graph_year_report")
+        $0.image = UIImage.graphYearReport
         $0.contentMode = .scaleAspectFit
         $0.tintColor = .primaryOrange
     }
     
     private var myReportSubImageView = UIImageView().then {
-        $0.image = UIImage(named: "sub_graph_month_report")
+        $0.image = UIImage.subGraphMonthReport
         $0.contentMode = .scaleAspectFit
     }
     
     private var myMonthlyReportImageView = UIImageView().then {
-        $0.image = UIImage(named: "graph_month_report")
+        $0.image = UIImage.graphMonthReport
         $0.contentMode = .scaleAspectFit
         $0.tintColor = .primaryOrange
     }

@@ -11,11 +11,11 @@ class MyReportBannerCell: UICollectionViewCell {
     let bannerImgList = ["img_promotion_1", "img_promotion_2", "img_promotion_3"]
     
     lazy var leftButton = UIButton().then {
-        $0.setBackgroundImage(UIImage(named: "icn_arrow_left_round_white_24px"), for: .normal)
+        $0.setBackgroundImage(UIImage.icnArrowLeftRoundWhite24Px, for: .normal)
         $0.addTarget(self, action: #selector(leftButtonTapped), for: .touchUpInside)
     }
     lazy var rightButton = UIButton().then {
-        $0.setBackgroundImage(UIImage(named: "icn_arrow_right_round_white_24px"), for: .normal)
+        $0.setBackgroundImage(UIImage.icnArrowRightRoundWhite24Px, for: .normal)
         $0.addTarget(self, action: #selector(rightButtonTapped), for: .touchUpInside)
     }
     
@@ -45,7 +45,7 @@ class MyReportBannerCell: UICollectionViewCell {
         $0.backgroundColor = .gray13Opacity40
         $0.layer.cornerRadius = 5
         
-        let dotImage = UIImage(named: "Ellipse5x5")?.withConfiguration(
+        let dotImage = UIImage.ellipse5X5.withConfiguration(
             UIImage.SymbolConfiguration(pointSize: 5)
         )
         $0.preferredIndicatorImage = dotImage

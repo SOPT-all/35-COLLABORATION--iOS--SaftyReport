@@ -21,7 +21,6 @@ class MainViewController: UIViewController {
     private lazy var tableView = UITableView().then {
         $0.separatorStyle = .none
         $0.isScrollEnabled = false
-//        $0.clipsToBounds = false
         $0.backgroundColor = .gray1
         $0.alpha = 0.0
         $0.transform = CGAffineTransform.identity
@@ -42,6 +41,7 @@ class MainViewController: UIViewController {
         view.backgroundColor = .gray1
         
         CustomShadow.shared.applyShadow(to: tableView.layer, width: 5, height: 5)
+        
         setUI()
         setLayout()
         updateFloaingButtonUI()
@@ -153,7 +153,7 @@ class MainViewController: UIViewController {
     }
     
     private func updateFloaingButtonUI() {
-        let image = UIImage(named: "icn_cross_i_normal_white_16px")?.withRenderingMode(.alwaysTemplate)
+        let image = UIImage.icnCrossINormalWhite16Px.withRenderingMode(.alwaysTemplate)
         floatingButton.setImage(image, for: .normal)
         
         if isToggled {
@@ -197,6 +197,7 @@ extension MainViewController: UITableViewDataSource {
         }
         cell.configure(with: tableItems[indexPath.row])
         cell.frame.self.size.height = 40
+        cell.layer.cornerRadius = 15
         cell.backgroundColor = .clear
         return cell
     }
