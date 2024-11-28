@@ -12,6 +12,7 @@ import Then
 
 class ReportTypeCell: BaseCell {
     private let mockReportView = MockReportView()
+    weak var delegate: ReportTypeCellDelegate?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -42,6 +43,7 @@ class ReportTypeCell: BaseCell {
     
     @objc private func mainButtonTapped() {
         mockReportView.isExpanded.toggle()
+        delegate?.didToggleExpansion(isExpanded: mockReportView.isExpanded)
     }
     
     override func configure(with item: ReportDetailItem) {
