@@ -72,9 +72,9 @@ class ContentsCell: UICollectionViewCell {
         
         self.isChecked = isChecked
         self.checkbox.setImage(
-                    isChecked ? .icnCheckboxISquareSelectedWhite24Px : .icnCheckboxISquareUnselectedWhite24Px,
-                    for: .normal
-                )
+            isChecked ? .icnCheckboxISquareSelectedWhite24Px : .icnCheckboxISquareUnselectedWhite24Px,
+            for: .normal
+        )
         
     }
     

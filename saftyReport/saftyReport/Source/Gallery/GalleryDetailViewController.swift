@@ -29,7 +29,7 @@ class GalleryDetailViewController: UIViewController {
         $0.setBackgroundImage(.icnCheckboxISquareUnselectedWhite24Px, for: .normal)
         $0.addTarget(self, action: #selector(checkboxTapped), for: .touchUpInside)
     }
-        
+    
     private var timeStackView = UIStackView().then {
         $0.layer.cornerRadius = 5
         $0.layer.borderWidth = 1
