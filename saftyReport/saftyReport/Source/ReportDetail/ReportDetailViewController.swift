@@ -139,16 +139,19 @@ class ReportDetailViewController: UIViewController {
     private func setupOverlayView() {
         view.addSubview(overlayView)
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
             guard let self = self,
-                  let firstCell = self.collectionView.cellForItem(at: IndexPath(item: 0, section: 0)) else { return }
+                  let locationCell = self.collectionView.cellForItem(at: IndexPath(item: 0, section: 1)) else { return }
             
-            let cellFrameInView = self.collectionView.convert(firstCell.frame, to: self.view)
+            let cellFrameInView = self.collectionView.convert(locationCell.frame, to: self.view)
             
-            self.overlayView.snp.makeConstraints {
-                $0.top.equalTo(cellFrameInView.maxY)
-                $0.leading.trailing.bottom.equalToSuperview()
+            self.overlayView.snp.remakeConstraints {
+                $0.top.equalTo(cellFrameInView.minY)
+                $0.leading.trailing.equalToSuperview()
+                $0.bottom.equalToSuperview()
             }
+            
+            self.view.layoutIfNeeded()
         }
     }
     
