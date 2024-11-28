@@ -83,11 +83,15 @@ class ReportCategoryViewController: UIViewController {
                 var customCategoryItems: [CustomCategory.Item] = []
                 
                 categoryDetailList.forEach {
+                    let description = String.bullet + " " + $0.categoryDescription
+                        .replaceEscapeSequences()
+                        .removeQuotes()
+                    print("원본: \($0), 수정: \(description)")
                     customCategoryItems.append(
                         CustomCategory.Item(
                             section: CustomCategory.configureSection(categoryID: $0.categoryId),
                             name: $0.categoryName,
-                            description: $0.categoryDescription,
+                            description: description,
                             isExpanded: false))
                 }
                 
