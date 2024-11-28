@@ -65,10 +65,17 @@ class ContentsCell: UICollectionViewCell {
         }
     }
     
-    func configure(item: GalleryPhotoList){
+    func configure(item: GalleryPhotoList, isChecked: Bool = false){
         if let imageURL = URL(string: item.photoUrl ?? "") {
             imageView.kf.setImage(with: imageURL)
         }
+        
+        self.isChecked = isChecked
+        self.checkbox.setImage(
+                    isChecked ? .icnCheckboxISquareSelectedWhite24Px : .icnCheckboxISquareUnselectedWhite24Px,
+                    for: .normal
+                )
+        
     }
     
 }

@@ -14,7 +14,10 @@ class GalleryViewController: UIViewController {
     private let networkManager = NetworkManager()
     
     private var firstSectionPhotoList: [GalleryPhotoList] = []
+    private var firstSectionCheckedStatus: Set<IndexPath> = []
+    
     private var secondSectionPhotoList: [GalleryPhotoList] = []
+    private var secondSectionCheckedStatus: Set<IndexPath> = []
     
     private let collectionView = UICollectionView(frame: .zero,
                                                   collectionViewLayout: UICollectionViewLayout())
@@ -152,14 +155,15 @@ extension GalleryViewController: UICollectionViewDelegate {
         nextViewController.checkboxHandler = { [weak self] isChecked, indexPath in
             guard let self = self else { return }
             
-            if let cell = self.collectionView.cellForItem(at: indexPath) as? ContentsCell {
-                // 체크박스 상태 업데이트
-                cell.isChecked = isChecked
-                cell.checkbox.setImage(
-                    isChecked ? .icnCheckboxISquareSelectedWhite24Px : .icnCheckboxISquareUnselectedWhite24Px,
-                    for: .normal
-                )
+            if isChecked {
+                self.firstSectionCheckedStatus.insert(indexPath)
+                self.secondSectionCheckedStatus.insert(indexPath)
+            } else {
+                self.firstSectionCheckedStatus.remove(indexPath)
+                self.secondSectionCheckedStatus.remove(indexPath)
             }
+            
+            self.collectionView.reloadData()
         }
         
         if indexPath.section == 2 {
@@ -223,7 +227,7 @@ extension GalleryViewController: UICollectionViewDataSource {
                 return UICollectionViewCell(frame: .zero)
             }
             
-            cell.configure(item: firstSectionPhotoList[indexPath.row])
+            cell.configure(item: firstSectionPhotoList[indexPath.row], isChecked: firstSectionCheckedStatus.contains(indexPath))
             
             return cell
         default:
@@ -234,7 +238,7 @@ extension GalleryViewController: UICollectionViewDataSource {
                 return UICollectionViewCell(frame: .zero)
             }
             
-            cell.configure(item: secondSectionPhotoList[indexPath.row])
+            cell.configure(item: secondSectionPhotoList[indexPath.row], isChecked: secondSectionCheckedStatus.contains(indexPath))
             
             return cell
         }
