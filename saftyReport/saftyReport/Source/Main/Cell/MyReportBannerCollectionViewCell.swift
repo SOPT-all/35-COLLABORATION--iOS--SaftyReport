@@ -8,16 +8,15 @@
 import UIKit
 
 class MyReportBannerCell: UICollectionViewCell {
-    let cellIdentifier: String = "MyReportBannerCell"
-    
     let bannerImgList = ["img_promotion_1", "img_promotion_2", "img_promotion_3"]
     
     lazy var leftButton = UIButton().then {
-        $0.setBackgroundImage(UIImage(named: "icn_arrow_left_round_white_24px"), for: .normal)
+        $0.setBackgroundImage(UIImage.icnArrowLeftRoundWhite24Px, for: .normal)
         $0.addTarget(self, action: #selector(leftButtonTapped), for: .touchUpInside)
     }
+    
     lazy var rightButton = UIButton().then {
-        $0.setBackgroundImage(UIImage(named: "icn_arrow_right_round_white_24px"), for: .normal)
+        $0.setBackgroundImage(UIImage.icnArrowRightRoundWhite24Px, for: .normal)
         $0.addTarget(self, action: #selector(rightButtonTapped), for: .touchUpInside)
     }
     
@@ -47,7 +46,7 @@ class MyReportBannerCell: UICollectionViewCell {
         $0.backgroundColor = .gray13Opacity40
         $0.layer.cornerRadius = 5
         
-        let dotImage = UIImage(named: "Ellipse5x5")?.withConfiguration(
+        let dotImage = UIImage.ellipse5X5.withConfiguration(
             UIImage.SymbolConfiguration(pointSize: 5)
         )
         $0.preferredIndicatorImage = dotImage
@@ -60,11 +59,7 @@ class MyReportBannerCell: UICollectionViewCell {
         
         setUI()
         setLayout()
-        
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        
-        collectionView.register(BannerCell.self, forCellWithReuseIdentifier: BannerCell.cellIdentifier)
+        setCollectionView()
     }
     
     required init?(coder: NSCoder) {
@@ -77,11 +72,7 @@ class MyReportBannerCell: UICollectionViewCell {
         self.addSubviews(leftButton, rightButton)
     }
     
-    private func setLayout() {
-        leftButton.translatesAutoresizingMaskIntoConstraints = false
-        rightButton.translatesAutoresizingMaskIntoConstraints = false
-        pageControl.translatesAutoresizingMaskIntoConstraints = false
-        
+    private func setLayout() {        
         collectionView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
@@ -99,6 +90,13 @@ class MyReportBannerCell: UICollectionViewCell {
             $0.trailing.equalToSuperview().inset(4)
             $0.centerY.equalToSuperview()
         }
+    }
+    
+    private func setCollectionView(){
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        
+        collectionView.register(BannerCell.self, forCellWithReuseIdentifier: BannerCell.cellIdentifier)
     }
     
     private func scrollToCurrentPage() {
@@ -146,7 +144,10 @@ extension MyReportBannerCell: UICollectionViewDataSource {
 }
 
 extension MyReportBannerCell: UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
       return CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
     }
 }

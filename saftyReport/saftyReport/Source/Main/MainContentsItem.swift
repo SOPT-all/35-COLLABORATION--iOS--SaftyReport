@@ -7,7 +7,7 @@
 
 import UIKit
 
-enum MainContentsItemLayout {
+struct MainContentsItemLayout {
     static func createLayout() -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout { (sectionNumber, _ environment) -> NSCollectionLayoutSection? in
             let section: NSCollectionLayoutSection
