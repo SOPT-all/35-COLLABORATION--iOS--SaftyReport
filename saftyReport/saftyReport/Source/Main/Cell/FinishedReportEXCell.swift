@@ -8,8 +8,6 @@
 import UIKit
 
 class FinishedReportEXCell: UICollectionViewCell {
-    let cellIdentifier = "FinishedReportEXCell"
-    
     let stackViewList = [1, 2]
     private let stackView = UIStackView().then {
         $0.axis = .vertical

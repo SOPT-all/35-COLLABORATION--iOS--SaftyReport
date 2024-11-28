@@ -11,8 +11,6 @@ import SnapKit
 import Then
 
 class ButtonTableCell: UITableViewCell {
-    let cellIdentifier = "ButtonTableCell"
-    
     lazy var iconImageView = UIImageView().then {
         $0.contentMode = .scaleAspectFit
     }

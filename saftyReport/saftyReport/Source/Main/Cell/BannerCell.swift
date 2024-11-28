@@ -7,10 +7,7 @@
 
 import UIKit
 
-class BannerCell: UICollectionViewCell {
-    let cellIdentifier: String = "BannerCell"
-    
-    let bannerImageView = UIImageView().then {
+class BannerCell: UICollectionViewCell {let bannerImageView = UIImageView().then {
         $0.contentMode = .scaleAspectFill
     }
     

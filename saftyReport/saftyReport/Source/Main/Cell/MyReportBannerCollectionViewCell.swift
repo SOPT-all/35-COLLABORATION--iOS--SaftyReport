@@ -8,8 +8,6 @@
 import UIKit
 
 class MyReportBannerCell: UICollectionViewCell {
-    let cellIdentifier: String = "MyReportBannerCell"
-    
     let bannerImgList = ["img_promotion_1", "img_promotion_2", "img_promotion_3"]
     
     lazy var leftButton = UIButton().then {

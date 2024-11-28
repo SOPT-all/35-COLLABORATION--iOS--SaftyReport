@@ -8,8 +8,6 @@
 import UIKit
 
 class MyReportCell: UICollectionViewCell {
-    let cellIdentifier: String = "MyReportCell"
-    
     private let myReportView = UIView().then {
         $0.layer.cornerRadius = 15
         $0.backgroundColor = .gray1
