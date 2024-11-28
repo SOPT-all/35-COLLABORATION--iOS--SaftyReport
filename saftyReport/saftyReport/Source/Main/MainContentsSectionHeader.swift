@@ -123,7 +123,3 @@ class MainContentsSectionHeader: UICollectionReusableView {
         return formatter.string(for: beforeNum) ?? "\(number)"
     }
 }
-
-#Preview {
-    MainViewController()
-}
