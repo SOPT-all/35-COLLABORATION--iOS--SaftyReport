@@ -11,6 +11,13 @@ import SnapKit
 import Then
 
 class MainViewController: UIViewController {
+    private let networkManager = NetworkManager()
+    
+    var yearReportCount: Int = 0
+    var monthReportCount: Int = 0
+    var milieage: Int = 0
+    var bannerList: [BannerList] = []
+    
     let customNavigationItem = CustomNavigationItem(title: "홈") // 반드시 타이틀 설정
     
     private var isToggled = false
@@ -51,6 +58,13 @@ class MainViewController: UIViewController {
         updateFloaingButtonUI()
         
         setUpNavigationBar()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        connectAPI()
+        
+        collectionView.reloadData()
     }
     
     private func setUI() {
@@ -127,7 +141,7 @@ class MainViewController: UIViewController {
         floatingButton.snp.updateConstraints {
             $0.width.equalTo(newWidth)
         }
-
+        
         UIView.animate(withDuration: 0.15) {
             self.view.layoutIfNeeded() // 레이아웃 업데이트를 애니메이션으로 적용
             self.floatingButton.transform = CGAffineTransform(rotationAngle: newAngle) // 45도 회전
@@ -182,14 +196,37 @@ class MainViewController: UIViewController {
     
     
     // MARK: - Navigation Bar
+    
     private func setUpNavigationBar() {
         navigationController?.setUpNavigationBarColor()
         customNavigationItem.setUpNavigationBar(for: .leftRight)
         customNavigationItem.setUpTitle(title: "")
-
+        
         navigationItem.title = customNavigationItem.title
         navigationItem.leftBarButtonItem = customNavigationItem.leftBarButtonItem
         navigationItem.rightBarButtonItem = customNavigationItem.rightBarButtonItem
+    }
+    
+    // MARK: - Network
+    
+    private func connectAPI() {
+        self.networkManager.homeAPI { [weak self] result in
+            guard let self = self else { return }
+            
+            switch result {
+            case let .success(response):
+                yearReportCount = response.yearReportCount ?? 0
+                monthReportCount = response.monthReportCount ?? 0
+                milieage = response.mileage ?? 0
+                bannerList = response.bannerList
+            case let .failure(error):
+                print(error.localizedDescription)
+                
+            }
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
+            }
+        }
     }
 }
 
@@ -256,7 +293,7 @@ extension MainViewController: UICollectionViewDataSource {
             ) as? MyReportCell else {
                 return UICollectionViewCell(frame: .zero)
             }
-            cell.configure(with: indexPath.item)
+            cell.configure(with: indexPath.item, yearReportCount: yearReportCount, monthReportCount: monthReportCount)
             return cell
         case 1:
             guard let cell = collectionView.dequeueReusableCell(
