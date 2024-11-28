@@ -97,7 +97,7 @@ class ReportCategoryExpandedTableViewCell: UITableViewCell {
         }
     }
     
-    func bind(item: ReportCategory.Item) {
+    func bind(item: CustomCategory.Item) {
         titleLabel.attributedText = NSAttributedString.styled(
             text: item.name,
             style: .body4)
