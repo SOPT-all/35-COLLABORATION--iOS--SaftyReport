@@ -35,8 +35,8 @@ class BannerCell: UICollectionViewCell {let bannerImageView = UIImageView().then
     }
     
     func configure(image: String) {
-        if let image = UIImage(named: image) {
-            bannerImageView.image = image
+        if let url = URL(string: image) {
+            bannerImageView.kf.setImage(with: url)
         }
     }
 }

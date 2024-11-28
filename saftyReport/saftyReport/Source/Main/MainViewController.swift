@@ -17,6 +17,7 @@ class MainViewController: UIViewController {
     var monthReportCount: Int = 0
     var milieage: Int = 0
     var bannerList: [BannerList] = []
+    var bannerListImgUrl: [String] = []
     
     let customNavigationItem = CustomNavigationItem(title: "홈") // 반드시 타이틀 설정
     
@@ -219,6 +220,9 @@ class MainViewController: UIViewController {
                 monthReportCount = response.monthReportCount ?? 0
                 milieage = response.mileage ?? 0
                 bannerList = response.bannerList
+                for banner in bannerList {
+                    bannerListImgUrl.append(banner.bannerUrl ?? "")
+                }
             case let .failure(error):
                 print(error.localizedDescription)
                 
@@ -302,6 +306,7 @@ extension MainViewController: UICollectionViewDataSource {
             ) as? MyReportBannerCell else {
                 return UICollectionViewCell(frame: .zero)
             }
+            cell.configure(bannerListImgUrl: bannerListImgUrl)
             return cell
         case 2:
             guard let cell = collectionView.dequeueReusableCell(
