@@ -24,13 +24,13 @@ class ContentsCell: UICollectionViewCell {
     lazy var checkbox = UIButton().then {
         $0.clipsToBounds = true
         $0.contentMode = .scaleAspectFill
-        $0.setImage(isChecked ? .icnCheckboxISquareSelectedWhite24Px : .icnCheckboxISquareUnselectedWhite24Px, for: .normal)
+        $0.setImage(.icnCheckboxISquareUnselectedWhite24Px, for: .normal)
         $0.addTarget(self, action: #selector(checkboxTapped), for: .touchUpInside)
     }
     
     override init(frame: CGRect) {
         super .init(frame: frame)
-                
+        
         setUI()
         setLayout()
     }
@@ -70,5 +70,5 @@ class ContentsCell: UICollectionViewCell {
             imageView.kf.setImage(with: imageURL)
         }
     }
-
+    
 }

@@ -13,9 +13,9 @@ import Then
 class GalleryDetailViewController: UIViewController {
     var checkboxHandler: ((Bool, IndexPath) -> ())?
     var indexPath: IndexPath!
-
+    
     var isChecked = false
-
+    
     private var baseView = UIView().then {
         $0.backgroundColor = .gray1
     }
@@ -70,11 +70,11 @@ class GalleryDetailViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        tabBarController?.tabBar.isHidden = true
         checkbox.setBackgroundImage(
             isChecked ? .icnCheckboxISquareSelectedWhite24Px : .icnCheckboxISquareUnselectedWhite24Px,
             for: .normal
         )
+        tabBarController?.tabBar.isHidden = true
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -132,6 +132,7 @@ class GalleryDetailViewController: UIViewController {
     }
     
     func configure(item: GalleryPhotoList){
+        
         if let imageURL = URL(string: item.photoUrl ?? "") {
             imageView.kf.setImage(with: imageURL)
             
@@ -143,6 +144,7 @@ class GalleryDetailViewController: UIViewController {
         
         let dateTime = formatDateTime(item.createdAt ?? "")
         dateTimeLabel.text = dateTime
+        
     }
     
     private func setupNavigationBar() {
