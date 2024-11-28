@@ -9,6 +9,7 @@ import UIKit
 
 import SnapKit
 import Then
+import Alamofire
 
 class ReportDetailViewController: UIViewController {
     
@@ -145,45 +146,45 @@ class ReportDetailViewController: UIViewController {
                     height: usableHeight * 0.2,
                     insets: .init(top: sectionSpacing + 12, leading: 20, bottom: 0, trailing: 20)
                 )
-               
-           case .location:
-               return self.makeSection(
-                   height: availableHeight * 0.15,
-                   insets: .init(top: sectionSpacing, leading: 20, bottom: 0, trailing: 20)
-               )
-               
-           case .content:
-               return self.makeSection(
-                   height: availableHeight * 0.35,
-                   insets: .init(top: 0, leading: 20, bottom: 0, trailing: 20)
-               )
-               
-           case .phone:
-               return self.makeSection(
-                   height: availableHeight * 0.15,
-                   insets: .init(top: 0, leading: 20, bottom: 0, trailing: 20)
-               )
-               
-           case .none:
-               return nil
-           }
-       }
-       return layout
+                
+            case .location:
+                return self.makeSection(
+                    height: availableHeight * 0.15,
+                    insets: .init(top: sectionSpacing, leading: 20, bottom: 0, trailing: 20)
+                )
+                
+            case .content:
+                return self.makeSection(
+                    height: availableHeight * 0.35,
+                    insets: .init(top: 0, leading: 20, bottom: 0, trailing: 20)
+                )
+                
+            case .phone:
+                return self.makeSection(
+                    height: availableHeight * 0.15,
+                    insets: .init(top: 0, leading: 20, bottom: 0, trailing: 20)
+                )
+                
+            case .none:
+                return nil
+            }
+        }
+        return layout
     }
-
+    
     private func makeSection(height: CGFloat, insets: NSDirectionalEdgeInsets) -> NSCollectionLayoutSection {
-       let itemSize = NSCollectionLayoutSize(
-           widthDimension: .fractionalWidth(1.0),
-           heightDimension: .absolute(height)
-       )
-       let item = NSCollectionLayoutItem(layoutSize: itemSize)
-       let group = NSCollectionLayoutGroup.horizontal(
-           layoutSize: itemSize,
-           subitems: [item]
-       )
-       let section = NSCollectionLayoutSection(group: group)
-       section.contentInsets = insets
-       return section
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .absolute(height)
+        )
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        let group = NSCollectionLayoutGroup.horizontal(
+            layoutSize: itemSize,
+            subitems: [item]
+        )
+        let section = NSCollectionLayoutSection(group: group)
+        section.contentInsets = insets
+        return section
     }
     
     private func configureDataSource() {
@@ -225,7 +226,7 @@ class ReportDetailViewController: UIViewController {
             return cell
         }
     }
-
+    
     private func applySnapshot() {
         var snapshot = NSDiffableDataSourceSnapshot<ReportDetailSection, ReportDetailItem>()
         ReportDetailSection.allCases.forEach { section in
@@ -250,16 +251,90 @@ class ReportDetailViewController: UIViewController {
             for: .touchUpInside
         )
     }
-    
-    @objc private func submitButtonTapped() {
-        print("제출 버튼이 눌렸습니다.")
-    }
 }
 
 extension ReportDetailViewController: LocationCellDelegate {
     func locationIconTapped() {
         let reportAddressVC = ReportAddressViewController()
         navigationController?.pushViewController(reportAddressVC, animated: true)
+    }
+}
+
+extension ReportDetailViewController {
+    @objc private func submitButtonTapped() {
+        //  1: URL 주소 생성
+        guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BASE_URL") as? String else {
+            showAlert(message: NetworkError.invalidURL.errorMessage)
+            return
+        }
+        
+        let endPoint = "/api/v1/report"
+        let fullURL = baseURL + endPoint
+        
+        //  2: 전송할 데이터 준비 (원래는 내부 내용이 들어가야하는데 여기서는 목데이터로)
+        let reportRequest = ReportRequest(
+            photoList: [
+                PhotoRequest(photoId: 1, photoUrl: "www.example1.com"),
+                PhotoRequest(photoId: 2, photoUrl: "www.example2.com")
+            ],
+            address: "사랑시 고백구 행복동",
+            content: "널 너무나 많이 사랑한죄",
+            phoneNumber: "010-2998-0867",
+            category: "PARKING"
+        )
+        
+        //  3: HTTP 헤더 설정
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/json",
+            "userId": "1"
+        ]
+        
+        //  4: 네트워크 요청 보내기
+        AF.request(
+            fullURL,
+            method: .post,
+            parameters: reportRequest,
+            encoder: JSONParameterEncoder.default,
+            headers: headers
+        )
+        .validate()
+        .responseDecodable(of: ReportResponse.self) { [weak self] response in
+            switch response.result {
+            case .success(let reportResponse):
+                if reportResponse.status == 201 {
+                    self?.showAlert(message: "신고가 성공적으로 접수되었습니다") {
+                        self?.navigationController?.popViewController(animated: true)
+                    }
+                } else {
+                    self?.showAlert(message: reportResponse.message ?? NetworkError.serverError.errorMessage)
+                }
+                
+            case .failure(_):
+                // 이미 정의된 NetworkError의 에러 메시지 사용
+                if let data = response.data {
+                    self?.showAlert(message: NetworkError.decodingError.errorMessage)
+                } else if response.response == nil {
+                    self?.showAlert(message: NetworkError.networkError(response.error!).errorMessage)
+                } else {
+                    self?.showAlert(message: NetworkError.serverError.errorMessage)
+                }
+            }
+        }
+    }
+    
+    private func showAlert(message: String, completion: (() -> Void)? = nil) {
+        let alert = UIAlertController(
+            title: nil,
+            message: message,
+            preferredStyle: .alert
+        )
+        
+        let okAction = UIAlertAction(title: "확인", style: .default) { _ in
+            completion?()
+        }
+        
+        alert.addAction(okAction)
+        present(alert, animated: true)
     }
 }
 
