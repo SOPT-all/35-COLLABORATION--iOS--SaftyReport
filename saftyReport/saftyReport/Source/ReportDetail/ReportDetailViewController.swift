@@ -16,7 +16,10 @@ protocol ReportTypeCellDelegate: AnyObject {
 }
 
 class ReportDetailViewController: UIViewController {
-    // MARK: - Properties
+    
+    private var isInitialState = true
+    private var isOverlayVisible = true
+    
     private let overlayView = UIView().then {
         $0.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         $0.isUserInteractionEnabled = false
@@ -178,7 +181,9 @@ class ReportDetailViewController: UIViewController {
             let usableHeight = availableHeight - totalSpacing
             
             let section = ReportDetailSection(rawValue: sectionIndex)
+            
             switch section {
+                
             case .reportType:
                 return makeSection(height: totalTopHeight * 0.2, insets: .zero)
             case .photo:
@@ -235,14 +240,17 @@ class ReportDetailViewController: UIViewController {
             }
             
             switch section {
-                case .reportType:
-                    let cell = collectionView.dequeueReusableCell(
-                        withReuseIdentifier: ReportTypeCell.reuseIdentifier,
-                        for: indexPath
-                    ) as! ReportTypeCell
-                    cell.configure(with: item)
-                    cell.delegate = self
-                    return cell
+            case .reportType:
+                let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: ReportTypeCell.reuseIdentifier,
+                    for: indexPath
+                ) as! ReportTypeCell
+                cell.configure(with: item)
+                cell.delegate = self
+                if isInitialState {
+                    cell.updateTitleColor(.primaryOrange)
+                }
+                return cell
                 
             case .photo:
                 let cell = collectionView.dequeueReusableCell(
@@ -293,8 +301,11 @@ class ReportDetailViewController: UIViewController {
 // MARK: - ReportTypeCellDelegate
 extension ReportDetailViewController: ReportTypeCellDelegate {
     func didToggleExpansion(isExpanded: Bool) {
-        UIView.animate(withDuration: 0.3) {
-            self.overlayView.alpha = isExpanded ? 0.0 : 0.5
+        if isInitialState {
+            UIView.animate(withDuration: 0.3) {
+                self.overlayView.alpha = 0.0
+            }
+            isInitialState = false
         }
     }
 }
