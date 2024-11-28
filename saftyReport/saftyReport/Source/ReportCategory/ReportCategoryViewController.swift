@@ -180,14 +180,15 @@ extension ReportCategoryViewController: UITableViewDataSource {
 
 extension ReportCategoryViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard let item = dataSource.itemIdentifier(for: indexPath)
-        else { return UITableView.automaticDimension }
-        
-        if item.isExpanded {
-            return 258 + 10
-        } else {
-            return 58 + 10
-        }
+//        guard let item = dataSource.itemIdentifier(for: indexPath)
+//        else { return UITableView.automaticDimension }
+//        
+//        if item.isExpanded {
+//            return 258 + 10
+//        } else {
+//            return 58 + 10
+//        }
+        return UITableView.automaticDimension
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -201,5 +202,9 @@ extension ReportCategoryViewController: UITableViewDelegate {
         snapshot.deleteItems([dataSource.itemIdentifier(for: indexPath)!])
         
         dataSource.apply(snapshot, animatingDifferences: false)
+        
+        // 높이 재계산
+            tableView.beginUpdates()
+            tableView.endUpdates()
     }
 }

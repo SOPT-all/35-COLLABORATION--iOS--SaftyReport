@@ -95,6 +95,7 @@ class ReportCategoryExpandedTableViewCell: UITableViewCell {
         descriptionContentLabel.snp.makeConstraints {
             $0.top.equalTo(descriptionTitleLabel.snp.bottom).offset(8)
             $0.horizontalEdges.equalToSuperview().inset(15)
+            $0.bottom.equalToSuperview().offset(-15)
         }
     }
     

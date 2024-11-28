@@ -13,6 +13,8 @@ class ReportCategoryView: UIView {
     
     let tableView = UITableView().then {
         $0.separatorStyle = .none
+        $0.rowHeight = UITableView.automaticDimension
+        $0.estimatedRowHeight = 68
     }
     
     
