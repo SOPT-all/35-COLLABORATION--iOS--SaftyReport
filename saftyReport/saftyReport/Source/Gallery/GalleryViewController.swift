@@ -327,7 +327,7 @@ extension GalleryViewController {
     private func createContentsSection() -> NSCollectionLayoutSection {
         // 아이템 크기 설정
         let itemSize = NSCollectionLayoutSize(
-            widthDimension: .absolute(110),
+            widthDimension: .fractionalWidth(1/3),
             heightDimension: .fractionalHeight(1)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
@@ -356,7 +356,7 @@ extension GalleryViewController {
             top: 0,
             leading: 20,
             bottom: 20,
-            trailing: 20
+            trailing: 17
         )
         section.boundarySupplementaryItems = [self.createSectionHeader()] // 헤더 추가
         

@@ -15,7 +15,7 @@ class ReportAddressViewController: UIViewController {
     
     private let imageView = UIImageView().then {
         $0.image = .reportAddress
-        $0.contentMode = .scaleAspectFit
+        $0.contentMode = .scaleToFill
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 5
         $0.layer.borderWidth = 1
@@ -128,14 +128,14 @@ class ReportAddressViewController: UIViewController {
         searchKeywordButton.snp.makeConstraints {
             $0.top.equalTo(addressView.snp.bottom).offset(20)
             $0.leading.equalToSuperview().inset(15)
-            $0.width.equalTo(168)
+            $0.width.equalTo(self.view.snp.width).dividedBy(2).inset(10)
             $0.height.equalTo(50)
         }
         
         searchAddressButton.snp.makeConstraints {
             $0.top.equalTo(addressView.snp.bottom).offset(20)
             $0.trailing.equalToSuperview().inset(15)
-            $0.width.equalTo(168)
+            $0.width.equalTo(self.view.snp.width).dividedBy(2).inset(10)
             $0.height.equalTo(50)
         }
         
