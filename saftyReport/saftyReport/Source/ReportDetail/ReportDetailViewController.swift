@@ -21,7 +21,7 @@ class ReportDetailViewController: UIViewController {
     private var isOverlayVisible = true
     
     private let overlayView = UIView().then {
-        $0.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        $0.backgroundColor = UIColor.white.withAlphaComponent(0.6)
         $0.isUserInteractionEnabled = false
     }
     
