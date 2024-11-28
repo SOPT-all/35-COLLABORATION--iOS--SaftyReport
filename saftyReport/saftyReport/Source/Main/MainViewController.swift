@@ -12,6 +12,7 @@ import Then
 
 class MainViewController: UIViewController {
     let customNavigationItem = CustomNavigationItem(title: "홈") // 반드시 타이틀 설정
+    
     private var isToggled = false
     
     private lazy var floatingButton = UIButton().then {
@@ -103,7 +104,10 @@ class MainViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         
-        tableView.register(ButtonTableCell.self, forCellReuseIdentifier: ButtonTableCell.identifier)
+        tableView.register(
+            ButtonTableCell.self,
+            forCellReuseIdentifier: ButtonTableCell.identifier
+        )
     }
     
     // MARK: - Floating Button and Animation
@@ -198,7 +202,10 @@ extension MainViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: ButtonTableCell.identifier, for: indexPath) as? ButtonTableCell else {
+        guard let cell = tableView.dequeueReusableCell(
+            withIdentifier: ButtonTableCell.identifier,
+            for: indexPath
+        ) as? ButtonTableCell else {
             return UITableViewCell()
         }
         cell.configure(with: tableItems[indexPath.row])
@@ -222,7 +229,10 @@ extension MainViewController: UICollectionViewDataSource {
         return 3
     }
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        numberOfItemsInSection section: Int
+    ) -> Int {
         switch section {
         case 0:
             return 2
