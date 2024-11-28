@@ -44,33 +44,10 @@ class MainViewController: UIViewController {
         
         setUI()
         setLayout()
+        setCollectionView()
+        setTableView()
+        
         updateFloaingButtonUI()
-        
-        tableView.dataSource = self
-        tableView.delegate = self
-        
-        tableView.register(ButtonTableCell.self, forCellReuseIdentifier: ButtonTableCell.identifier)
-        
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        
-        collectionView.register(
-            MyReportCell.self,
-            forCellWithReuseIdentifier: MyReportCell.cellIdentifier
-        )
-        collectionView.register(
-            MyReportBannerCell.self,
-            forCellWithReuseIdentifier: MyReportBannerCell.cellIdentifier
-        )
-        collectionView.register(
-            FinishedReportEXCell.self,
-            forCellWithReuseIdentifier: FinishedReportEXCell.cellIdentifier
-        )
-        collectionView.register(
-            MainContentsSectionHeader.self,
-            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-            withReuseIdentifier: MainContentsSectionHeader.identifier
-        )
         
         setUpNavigationBar()
     }
@@ -99,6 +76,35 @@ class MainViewController: UIViewController {
         }
     }
     
+    private func setCollectionView() {
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        
+        collectionView.register(
+            MyReportCell.self,
+            forCellWithReuseIdentifier: MyReportCell.cellIdentifier
+        )
+        collectionView.register(
+            MyReportBannerCell.self,
+            forCellWithReuseIdentifier: MyReportBannerCell.cellIdentifier
+        )
+        collectionView.register(
+            FinishedReportEXCell.self,
+            forCellWithReuseIdentifier: FinishedReportEXCell.cellIdentifier
+        )
+        collectionView.register(
+            MainContentsSectionHeader.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: MainContentsSectionHeader.identifier
+        )
+    }
+    
+    private func setTableView() {
+        tableView.dataSource = self
+        tableView.delegate = self
+        
+        tableView.register(ButtonTableCell.self, forCellReuseIdentifier: ButtonTableCell.identifier)
+    }
     
     // MARK: - Floating Button and Animation
     
