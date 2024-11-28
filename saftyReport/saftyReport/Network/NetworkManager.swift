@@ -4,13 +4,7 @@ import Alamofire
 class NetworkManager {
     
     func photoAPI(compleation: @escaping (Result<[GalleryPhotoList], NetworkError>) -> Void) {
-        guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BASE_URL") as? String else {
-            print("[Error] BASE_URL is missing in Info.plist")
-            compleation(.failure(.unknownError))
-            return
-        }
-        
-        let url = "\(baseURL)/api/v1/report/photo"
+        let url = "\(Environment.baseURL)/api/v1/report/photo"
         
         let headers: HTTPHeaders = ["userId": "1"]
         
