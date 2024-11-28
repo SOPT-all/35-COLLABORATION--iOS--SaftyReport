@@ -9,9 +9,15 @@ import UIKit
 
 import SnapKit
 import Then
-import Kingfisher
 
 class GalleryViewController: UIViewController {
+    private let networkManager = NetworkManager()
+    
+    private var firstSectionPhotoList: [GalleryPhotoList] = []
+    private var firstSectionCheckedStatus: Set<IndexPath> = []
+    
+    private var secondSectionPhotoList: [GalleryPhotoList] = []
+    private var secondSectionCheckedStatus: Set<IndexPath> = []
     
     private let collectionView = UICollectionView(frame: .zero,
                                                   collectionViewLayout: UICollectionViewLayout())
@@ -25,9 +31,9 @@ class GalleryViewController: UIViewController {
         $0.setAttributedTitle(NSAttributedString.styled(text: "사용", style: .heading1), for: .normal)
         $0.titleLabel?.font = .systemFont(ofSize: 20, weight: .semibold)
         $0.setTitleColor(.gray1, for: .normal)
-        $0.backgroundColor = .primaryOrange
         $0.layer.cornerRadius = 10
         $0.addTarget(self, action: #selector(usingButtonTapped), for: .touchUpInside)
+        $0.backgroundColor = .primaryLight
     }
     
     override func viewDidLoad() {
@@ -35,6 +41,18 @@ class GalleryViewController: UIViewController {
         setUI()
         setLayout()
         setupCollectionView()
+        setupNavigationBar()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tabBarController?.tabBar.isHidden = true
+        connectAPI()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        tabBarController?.tabBar.isHidden = false
     }
     
     private func setUI() {
@@ -60,6 +78,175 @@ class GalleryViewController: UIViewController {
         
     }
     
+    private func setupNavigationBar() {
+        let customNavigationItem = CustomNavigationItem()
+        customNavigationItem.setUpNavigationBar(for: .back)
+        navigationItem.backBarButtonItem = customNavigationItem.backBarButtonItem
+        navigationItem.backBarButtonItem?.tintColor = .gray1
+        navigationItem.title = "안전신문고 갤러리"
+    }
+    
+    @objc private func usingButtonTapped() {
+        print("사용 버튼이 눌렸습니다.")
+    }
+    
+    private func connectAPI() {
+        DispatchQueue.main.async {
+            self.networkManager.photoAPI { [weak self] result in
+                guard let self = self else { return }
+                
+                switch result {
+                case let .success(list):
+                    
+                    self.firstSectionPhotoList = list.filter({
+                        self.formatDateTime($0.createdAt!) == "2024년 10월 26일"
+                    })
+                    .dropLast()
+                    
+                    
+                    self.secondSectionPhotoList = list.filter({
+                        self.formatDateTime($0.createdAt!) == "2024년 11월 26일"
+                    })
+                    .dropLast()
+                    
+                    self.collectionView.reloadData()
+                case let .failure(error):
+                    print(error.localizedDescription)
+                }
+                
+            }
+        }
+    }
+    
+}
+
+extension GalleryViewController: UICollectionViewDelegate {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        viewForSupplementaryElementOfKind kind: String,
+        at indexPath: IndexPath
+    ) -> UICollectionReusableView {
+        guard kind == UICollectionView.elementKindSectionHeader,
+              let header = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: GalleryContentsSectionHeader.identifier,
+                for: indexPath
+              ) as? GalleryContentsSectionHeader else {
+            return UICollectionReusableView()
+        }
+        if indexPath.section == 2 {
+            let sectionTitles = "2024년 10월 26일"
+            header.configure(with: sectionTitles)
+        } else if indexPath.section == 3{
+            let sectionTitles = "2024년 11월 26일"
+            header.configure(with: sectionTitles)
+        }
+        
+        return header
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? ContentsCell else { return }
+        
+        let nextViewController = GalleryDetailViewController()
+        nextViewController.isChecked = cell.isChecked
+        nextViewController.indexPath = indexPath
+        
+        nextViewController.checkboxHandler = { [weak self] isChecked, indexPath in
+            guard let self = self else { return }
+            
+            if isChecked {
+                self.firstSectionCheckedStatus.insert(indexPath)
+                self.secondSectionCheckedStatus.insert(indexPath)
+            } else {
+                self.firstSectionCheckedStatus.remove(indexPath)
+                self.secondSectionCheckedStatus.remove(indexPath)
+            }
+            
+            self.collectionView.reloadData()
+        }
+        
+        if indexPath.section == 2 {
+            nextViewController.configure(item: firstSectionPhotoList[indexPath.row])
+            
+        } else {
+            nextViewController.configure(item: secondSectionPhotoList[indexPath.row])
+        }
+        
+        
+        self.navigationController?.pushViewController(nextViewController, animated: true)
+    }
+    
+}
+
+extension GalleryViewController: UICollectionViewDataSource {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 4
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int)
+    -> Int {
+        switch section {
+        case 0:
+            return 1
+        case 1:
+            return 1
+        case 2:
+            return firstSectionPhotoList.count
+        case 3:
+            return secondSectionPhotoList.count
+        default:
+            return 0
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath)
+    -> UICollectionViewCell {
+        switch indexPath.section {
+        case 0:
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: MediaSelectCell.cellIdentifier,
+                for: indexPath
+            ) as? MediaSelectCell else {
+                return UICollectionViewCell(frame: .zero)
+            }
+            return cell
+        case 1:
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: WarningCell.cellIdentifier,
+                for: indexPath
+            ) as? WarningCell else {
+                return UICollectionViewCell(frame: .zero)
+            }
+            return cell
+        case 2:
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: ContentsCell.cellIdentifier,
+                for: indexPath
+            ) as? ContentsCell else {
+                return UICollectionViewCell(frame: .zero)
+            }
+            
+            cell.configure(item: firstSectionPhotoList[indexPath.row], isChecked: firstSectionCheckedStatus.contains(indexPath))
+            
+            return cell
+        default:
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: ContentsCell.cellIdentifier,
+                for: indexPath.appending(9)
+            ) as? ContentsCell else {
+                return UICollectionViewCell(frame: .zero)
+            }
+            
+            cell.configure(item: secondSectionPhotoList[indexPath.row], isChecked: secondSectionCheckedStatus.contains(indexPath))
+            
+            return cell
+        }
+    }
+    
+}
+
+extension GalleryViewController {
     private func setupCollectionView() {
         collectionView.collectionViewLayout = createSection()
         collectionView.delegate = self
@@ -72,8 +259,8 @@ class GalleryViewController: UIViewController {
         collectionView.register(ContentsCell.self,
                                 forCellWithReuseIdentifier: ContentsCell.cellIdentifier)
         collectionView.register(GalleryContentsSectionHeader.self,
-            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-            withReuseIdentifier: GalleryContentsSectionHeader.identifier
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                withReuseIdentifier: GalleryContentsSectionHeader.identifier
         )
     }
     
@@ -172,7 +359,7 @@ class GalleryViewController: UIViewController {
             trailing: 17
         )
         section.boundarySupplementaryItems = [self.createSectionHeader()] // 헤더 추가
-                
+        
         return section
     }
     
@@ -189,122 +376,22 @@ class GalleryViewController: UIViewController {
         
         return sectionHeader
     }
-
-    @objc private func usingButtonTapped() {
-        print("사용 버튼이 눌렸습니다.")
-    }
-    
 }
 
-extension GalleryViewController: UICollectionViewDelegate {
-    func collectionView(
-        _ collectionView: UICollectionView,
-        viewForSupplementaryElementOfKind kind: String,
-        at indexPath: IndexPath
-    ) -> UICollectionReusableView {
-        guard kind == UICollectionView.elementKindSectionHeader,
-              let header = collectionView.dequeueReusableSupplementaryView(
-                  ofKind: kind,
-                  withReuseIdentifier: GalleryContentsSectionHeader.identifier,
-                  for: indexPath
-              ) as? GalleryContentsSectionHeader else {
-            return UICollectionReusableView()
-        }
-        if indexPath.section == 2 {
-            let sectionTitles = "2024년 11월 14일"
-            header.configure(with: sectionTitles)
-        } else if indexPath.section == 3{
-            let sectionTitles = "2024년 11월 13일"
-            header.configure(with: sectionTitles)
-        }
+extension GalleryViewController {
+    private func formatDateTime(_ dateTime: String) -> String {
+        let inputFormatter = DateFormatter()
+        inputFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss" // 서버에서 받은 날짜 형식
         
-        return header
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? ContentsCell else { return }
+        let outputFormatter = DateFormatter()
+        outputFormatter.dateFormat = "yyyy년 MM월 dd일" // 원하는 출력 형식
         
-        let nextViewController = GalleryDetailViewController()
-        nextViewController.isChecked = cell.isChecked
-        nextViewController.indexPath = indexPath
-        
-        nextViewController.checkboxHandler = { [weak self] isChecked, indexPath in
-            guard let self = self else { return }
-            
-            if let cell = self.collectionView.cellForItem(at: indexPath) as? ContentsCell {
-                // 체크박스 상태 업데이트
-                cell.isChecked = isChecked
-                cell.checkbox.setImage(
-                    isChecked ? .icnCheckboxISquareSelectedWhite24Px : .icnCheckboxISquareUnselectedWhite24Px,
-                    for: .normal
-                )
-            }
-        }
-        
-        self.navigationController?.pushViewController(nextViewController, animated: true)
-    }
-    
-}
-
-extension GalleryViewController: UICollectionViewDataSource {
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 4
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int)
-    -> Int {
-        switch section {
-        case 0:
-            return 1
-        case 1:
-            return 1
-        case 2:
-            return 6
-        case 3:
-            return 6
-        default:
-            return 0
+        // 입력 문자열을 Date로 변환한 후, 다시 문자열로 변환
+        if let date = inputFormatter.date(from: dateTime) {
+            return outputFormatter.string(from: date)
+        } else {
+            print("[Error] Invalid date format: \(dateTime)")
+            return dateTime // 변환 실패 시 원본 문자열 반환
         }
     }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath)
-    -> UICollectionViewCell {
-        switch indexPath.section {
-        case 0:
-            guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: MediaSelectCell.cellIdentifier,
-                for: indexPath
-            ) as? MediaSelectCell else {
-                return UICollectionViewCell(frame: .zero)
-            }
-            return cell
-        case 1:
-            guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: WarningCell.cellIdentifier,
-                for: indexPath
-            ) as? WarningCell else {
-                return UICollectionViewCell(frame: .zero)
-            }
-            return cell
-        case 2:
-            guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: ContentsCell.cellIdentifier,
-                for: indexPath
-            ) as? ContentsCell else {
-                return UICollectionViewCell(frame: .zero)
-            }
-            
-            return cell
-        default:
-            guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: ContentsCell.cellIdentifier,
-                for: indexPath
-            ) as? ContentsCell else {
-                return UICollectionViewCell(frame: .zero)
-            }
-            
-            return cell
-        }
-    }
-    
 }
