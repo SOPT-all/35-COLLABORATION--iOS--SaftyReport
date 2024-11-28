@@ -79,7 +79,6 @@ class ReportDetailViewController: UIViewController {
         )
     ]
     
-    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -91,7 +90,6 @@ class ReportDetailViewController: UIViewController {
         applySnapshot()
     }
     
-    // MARK: - Setup Methods
     private func setupNavigationBar() {
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -231,7 +229,6 @@ class ReportDetailViewController: UIViewController {
         return section
     }
     
-    // MARK: - DataSource Configuration
     private func configureDataSource() {
         dataSource = UICollectionViewDiffableDataSource<ReportDetailSection, ReportDetailItem>(
             collectionView: collectionView
@@ -250,8 +247,11 @@ class ReportDetailViewController: UIViewController {
                 ) as! ReportTypeCell
                 cell.configure(with: item)
                 cell.delegate = self
-                if isInitialState {
-                    cell.updateTitleColor(.primaryOrange)
+                
+                if self.isInitialState {
+                    DispatchQueue.main.async {
+                        cell.updateTitleColor(.primaryOrange)
+                    }
                 }
                 return cell
                 
@@ -307,8 +307,18 @@ extension ReportDetailViewController: ReportTypeCellDelegate {
         if isInitialState {
             UIView.animate(withDuration: 0.3) {
                 self.overlayView.alpha = 0.0
+            } completion: { _ in
+                self.isOverlayVisible = false
             }
             isInitialState = false
+        }
+        
+        if let cell = collectionView.cellForItem(at: IndexPath(item: 0, section: 0)) as? ReportTypeCell {
+            let newColor: UIColor = self.isOverlayVisible || isExpanded ? .primaryOrange : .black
+            cell.updateTitleColor(newColor)
+            
+            cell.setNeedsLayout()
+            cell.layoutIfNeeded()
         }
     }
 }

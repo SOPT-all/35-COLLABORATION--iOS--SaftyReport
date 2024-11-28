@@ -39,22 +39,21 @@ class ReportTypeCell: BaseCell {
         )
     }
     
-    func updateTitleColor(_ color: UIColor) {
-        titleLabel.textColor = color
-    }
-    
     @objc private func mainButtonTapped() {
         mockReportView.isExpanded.toggle()
         delegate?.didToggleExpansion(isExpanded: mockReportView.isExpanded)
-        updateTitleColor(mockReportView.isExpanded ? .black : .primaryOrange)
     }
     
     override func configure(with item: ReportDetailItem) {
-        super.configure(with: item)
         let attributedText = NSAttributedString.styled(
             text: "신고 유형을 선택해주세요",
             style: .body3
         )
         titleLabel.attributedText = attributedText
+    }
+    
+    func updateTitleColor(_ color: UIColor) {
+        titleLabel.textColor = color
+        setNeedsLayout()
     }
 }
