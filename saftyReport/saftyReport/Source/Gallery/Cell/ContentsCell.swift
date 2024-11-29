@@ -13,7 +13,8 @@ import Kingfisher
 
 class ContentsCell: UICollectionViewCell {
     var isChecked = false
-    
+    var checkboxTappedHandler: ((Bool) -> Void)?
+
     private var imageView = UIImageView().then {
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 5
@@ -56,26 +57,29 @@ class ContentsCell: UICollectionViewCell {
     }
     
     @objc private func checkboxTapped() {
-        isChecked.toggle()
-        
-        if isChecked {
-            checkbox.setImage(.icnCheckboxISquareSelectedWhite24Px, for: .normal)
-        } else {
-            checkbox.setImage(.icnCheckboxISquareUnselectedWhite24Px, for: .normal)
-        }
-    }
-    
-    func configure(item: GalleryPhotoList, isChecked: Bool = false){
-        if let imageURL = URL(string: item.photoUrl ?? "") {
-            imageView.kf.setImage(with: imageURL)
+            isChecked.toggle()
+            
+            if isChecked {
+                checkbox.setImage(.icnCheckboxISquareSelectedWhite24Px, for: .normal)
+            } else {
+                checkbox.setImage(.icnCheckboxISquareUnselectedWhite24Px, for: .normal)
+            }
+            
+            checkboxTappedHandler?(isChecked)
         }
         
-        self.isChecked = isChecked
-        self.checkbox.setImage(
-            isChecked ? .icnCheckboxISquareSelectedWhite24Px : .icnCheckboxISquareUnselectedWhite24Px,
-            for: .normal
-        )
-        
-    }
+        func configure(item: GalleryPhotoList, isChecked: Bool = false, onCheckboxTapped: ((Bool) -> Void)? = nil) {
+            if let imageURL = URL(string: item.photoUrl ?? "") {
+                imageView.kf.setImage(with: imageURL)
+            }
+            
+            self.isChecked = isChecked
+            self.checkbox.setImage(
+                isChecked ? .icnCheckboxISquareSelectedWhite24Px : .icnCheckboxISquareUnselectedWhite24Px,
+                for: .normal
+            )
+            
+            self.checkboxTappedHandler = onCheckboxTapped 
+        }
     
 }
