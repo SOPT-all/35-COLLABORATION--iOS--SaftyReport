@@ -459,4 +459,5 @@
 
 
 ## 시연영상
+![Simulator Screen Recording - iPhone 13 mini - 2024-11-29 at 23 22 40](https://github.com/user-attachments/assets/3d5ab7d6-8478-4f32-9e51-2cd37708df9b)
 
