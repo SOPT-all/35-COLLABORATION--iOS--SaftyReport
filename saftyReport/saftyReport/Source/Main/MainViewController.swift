@@ -11,6 +11,14 @@ import SnapKit
 import Then
 
 class MainViewController: UIViewController {
+    private let networkManager = NetworkManager()
+    
+    var yearReportCount: Int = 0
+    var monthReportCount: Int = 0
+    var mileage: Int?
+    var bannerList: [BannerList] = []
+    var bannerListImgUrl: [String] = []
+    
     let customNavigationItem = CustomNavigationItem(title: "홈") // 반드시 타이틀 설정
     
     private var isToggled = false
@@ -51,6 +59,11 @@ class MainViewController: UIViewController {
         updateFloaingButtonUI()
         
         setUpNavigationBar()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        connectAPI()
     }
     
     private func setUI() {
@@ -110,6 +123,7 @@ class MainViewController: UIViewController {
         )
     }
     
+    
     // MARK: - Floating Button and Animation
     
     @objc private func floatingButtonTapped(_ sender: UIButton) {
@@ -127,7 +141,7 @@ class MainViewController: UIViewController {
         floatingButton.snp.updateConstraints {
             $0.width.equalTo(newWidth)
         }
-
+        
         UIView.animate(withDuration: 0.15) {
             self.view.layoutIfNeeded() // 레이아웃 업데이트를 애니메이션으로 적용
             self.floatingButton.transform = CGAffineTransform(rotationAngle: newAngle) // 45도 회전
@@ -182,14 +196,40 @@ class MainViewController: UIViewController {
     
     
     // MARK: - Navigation Bar
+    
     private func setUpNavigationBar() {
         navigationController?.setUpNavigationBarColor()
         customNavigationItem.setUpNavigationBar(for: .leftRight)
         customNavigationItem.setUpTitle(title: "")
-
+        
         navigationItem.title = customNavigationItem.title
         navigationItem.leftBarButtonItem = customNavigationItem.leftBarButtonItem
         navigationItem.rightBarButtonItem = customNavigationItem.rightBarButtonItem
+    }
+    
+    // MARK: - Network
+    
+    private func connectAPI() {
+        self.networkManager.homeAPI { [weak self] result in
+            guard let self = self else { return }
+            
+            switch result {
+            case let .success(response):
+                yearReportCount = response.yearReportCount ?? 0
+                monthReportCount = response.monthReportCount ?? 0
+                mileage = response.mileage ?? 0
+                bannerList = response.bannerList
+                for banner in bannerList {
+                    bannerListImgUrl.append(banner.bannerUrl ?? "")
+                }
+                collectionView.reloadData()
+            case let .failure(error):
+                print(error.localizedDescription)
+            }
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
+            }
+        }
     }
 }
 
@@ -256,7 +296,7 @@ extension MainViewController: UICollectionViewDataSource {
             ) as? MyReportCell else {
                 return UICollectionViewCell(frame: .zero)
             }
-            cell.configure(with: indexPath.item)
+            cell.configure(with: indexPath.item, yearReportCount: yearReportCount, monthReportCount: monthReportCount)
             return cell
         case 1:
             guard let cell = collectionView.dequeueReusableCell(
@@ -265,6 +305,7 @@ extension MainViewController: UICollectionViewDataSource {
             ) as? MyReportBannerCell else {
                 return UICollectionViewCell(frame: .zero)
             }
+            cell.configure(bannerListImgUrl: bannerListImgUrl)
             return cell
         case 2:
             guard let cell = collectionView.dequeueReusableCell(
@@ -306,24 +347,20 @@ extension MainViewController: UICollectionViewDelegate {
             header.configure(with: MainHeaderItem(
                 section: .myReport,
                 title: "올해 나의 신고",
-                rightHeaderItem: .mileageLabel))
+                rightHeaderItem: .mileageLabel), mileage: mileage)
         case 1:
             header.configure(with: MainHeaderItem(
                 section: .banner,
                 title: nil,
-                rightHeaderItem: nil))
+                rightHeaderItem: nil), mileage: nil)
         case 2:
             header.configure(with: MainHeaderItem(
                 section: .finishedReport,
                 title: "주요 처리 사례",
-                rightHeaderItem: .moreButton))
+                rightHeaderItem: .moreButton), mileage: nil)
         default :
             break
         }
         return header
     }
-}
-
-#Preview {
-    MainViewController()
 }

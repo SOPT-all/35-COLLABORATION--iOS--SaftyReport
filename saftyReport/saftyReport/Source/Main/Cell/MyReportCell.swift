@@ -177,7 +177,7 @@ class MyReportCell: UICollectionViewCell {
         }
     }
     
-    func configure(with itemIndex: Int) {
+    func configure(with itemIndex: Int, yearReportCount: Int, monthReportCount: Int) {
         let allViews: [UIView] = [
             totalCountStackView,
             myReportCountImageView,
@@ -195,6 +195,7 @@ class MyReportCell: UICollectionViewCell {
             titleLabel.text = "나의 올해 신고"
             totalCountStackView.isHidden = false
             myReportCountImageView.isHidden = false
+            countLabel.text = "\(yearReportCount)"
             myReportSubImageView.isHidden = false
             reportCategoryStackView.isHidden = false
             myReportCountImageView.isHidden = false
@@ -202,6 +203,7 @@ class MyReportCell: UICollectionViewCell {
             titleLabel.text = "2024년 10월"
             myMonthlyReportImageView.isHidden = false
             myMonthlyReportCountStackView.isHidden = false
+            myMonthlyReportCountTargetLabel.text = "\(monthReportCount)"
             subMonthlyReportCount.isHidden = false
         default:
             allViews.forEach { $0.isHidden = true }

@@ -3,6 +3,48 @@ import Alamofire
 
 class NetworkManager {
     
+    func homeAPI(compleation: @escaping (Result<HomeDataObject, NetworkError>) -> Void) {
+        let url = "\(Environment.baseURL)/api/v1/home"
+        
+        let headers: HTTPHeaders = ["UserId": "1"]
+        
+        AF.request(url, method: .get, headers: headers)
+            .validate()
+            .response { [weak self] response in
+                guard let statusCode = response.response?.statusCode,
+                      let data = response.data,
+                      let self = self
+                else {
+                    print("[Error] Response or Data is nil")
+                    compleation(.failure(.unknownError))
+                    return
+                }
+                
+                switch response.result {
+                case .success:
+                      if let homeDataObject = self.decodeHome(data: data) {
+                          compleation(.success(homeDataObject))
+                      } else {
+                          compleation(.failure(.decodingError))
+                      }
+                case .failure(let error):
+                    print("[Error] Request Failed: \(error.localizedDescription)")
+                    let error = self.handleStatusCode(statusCode, data: data)
+                    compleation(.failure(error))
+                }
+            }
+    }
+        
+    func decodeHome(data: Data) -> HomeDataObject? {
+        do {
+            let response = try JSONDecoder().decode(HomeResponse.self, from: data)
+            return response.data
+        } catch {
+            print("[Decode Error] Failed to Decode HomeResponse: \(error)")
+            return nil
+        }
+    }
+    
     func photoAPI(compleation: @escaping (Result<[GalleryPhotoList], NetworkError>) -> Void) {
         let url = "\(Environment.baseURL)/api/v1/report/photo"
         
