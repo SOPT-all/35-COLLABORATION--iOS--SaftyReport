@@ -10,7 +10,14 @@ import UIKit
 import SnapKit
 import Then
 
+protocol ContentCellDelegate: AnyObject {
+    func contentDidChange(_ text: String)
+}
+
 class ContentCell: BaseCell {
+    
+    weak var delegate: ContentCellDelegate?
+
     private let recommendationLabel = UILabel().then {
         $0.textColor = .primaryOrange
         let attributedText = NSAttributedString.styled(
@@ -136,6 +143,12 @@ class ContentCell: BaseCell {
         textCheckButton.addTarget(self, action: #selector(textCheckButtonTapped), for: .touchUpInside)
     }
     
+    func textViewDidChange(_ textView: UITextView) {
+        if textView.textColor != .lightGray {
+            delegate?.contentDidChange(textView.text)
+        }
+    }
+    
     @objc private func textCheckButtonTapped() {
         textCheckButton.isSelected.toggle()
         if textCheckButton.isSelected {
@@ -152,6 +165,8 @@ class ContentCell: BaseCell {
             }
         }
     }
+    
+    
 }
 
 extension ContentCell: UITextViewDelegate {

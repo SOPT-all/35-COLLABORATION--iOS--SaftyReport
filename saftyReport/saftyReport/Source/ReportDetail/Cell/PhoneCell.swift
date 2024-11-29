@@ -11,7 +11,14 @@ import UIKit
 import SnapKit
 import Then
 
+protocol PhoneCellDelegate: AnyObject {
+    func phoneNumberDidChange(_ number: String)
+}
+
 class PhoneCell: BaseCell {
+    
+    weak var delegate: PhoneCellDelegate?
+    
     private let textField = UITextField().then {
         $0.backgroundColor = .gray3
         $0.layer.cornerRadius = 8
@@ -42,14 +49,17 @@ class PhoneCell: BaseCell {
     override func configure(with item: ReportDetailItem) {
         super.configure(with: item)
         
-        // placeholder에 스타일 적용
         let attributedPlaceholder = NSAttributedString.styled(
             text: item.placeholder ?? "",
             style: .body9,
             alignment: .left
         )
-            textField.attributedPlaceholder = attributedPlaceholder
+        textField.attributedPlaceholder = attributedPlaceholder
     }
+
+    @objc private func textFieldDidChange(_ textField: UITextField) {
+         delegate?.phoneNumberDidChange(textField.text ?? "")
+     }
 }
 
 #Preview {

@@ -16,6 +16,8 @@ protocol ReportTypeCellDelegate: AnyObject {
 }
 
 class ReportDetailViewController: UIViewController {
+    private var contentText: String = ""
+    private var phoneNumber: String = ""
     
     private var isInitialState = true
     private var isOverlayVisible = true
@@ -95,7 +97,7 @@ class ReportDetailViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
+        
         tabBarController?.tabBar.isHidden = true
     }
     
@@ -185,7 +187,6 @@ class ReportDetailViewController: UIViewController {
         )
     }
     
-    // MARK: - CollectionView Layout
     private func createLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewCompositionalLayout { [weak self] sectionIndex, _ in
             guard let self = self else { return nil }
@@ -294,6 +295,7 @@ class ReportDetailViewController: UIViewController {
                     for: indexPath
                 ) as! ContentCell
                 cell.configure(with: item)
+                cell.delegate = self
                 return cell
                 
             case .phone:
@@ -302,6 +304,7 @@ class ReportDetailViewController: UIViewController {
                     for: indexPath
                 ) as! PhoneCell
                 cell.configure(with: item)
+                cell.delegate = self
                 return cell
             }
         }
@@ -315,9 +318,91 @@ class ReportDetailViewController: UIViewController {
         }
         dataSource.apply(snapshot, animatingDifferences: false)
     }
+    
+    func didUpdateContent(_ text: String) {
+        self.contentText = text
+    }
+    
+    func didUpdatePhone(_ number: String) {
+        self.phoneNumber = number
+    }
+    
+    @objc private func submitButtonTapped() {
+        
+        guard let viewController = viewController() else { return }
+        
+        let contentView = createAlertContentView(text: "신고 내용을 제출하시겠습니까?")
+        let alertVC = BaseTwoButtonAlertViewController()
+        alertVC.modalPresentationStyle = .overFullScreen
+        alertVC.modalTransitionStyle = .crossDissolve
+        alertVC.setAlert("알림", contentView)
+        
+        alertVC.alertView.confirmButton.addAction(
+            UIAction { [weak self, weak alertVC] _ in
+                alertVC?.dismiss(animated: true) {
+                    self?.submitReport()
+                }
+            },
+            for: .touchUpInside
+        )
+        
+        viewController.present(alertVC, animated: true)
+    }
+    
+    private func submitReport() {
+        let url = "\(Environment.baseURL)/api/v1/report"
+        
+        let reportRequest = ReportRequest(
+            photoList: [
+                PhotoRequest(photoId: 1, photoUrl: "www.example1.com"),
+                PhotoRequest(photoId: 2, photoUrl: "www.example2.com")
+            ],
+            address: "서울시 마포구",
+            content: contentText,
+            phoneNumber: phoneNumber,
+            category: "PARKING"
+        )
+        
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/json",
+            "userId": "1"
+        ]
+        
+        AF.request(
+            url,
+            method: .post,
+            parameters: reportRequest,
+            encoder: JSONParameterEncoder.default,
+            headers: headers
+        )
+        .validate()
+        .responseDecodable(of: ReportResponse.self) { [weak self] response in
+            switch response.result {
+            case .success(let reportResponse):
+                if reportResponse.status == 201 {
+                    self?.showAlert(message: "신고가 성공적으로 접수되었습니다") {
+                        self?.navigationController?.popViewController(animated: true)
+                    }
+                } else {
+                    self?.showAlert(message: reportResponse.message ?? NetworkError.serverError.errorMessage)
+                }
+                
+            case .failure(let error):
+                print("Error: \(error)")
+                print("Response Data: \(String(describing: try? JSONSerialization.jsonObject(with: response.data ?? Data(), options: [])))")
+                
+                if let data = response.data {
+                    self?.showAlert(message: NetworkError.decodingError.errorMessage)
+                } else if response.response == nil {
+                    self?.showAlert(message: NetworkError.networkError(response.error!).errorMessage)
+                } else {
+                    self?.showAlert(message: NetworkError.serverError.errorMessage)
+                }
+            }
+        }
+    }
 }
 
-// MARK: - ReportTypeCellDelegate
 extension ReportDetailViewController: ReportTypeCellDelegate {
     func didToggleExpansion(isExpanded: Bool) {
         if isInitialState {
@@ -339,7 +424,6 @@ extension ReportDetailViewController: ReportTypeCellDelegate {
     }
 }
 
-// MARK: - LocationCellDelegate
 extension ReportDetailViewController: LocationCellDelegate {
     func locationIconTapped() {
         let reportAddressVC = ReportAddressViewController()
@@ -348,18 +432,17 @@ extension ReportDetailViewController: LocationCellDelegate {
     }
 }
 
-// MARK: - Submit Action
 extension ReportDetailViewController {
     func viewController() -> UIViewController? {
-            var nextResponder: UIResponder? = self
-            while let responder = nextResponder {
-                if let vc = responder as? UIViewController {
-                    return vc
-                }
-                nextResponder = responder.next
+        var nextResponder: UIResponder? = self
+        while let responder = nextResponder {
+            if let vc = responder as? UIViewController {
+                return vc
             }
-            return nil
+            nextResponder = responder.next
         }
+        return nil
+    }
     
     private func createAlertContentView(text: String) -> UIView {
         let contentView = UIView()
@@ -380,77 +463,6 @@ extension ReportDetailViewController {
         return contentView
     }
     
-    @objc private func submitButtonTapped() {
-        
-        guard let viewController = viewController() else {return}
-        
-        let contentView = createAlertContentView(text: "신고 내용을 제출하시겠습니까?")
-        
-        let alertVC = BaseTwoButtonAlertViewController()
-        alertVC.modalPresentationStyle = .overFullScreen
-        alertVC.modalTransitionStyle = .crossDissolve
-        alertVC.setAlert("알림", contentView)
-        
-        alertVC.alertView.confirmButton.addAction(
-            UIAction { [weak alertVC, weak viewController] _ in
-                alertVC?.dismiss(animated: true) {
-                    let url = "\(Environment.baseURL)/api/v1/report"
-                    
-                    let reportRequest = ReportRequest(
-                        photoList: [
-                            PhotoRequest(photoId: 1, photoUrl: "www.example1.com"),
-                            PhotoRequest(photoId: 2, photoUrl: "www.example2.com")
-                        ],
-                        address: "사랑시 고백구 행복동",
-                        content: "널 너무나 많이 사랑한죄",
-                        phoneNumber: "010-2998-0867",
-                        category: "PARKING"
-                    )
-                    
-                    let headers: HTTPHeaders = [
-                        "Content-Type": "application/json",
-                        "userId": "1"
-                    ]
-                    
-                    AF.request(
-                        url,
-                        method: .post,
-                        parameters: reportRequest,
-                        encoder: JSONParameterEncoder.default,
-                        headers: headers
-                    )
-                    .validate()
-                    .responseDecodable(of: ReportResponse.self) { [weak self] response in
-                        switch response.result {
-                        case .success(let reportResponse):
-                            if reportResponse.status == 201 {
-                                self?.showAlert(message: "신고가 성공적으로 접수되었습니다") {
-                                    self?.navigationController?.popViewController(animated: true)
-                                }
-                            } else {
-                                self?.showAlert(message: reportResponse.message ?? NetworkError.serverError.errorMessage)
-                            }
-                            
-                        case .failure(_):
-                            if let data = response.data {
-                                self?.showAlert(message: NetworkError.decodingError.errorMessage)
-                            } else if response.response == nil {
-                                self?.showAlert(message: NetworkError.networkError(response.error!).errorMessage)
-                            } else {
-                                self?.showAlert(message: NetworkError.serverError.errorMessage)
-                            }
-                        }
-                    }
-                }
-            },
-            for: .touchUpInside)
-        
-        viewController.present(alertVC, animated: true)
-        
-        
-        
-    }
-    
     private func showAlert(message: String, completion: (() -> Void)? = nil) {
         let alert = UIAlertController(
             title: nil,
@@ -468,14 +480,22 @@ extension ReportDetailViewController {
 }
 
 
-// MARK: - ReportAddressDelegate
 extension ReportDetailViewController: ReportAddressDelegate {
     func didSelectAddress(_ address: String) {
-        // 변경된 주소를 LocationCell에 반영
         if let indexPath = IndexPath(item: 0, section: 2) as? IndexPath,
-            let cell = collectionView.cellForItem(at: indexPath) as? LocationCell {
+           let cell = collectionView.cellForItem(at: indexPath) as? LocationCell {
             cell.updateLocationText(address)
         }
+    }
+}
+
+extension ReportDetailViewController: ContentCellDelegate, PhoneCellDelegate {
+    func contentDidChange(_ text: String) {
+        self.contentText = text
+    }
+    
+    func phoneNumberDidChange(_ number: String) {
+        self.phoneNumber = number
     }
 }
 
