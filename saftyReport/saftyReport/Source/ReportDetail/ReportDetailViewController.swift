@@ -328,9 +328,6 @@ class ReportDetailViewController: UIViewController {
     }
     
     @objc private func submitButtonTapped() {
-        
-        guard let viewController = viewController() else { return }
-        
         let contentView = createAlertContentView(text: "신고 내용을 제출하시겠습니까?")
         let alertVC = BaseTwoButtonAlertViewController()
         alertVC.modalPresentationStyle = .overFullScreen
@@ -346,7 +343,7 @@ class ReportDetailViewController: UIViewController {
             for: .touchUpInside
         )
         
-        viewController.present(alertVC, animated: true)
+        present(alertVC, animated: true)
     }
     
     private func submitReport() {
@@ -363,6 +360,13 @@ class ReportDetailViewController: UIViewController {
             category: "PARKING"
         )
         
+        print("✅ Request Data:")
+        print("📝 Content: \(contentText)")
+        print("📱 Phone: \(phoneNumber)")
+        print("🌍 Address: 서울시 마포구")
+        print("📸 Photos: \(reportRequest.photoList)")
+        print("🏷 Category: PARKING")
+        
         let headers: HTTPHeaders = [
             "Content-Type": "application/json",
             "userId": "1"
@@ -377,32 +381,105 @@ class ReportDetailViewController: UIViewController {
         )
         .validate()
         .responseDecodable(of: ReportResponse.self) { [weak self] response in
+            guard let self = self else { return }
+            
+            print("\n✅ Response Data:")
+            if let data = response.data,
+               let jsonString = String(data: data, encoding: .utf8) {
+                print("📊 Raw Response: \(jsonString)")
+            }
+            
             switch response.result {
             case .success(let reportResponse):
+                print("🔵 Status: \(reportResponse.status ?? 0)")
+                print("📨 Message: \(reportResponse.message ?? "No message")")
+                if let data = reportResponse.data {
+                    print("🆔 Report ID: \(data.reportId ?? 0)")
+                    print("📍 Address: \(data.address ?? "No address")")
+                    print("📝 Content: \(data.content ?? "No content")")
+                    print("📱 Phone: \(data.phoneNumber ?? "No phone")")
+                }
+                
                 if reportResponse.status == 201 {
-                    self?.showAlert(message: "신고가 성공적으로 접수되었습니다") {
-                        self?.navigationController?.popViewController(animated: true)
+                    DispatchQueue.main.async {
+                        let contentView = self.createAlertContentView(text: "신고가 성공적으로 접수되었습니다")
+                        let alertVC = BaseTwoButtonAlertViewController()
+                        alertVC.modalPresentationStyle = .overFullScreen
+                        alertVC.modalTransitionStyle = .crossDissolve
+                        alertVC.setAlert("알림", contentView)
+                        
+                        alertVC.alertView.cancelButton.setTitle("닫기", for: .normal)
+                        alertVC.alertView.confirmButton.setTitle("홈으로", for: .normal)
+                        
+                        alertVC.alertView.cancelButton.removeTarget(alertVC, action: #selector(alertVC.dismissAlert), for: .touchUpInside)
+                        alertVC.alertView.cancelButton.addTarget(alertVC, action: #selector(BaseTwoButtonAlertViewController.dismissAlert), for: .touchUpInside)
+                                                alertVC.alertView.confirmButton.removeTarget(alertVC, action: #selector(alertVC.dismissAlert), for: .touchUpInside)
+                        alertVC.alertView.confirmButton.addAction(
+                            UIAction { [weak self] _ in
+                                alertVC.dismiss(animated: true) {
+                                    self?.navigateToMain()
+                                }
+                            },
+                            for: .touchUpInside
+                        )
+                        
+                        self.present(alertVC, animated: true)
                     }
                 } else {
-                    self?.showAlert(message: reportResponse.message ?? NetworkError.serverError.errorMessage)
+                    self.showCustomAlert(message: reportResponse.message ?? NetworkError.serverError.errorMessage)
                 }
                 
             case .failure(let error):
-                print("Error: \(error)")
-                print("Response Data: \(String(describing: try? JSONSerialization.jsonObject(with: response.data ?? Data(), options: [])))")
+                // 오류 로깅
+                print("❌ Error: \(error)")
+                print("❌ Error Description: \(error.localizedDescription)")
                 
                 if let data = response.data {
-                    self?.showAlert(message: NetworkError.decodingError.errorMessage)
+                    self.showCustomAlert(message: NetworkError.decodingError.errorMessage)
                 } else if response.response == nil {
-                    self?.showAlert(message: NetworkError.networkError(response.error!).errorMessage)
+                    self.showCustomAlert(message: NetworkError.networkError(response.error!).errorMessage)
                 } else {
-                    self?.showAlert(message: NetworkError.serverError.errorMessage)
+                    self.showCustomAlert(message: NetworkError.serverError.errorMessage)
                 }
             }
         }
     }
+
+    private func navigateToMain() {
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first {
+            UIView.transition(with: window,
+                             duration: 0.3,
+                             options: .transitionCrossDissolve,
+                             animations: {
+                let mainVC = MainViewController()
+                let navigationController = UINavigationController(rootViewController: mainVC)
+                window.rootViewController = navigationController
+            })
+        }
+    }
+
+    private func showCustomAlert(message: String) {
+        let contentView = createAlertContentView(text: message)
+        let alertVC = BaseTwoButtonAlertViewController()
+        alertVC.modalPresentationStyle = .overFullScreen
+        alertVC.modalTransitionStyle = .crossDissolve
+        alertVC.setAlert("알림", contentView)
+        
+        alertVC.alertView.cancelButton.isHidden = true
+        
+        alertVC.alertView.confirmButton.addAction(
+            UIAction { [weak alertVC] _ in
+                alertVC?.dismiss(animated: true)
+            },
+            for: .touchUpInside
+        )
+        
+        present(alertVC, animated: true)
+    }
 }
 
+// MARK: - ReportTypeCellDelegate
 extension ReportDetailViewController: ReportTypeCellDelegate {
     func didToggleExpansion(isExpanded: Bool) {
         if isInitialState {
@@ -462,21 +539,7 @@ extension ReportDetailViewController {
         
         return contentView
     }
-    
-    private func showAlert(message: String, completion: (() -> Void)? = nil) {
-        let alert = UIAlertController(
-            title: nil,
-            message: message,
-            preferredStyle: .alert
-        )
-        
-        let okAction = UIAlertAction(title: "확인", style: .default) { _ in
-            completion?()
-        }
-        
-        alert.addAction(okAction)
-        present(alert, animated: true)
-    }
+
 }
 
 
