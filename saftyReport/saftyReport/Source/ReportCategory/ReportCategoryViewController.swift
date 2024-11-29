@@ -7,12 +7,15 @@
 
 import UIKit
 
+import Alamofire
+
 class ReportCategoryViewController: UIViewController {
     
     // MARK: - Properties
     
-    private var dataSource: UITableViewDiffableDataSource<ReportCategory.Section,
-                                                            ReportCategory.Item>! = nil
+    private var dataSource: UITableViewDiffableDataSource<CustomCategory.Section,
+                                                            CustomCategory.Item>! = nil
+    
     private let reportCategoryView = ReportCategoryView()
     
     private lazy var navigationBackButton = UIButton().then {
@@ -31,8 +34,8 @@ class ReportCategoryViewController: UIViewController {
         super.viewDidLoad()
         setUpNavigationBar()
         setTableView()
+        fetchCategoryList()
         setDataSource()
-        applyInitialSnapshots()
     }
     
     private func setUpNavigationBar() {
@@ -62,13 +65,61 @@ class ReportCategoryViewController: UIViewController {
         )
     }
     
+    private func fetchCategoryList() {
+        let endPoint = "/api/v1/report/category"
+        let fullURL = Environment.baseURL + endPoint
+        
+        AF.request(
+            fullURL,
+            method: .get
+        )
+        .validate()
+        .responseDecodable(of: CategoryResponse.self) { [weak self] response in
+            guard let self = self else { return }
+            switch response.result {
+                
+            case .success(let response):
+                let categoryDetailList = response.data.categoryDetailList
+                var customCategoryItems: [CustomCategory.Item] = []
+                
+                categoryDetailList.forEach {
+                    let description = String.bullet + " " + $0.categoryDescription
+                        .replaceEscapeSequences()
+                        .removeQuotes()
+                    customCategoryItems.append(
+                        CustomCategory.Item(
+                            section: CustomCategory.configureSection(categoryID: $0.categoryId),
+                            name: $0.categoryName,
+                            description: description,
+                            isExpanded: false))
+                }
+                
+                applyInitialSnapshots(data: customCategoryItems)
+                
+            case .failure(let error):
+                let label = UILabel().then {
+                    $0.numberOfLines = 0
+                    $0.text = "카테고리를 불러오는 데 실패했습니다. \n 인터넷 상태를 확인해주세요."
+                    $0.textColor = .gray13
+                }
+                AlertManager.presentOneButtonAlert(
+                    title: "네트워크 오류",
+                    contentView: label,
+                    mode: .alarm,
+                    vc: self
+                )
+                print("Decoding Error: \(error)")
+            }
+        }
+    }
+    
     private func setDataSource() {
         dataSource = UITableViewDiffableDataSource
-            <ReportCategory.Section, ReportCategory.Item>(tableView:
+            <CustomCategory.Section, CustomCategory.Item>(tableView:
                                                             reportCategoryView.tableView) {
                 [weak self] (tableView: UITableView,
                              indexPath: IndexPath,
-                             item: ReportCategory.Item) -> UITableViewCell? in
+                             item: CustomCategory.Item) -> UITableViewCell? in
                 guard let self = self else { return nil }
                 
                 if item.isExpanded {
@@ -92,17 +143,20 @@ class ReportCategoryViewController: UIViewController {
             }
     }
     
-    private func applyInitialSnapshots() {
-        var snapshot = NSDiffableDataSourceSnapshot<ReportCategory.Section, ReportCategory.Item>()
+    
+    private func applyInitialSnapshots(data: [CustomCategory.Item]) {
+        var snapshot = NSDiffableDataSourceSnapshot<CustomCategory.Section, CustomCategory.Item>()
         snapshot.appendSections([.safety, .parking, .traffic, .environment])
         
-        snapshot.appendItems(ReportCategory.Dummy.safety, toSection: .safety)
-        snapshot.appendItems(ReportCategory.Dummy.parking, toSection: .parking)
-        snapshot.appendItems(ReportCategory.Dummy.traffic, toSection: .traffic)
-        snapshot.appendItems(ReportCategory.Dummy.environment, toSection: .environment)
+        data.forEach {
+            snapshot.appendItems([$0], toSection: $0.section)
+        }
         
         dataSource.apply(snapshot, animatingDifferences: false)
     }
+    
+    
+    // MARK: - Objc functions
     
     @objc private func popSelf() {
         self.navigationController?.popViewController(animated: true)
@@ -111,12 +165,12 @@ class ReportCategoryViewController: UIViewController {
 
 extension ReportCategoryViewController: UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
-        print("sections: \(ReportCategory.Section.allCases.count)개")
-        return ReportCategory.Section.allCases.count
+        print("sections: \(CustomCategory.Section.allCases.count)개")
+        return CustomCategory.Section.allCases.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return dataSource.snapshot().itemIdentifiers(inSection: ReportCategory.Section.allCases[section]).count
+        return dataSource.snapshot().itemIdentifiers(inSection: CustomCategory.Section.allCases[section]).count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -126,14 +180,15 @@ extension ReportCategoryViewController: UITableViewDataSource {
 
 extension ReportCategoryViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard let item = dataSource.itemIdentifier(for: indexPath)
-        else { return UITableView.automaticDimension }
-        
-        if item.isExpanded {
-            return 258 + 10
-        } else {
-            return 58 + 10
-        }
+//        guard let item = dataSource.itemIdentifier(for: indexPath)
+//        else { return UITableView.automaticDimension }
+//        
+//        if item.isExpanded {
+//            return 258 + 10
+//        } else {
+//            return 58 + 10
+//        }
+        return UITableView.automaticDimension
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -147,5 +202,9 @@ extension ReportCategoryViewController: UITableViewDelegate {
         snapshot.deleteItems([dataSource.itemIdentifier(for: indexPath)!])
         
         dataSource.apply(snapshot, animatingDifferences: false)
+        
+        // 높이 재계산
+            tableView.beginUpdates()
+            tableView.endUpdates()
     }
 }
