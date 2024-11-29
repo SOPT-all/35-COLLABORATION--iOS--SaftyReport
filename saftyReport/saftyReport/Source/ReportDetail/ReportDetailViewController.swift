@@ -88,6 +88,15 @@ class ReportDetailViewController: UIViewController {
         setupSubmitButton()
         configureDataSource()
         applySnapshot()
+        
+        
+        navigationController?.navigationBar.tintColor = .white
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        tabBarController?.tabBar.isHidden = true
     }
     
     private func setupNavigationBar() {
