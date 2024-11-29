@@ -14,11 +14,7 @@ class BaseCell: UICollectionViewCell, ConfigurableCell {
     static var reuseIdentifier: String { return String(describing: self) }
     
     let titleLabel = UILabel().then {
-        let attributedText = NSAttributedString.styled(
-            text: "",
-            style: .body3
-        )
-        $0.attributedText = attributedText
+        $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
     let requiredMark = UILabel().then {
@@ -44,7 +40,7 @@ class BaseCell: UICollectionViewCell, ConfigurableCell {
     
     private func setupBaseUI() {
         contentView.addSubviews(titleLabel, requiredMark, infoImageView)
-
+        
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview().offset(16)
             $0.leading.equalToSuperview()
@@ -69,7 +65,8 @@ class BaseCell: UICollectionViewCell, ConfigurableCell {
             style: .body3
         )
         titleLabel.attributedText = attributedText
+
         requiredMark.isHidden = !item.isRequired
-        infoImageView.isHidden = !item.showInfoIcon 
+        infoImageView.isHidden = !item.showInfoIcon
     }
 }
