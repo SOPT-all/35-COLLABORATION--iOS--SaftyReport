@@ -6,16 +6,24 @@
 //
 
 import UIKit
+
 import SnapKit
 import Then
 import Alamofire
-
 
 actor ReportService {
     static let shared = ReportService()
     private init() {}
     
+    private var cachedResponses: [String: ReportResponse] = [:]
+    
     func submitReport(_ report: ReportRequest) async throws -> ReportResponse {
+        let cacheKey = "\(report.content)-\(report.phoneNumber)"
+        
+        if let cachedResponse = cachedResponses[cacheKey] {
+            return cachedResponse
+        }
+        
         let url = "\(Environment.baseURL)/api/v1/report"
         let headers: HTTPHeaders = [
             "Content-Type": "application/json",
@@ -34,6 +42,7 @@ actor ReportService {
             .responseDecodable(of: ReportResponse.self) { response in
                 switch response.result {
                 case .success(let reportResponse):
+                    self.cachedResponses[cacheKey] = reportResponse
                     continuation.resume(returning: reportResponse)
                 case .failure(let error):
                     continuation.resume(throwing: error)
@@ -50,6 +59,8 @@ class ReportDetailViewController: UIViewController {
     private var isInitialState = true
     private var isOverlayVisible = true
     
+    private var alertContentViewCache: [String: UIView] = [:]
+    
     private let overlayView = UIView().then {
         $0.backgroundColor = UIColor.white.withAlphaComponent(0.6)
         $0.isUserInteractionEnabled = false
@@ -62,21 +73,62 @@ class ReportDetailViewController: UIViewController {
         CustomShadow.shared.applyShadow(to: $0.layer, width: 0, height: -4)
     }
     
-    private let submitButton = UIButton().then {
-        $0.setTitle("제출", for: .normal)
-        $0.backgroundColor = .primaryOrange
-        $0.layer.cornerRadius = 8
-    }
+    private lazy var submitButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("제출", for: .normal)
+        button.backgroundColor = .primaryOrange
+        button.layer.cornerRadius = 8
+        button.addAction(
+            UIAction { [weak self] _ in
+                Task { @MainActor in
+                    await self?.handleSubmit()
+                }
+            },
+            for: .touchUpInside
+        )
+        return button
+    }()
     
     private var collectionView: UICollectionView!
     private var dataSource: UICollectionViewDiffableDataSource<ReportDetailSection, ReportDetailItem>!
+    private let loadingIndicator = UIActivityIndicatorView(style: .large)
     
     private let items: [ReportDetailItem] = [
-        ReportDetailItem(section: .reportType, title: "신고 유형을 선택해주세요", isRequired: false, placeholder: nil, showInfoIcon: false),
-        ReportDetailItem(section: .photo, title: "사진", isRequired: true, placeholder: "사진을 추가해주세요", showInfoIcon: true),
-        ReportDetailItem(section: .location, title: "발생지역", isRequired: true, placeholder: "지역을 입력해주세요", showInfoIcon: true),
-        ReportDetailItem(section: .content, title: "내용", isRequired: true, placeholder: "내용을 입력해주세요", showInfoIcon: true),
-        ReportDetailItem(section: .phone, title: "휴대전화", isRequired: true, placeholder: "전화번호를 입력해주세요", showInfoIcon: false)
+        ReportDetailItem(
+            section: .reportType,
+            title: "신고 유형을 선택해주세요",
+            isRequired: false,
+            placeholder: nil,
+            showInfoIcon: false
+        ),
+        ReportDetailItem(
+            section: .photo,
+            title: "사진",
+            isRequired: true,
+            placeholder: "사진을 추가해주세요",
+            showInfoIcon: true
+        ),
+        ReportDetailItem(
+            section: .location,
+            title: "발생지역",
+            isRequired: true,
+            placeholder: "지역을 입력해주세요",
+            showInfoIcon: true
+        ),
+        ReportDetailItem(
+            section: .content,
+            title: "내용",
+            isRequired: true,
+            placeholder: "내용을 입력해주세요",
+            showInfoIcon: true
+        ),
+        ReportDetailItem(
+            section: .phone,
+            title: "휴대전화",
+            isRequired: true,
+            placeholder: "전화번호를 입력해주세요",
+            showInfoIcon: false
+        )
     ]
     
     override func viewDidLoad() {
@@ -94,124 +146,88 @@ class ReportDetailViewController: UIViewController {
         tabBarController?.tabBar.isHidden = false
     }
     
-    // MARK: - Setup Methods
     private func setupUI() {
         view.backgroundColor = .white
         setupNavigationBar()
         setupCollectionView()
         setupOverlayView()
         setupSubmitButton()
+        setupLoadingIndicator()
         configureDataSource()
         applySnapshot()
         
         navigationController?.navigationBar.tintColor = .white
     }
     
-    private func setupNavigationBar() {
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = .primaryOrange
-        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-        
-        navigationController?.navigationBar.standardAppearance = appearance
-        navigationController?.navigationBar.scrollEdgeAppearance = appearance
-        navigationController?.navigationBar.compactAppearance = appearance
-        navigationController?.navigationBar.compactScrollEdgeAppearance = appearance
-        
-        let customNavigationItem = CustomNavigationItem()
-        customNavigationItem.setUpNavigationBar(for: .back)
-        navigationItem.backBarButtonItem = customNavigationItem.backBarButtonItem
-        navigationItem.backBarButtonItem?.tintColor = .gray1
-        navigationItem.title = "신고하기"
-        
-        navigationController?.setNavigationBarHidden(false, animated: false)
-    }
-    
-    private func setupCollectionView() {
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
-        collectionView.isScrollEnabled = false
-        view.addSubview(collectionView)
-        view.addSubview(containerView)
-        
-        containerView.snp.makeConstraints {
-            $0.leading.trailing.bottom.equalToSuperview()
-            $0.height.equalTo(84)
+    private func setupLoadingIndicator() {
+        view.addSubview(loadingIndicator)
+        loadingIndicator.snp.makeConstraints {
+            $0.center.equalToSuperview()
         }
-        
-        collectionView.snp.makeConstraints {
-            $0.top.leading.trailing.equalTo(view.safeAreaLayoutGuide)
-            $0.bottom.equalTo(containerView.snp.top)
-        }
-        
-        registerCells()
-    }
-    
-    private func registerCells() {
-        [(ReportTypeCell.self, ReportTypeCell.reuseIdentifier),
-         (PhotoCell.self, PhotoCell.reuseIdentifier),
-         (LocationCell.self, LocationCell.reuseIdentifier),
-         (ContentCell.self, ContentCell.reuseIdentifier),
-         (PhoneCell.self, PhoneCell.reuseIdentifier)].forEach { cellClass, identifier in
-            collectionView.register(cellClass, forCellWithReuseIdentifier: identifier)
-        }
-    }
-    
-    private func setupOverlayView() {
-        view.addSubview(overlayView)
-        
-        Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 300_000_000) // 0.3초 대기
-            
-            guard let locationCell = collectionView.cellForItem(at: IndexPath(item: 0, section: 1)) else { return }
-            let cellFrameInView = collectionView.convert(locationCell.frame, to: view)
-            
-            overlayView.snp.remakeConstraints {
-                $0.top.equalTo(cellFrameInView.minY)
-                $0.leading.trailing.equalToSuperview()
-                $0.bottom.equalToSuperview()
-            }
-            
-            view.layoutIfNeeded()
-        }
-    }
-    
-    private func setupSubmitButton() {
-        containerView.addSubview(submitButton)
-        
-        submitButton.snp.makeConstraints {
-            $0.left.right.equalToSuperview().inset(24)
-            $0.height.equalTo(50)
-            $0.centerY.equalToSuperview()
-        }
-        
-        submitButton.addAction(
-            UIAction { [weak self] _ in
-                Task { @MainActor in
-                    await self?.handleSubmit()
-                }
-            },
-            for: .touchUpInside
-        )
     }
     
     private func handleSubmit() async {
-        let shouldSubmit = await showSubmitConfirmationAlert()
-        if shouldSubmit {
-            await submitReport()
+        do {
+            async let alertResult = showSubmitConfirmationAlert()
+            async let prepareData = prepareSubmitData()
+            
+            let (shouldSubmit, reportRequest) = await (alertResult, prepareData)
+            
+            guard shouldSubmit else { return }
+            
+            loadingIndicator.startAnimating()
+            let response = try await ReportService.shared.submitReport(reportRequest)
+            loadingIndicator.stopAnimating()
+            
+            await MainActor.run {
+                handleResponse(response)
+            }
+            
+        } catch {
+            loadingIndicator.stopAnimating()
+            await handleError(error)
         }
     }
     
+    private func prepareSubmitData() async -> ReportRequest {
+        ReportRequest(
+            photoList: [
+                PhotoRequest(photoId: 1, photoUrl: "www.example1.com"),
+                PhotoRequest(photoId: 2, photoUrl: "www.example2.com")
+            ],
+            address: "서울시 마포구",
+            content: contentText,
+            phoneNumber: phoneNumber,
+            category: "PARKING"
+        )
+    }
+    
+    private func handleResponse(_ response: ReportResponse) {
+        if response.status == 201 {
+            Task {
+                await showSuccessAlert()
+            }
+        } else {
+            Task {
+                await showErrorAlert(message: response.message ?? "오류가 발생했습니다")
+            }
+        }
+    }
+    
+    private func handleError(_ error: Error) async {
+        await showErrorAlert(message: "네트워크 오류가 발생했습니다")
+    }
+    
     private func showSubmitConfirmationAlert() async -> Bool {
-        return await withCheckedContinuation { continuation in
-            let contentView = createAlertContentView(text: "신고 내용을 제출하시겠습니까?")
+        await withCheckedContinuation { continuation in
             let alertVC = BaseTwoButtonAlertViewController()
             alertVC.modalPresentationStyle = .overFullScreen
             alertVC.modalTransitionStyle = .crossDissolve
-            alertVC.setAlert("알림", contentView)
+            alertVC.setAlert("알림", createAlertContentView(text: "신고 내용을 제출하시겠습니까?"))
             
             alertVC.alertView.confirmButton.addAction(
                 UIAction { [weak alertVC] _ in
-                    alertVC?.dismiss(animated: true) {
+                    alertVC?.dismiss(animated: false) {
                         continuation.resume(returning: true)
                     }
                 },
@@ -220,57 +236,30 @@ class ReportDetailViewController: UIViewController {
             
             alertVC.alertView.cancelButton.addAction(
                 UIAction { [weak alertVC] _ in
-                    alertVC?.dismiss(animated: true) {
+                    alertVC?.dismiss(animated: false) {
                         continuation.resume(returning: false)
                     }
                 },
                 for: .touchUpInside
             )
             
-            present(alertVC, animated: true)
-        }
-    }
-    
-    private func submitReport() async {
-        do {
-            let reportRequest = ReportRequest(
-                photoList: [
-                    PhotoRequest(photoId: 1, photoUrl: "www.example1.com"),
-                    PhotoRequest(photoId: 2, photoUrl: "www.example2.com")
-                ],
-                address: "서울시 마포구",
-                content: contentText,
-                phoneNumber: phoneNumber,
-                category: "PARKING"
-            )
-            
-            let response = try await ReportService.shared.submitReport(reportRequest)
-            
-            if response.status == 201 {
-                await showSuccessAlert()
-            } else {
-                await showErrorAlert(message: response.message ?? "오류가 발생했습니다")
-            }
-            
-        } catch {
-            await showErrorAlert(message: "네트워크 오류가 발생했습니다")
+            present(alertVC, animated: false)
         }
     }
     
     private func showSuccessAlert() async {
-        return await withCheckedContinuation { continuation in
-            let contentView = createAlertContentView(text: "신고가 성공적으로 접수되었습니다")
+        await withCheckedContinuation { continuation in
             let alertVC = BaseTwoButtonAlertViewController()
             alertVC.modalPresentationStyle = .overFullScreen
             alertVC.modalTransitionStyle = .crossDissolve
-            alertVC.setAlert("알림", contentView)
+            alertVC.setAlert("알림", createAlertContentView(text: "신고가 성공적으로 접수되었습니다"))
             
             alertVC.alertView.cancelButton.setTitle("닫기", for: .normal)
             alertVC.alertView.confirmButton.setTitle("홈으로", for: .normal)
             
             alertVC.alertView.cancelButton.addAction(
                 UIAction { [weak alertVC] _ in
-                    alertVC?.dismiss(animated: true) {
+                    alertVC?.dismiss(animated: false) {
                         continuation.resume()
                     }
                 },
@@ -279,7 +268,7 @@ class ReportDetailViewController: UIViewController {
             
             alertVC.alertView.confirmButton.addAction(
                 UIAction { [weak self, weak alertVC] _ in
-                    alertVC?.dismiss(animated: true) {
+                    alertVC?.dismiss(animated: false) {
                         self?.navigateToHome()
                         continuation.resume()
                     }
@@ -287,49 +276,51 @@ class ReportDetailViewController: UIViewController {
                 for: .touchUpInside
             )
             
-            present(alertVC, animated: true)
+            present(alertVC, animated: false)
         }
     }
     
     private func showErrorAlert(message: String) async {
-        return await withCheckedContinuation { continuation in
-            let contentView = createAlertContentView(text: message)
+        await withCheckedContinuation { continuation in
             let alertVC = BaseTwoButtonAlertViewController()
             alertVC.modalPresentationStyle = .overFullScreen
             alertVC.modalTransitionStyle = .crossDissolve
-            alertVC.setAlert("알림", contentView)
+            alertVC.setAlert("알림", createAlertContentView(text: message))
             
             alertVC.alertView.cancelButton.isHidden = true
-            
             alertVC.alertView.confirmButton.addAction(
                 UIAction { [weak alertVC] _ in
-                    alertVC?.dismiss(animated: true) {
+                    alertVC?.dismiss(animated: false) {
                         continuation.resume()
                     }
                 },
                 for: .touchUpInside
             )
             
-            present(alertVC, animated: true)
+            present(alertVC, animated: false)
         }
     }
     
     private func navigateToHome() {
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = windowScene.windows.first {
-            let tabBarViewController = CustomTabBarController()
-            tabBarViewController.setNavViewControllers()
-            
-            UIView.transition(with: window,
-                            duration: 0.3,
-                            options: .transitionCrossDissolve,
-                            animations: {
-                window.rootViewController = tabBarViewController
-            })
-        }
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first else { return }
+        
+        let tabBarViewController = CustomTabBarController()
+        tabBarViewController.setNavViewControllers()
+        
+        UIView.transition(with: window,
+                         duration: 0.2,
+                         options: .transitionCrossDissolve,
+                         animations: {
+            window.rootViewController = tabBarViewController
+        })
     }
     
     private func createAlertContentView(text: String) -> UIView {
+        if let cachedView = alertContentViewCache[text] {
+            return cachedView
+        }
+        
         let contentView = UIView()
         let textLabel = UILabel().then {
             $0.attributedText = .styled(text: text, style: .body3)
@@ -345,6 +336,7 @@ class ReportDetailViewController: UIViewController {
             $0.height.equalTo(25)
         }
         
+        alertContentViewCache[text] = contentView
         return contentView
     }
 }
@@ -352,7 +344,7 @@ class ReportDetailViewController: UIViewController {
 extension ReportDetailViewController: ReportTypeCellDelegate {
     func didToggleExpansion(isExpanded: Bool) {
         if isInitialState {
-            UIView.animate(withDuration: 0.3) {
+            UIView.animate(withDuration: 0.2) {
                 self.overlayView.alpha = 0.0
             } completion: { _ in
                 self.isOverlayVisible = false
@@ -369,34 +361,36 @@ extension ReportDetailViewController: ReportTypeCellDelegate {
     }
 }
 
-extension ReportDetailViewController: LocationCellDelegate {
-    func locationIconTapped() {
-        let reportAddressVC = ReportAddressViewController()
-        reportAddressVC.delegate = self
-        navigationController?.pushViewController(reportAddressVC, animated: true)
-    }
-}
-
-extension ReportDetailViewController: ReportAddressDelegate {
-   func didSelectAddress(_ address: String) {
-       if let indexPath = IndexPath(item: 0, section: 2) as? IndexPath,
-          let cell = collectionView.cellForItem(at: indexPath) as? LocationCell {
-           cell.updateLocationText(address)
+extension ReportDetailViewController {
+   private func setupCollectionView() {
+       collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+       collectionView.isScrollEnabled = false
+       view.addSubview(collectionView)
+       view.addSubview(containerView)
+       
+       containerView.snp.makeConstraints {
+           $0.leading.trailing.bottom.equalToSuperview()
+           $0.height.equalTo(84)
        }
-   }
-}
-
-extension ReportDetailViewController: ContentCellDelegate, PhoneCellDelegate {
-   func contentDidChange(_ text: String) {
-       self.contentText = text
+       
+       collectionView.snp.makeConstraints {
+           $0.top.leading.trailing.equalTo(view.safeAreaLayoutGuide)
+           $0.bottom.equalTo(containerView.snp.top)
+       }
+       
+       registerCells()
    }
    
-   func phoneNumberDidChange(_ number: String) {
-       self.phoneNumber = number
+   private func registerCells() {
+       [(ReportTypeCell.self, ReportTypeCell.reuseIdentifier),
+        (PhotoCell.self, PhotoCell.reuseIdentifier),
+        (LocationCell.self, LocationCell.reuseIdentifier),
+        (ContentCell.self, ContentCell.reuseIdentifier),
+        (PhoneCell.self, PhoneCell.reuseIdentifier)].forEach { cellClass, identifier in
+           collectionView.register(cellClass, forCellWithReuseIdentifier: identifier)
+       }
    }
-}
 
-extension ReportDetailViewController {
    private func createLayout() -> UICollectionViewLayout {
        let layout = UICollectionViewCompositionalLayout { [weak self] sectionIndex, _ in
            guard let self = self else { return nil }
@@ -455,7 +449,7 @@ extension ReportDetailViewController {
        section.contentInsets = insets
        return section
    }
-   
+
    private func configureDataSource() {
        dataSource = UICollectionViewDiffableDataSource<ReportDetailSection, ReportDetailItem>(
            collectionView: collectionView
@@ -476,7 +470,7 @@ extension ReportDetailViewController {
                cell.delegate = self
                
                if self.isInitialState {
-                   DispatchQueue.main.async {
+                   Task { @MainActor in
                        cell.updateTitleColor(.primaryOrange)
                    }
                }
@@ -519,7 +513,7 @@ extension ReportDetailViewController {
            }
        }
    }
-   
+
    private func applySnapshot() {
        var snapshot = NSDiffableDataSourceSnapshot<ReportDetailSection, ReportDetailItem>()
        ReportDetailSection.allCases.forEach { section in
@@ -528,6 +522,94 @@ extension ReportDetailViewController {
        }
        dataSource.apply(snapshot, animatingDifferences: false)
    }
+}
+
+extension ReportDetailViewController {
+   private func setupNavigationBar() {
+       let appearance = UINavigationBarAppearance()
+       appearance.configureWithOpaqueBackground()
+       appearance.backgroundColor = .primaryOrange
+       appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+       
+       navigationController?.navigationBar.standardAppearance = appearance
+       navigationController?.navigationBar.scrollEdgeAppearance = appearance
+       navigationController?.navigationBar.compactAppearance = appearance
+       navigationController?.navigationBar.compactScrollEdgeAppearance = appearance
+       
+       let customNavigationItem = CustomNavigationItem()
+       customNavigationItem.setUpNavigationBar(for: .back)
+       navigationItem.backBarButtonItem = customNavigationItem.backBarButtonItem
+       navigationItem.backBarButtonItem?.tintColor = .gray1
+       navigationItem.title = "신고하기"
+       
+       navigationController?.setNavigationBarHidden(false, animated: false)
+   }
+}
+
+// MARK: - Navigation & Delegate Extensions
+extension ReportDetailViewController: LocationCellDelegate {
+   func locationIconTapped() {
+       let reportAddressVC = ReportAddressViewController()
+       reportAddressVC.delegate = self
+       navigationController?.pushViewController(reportAddressVC, animated: true)
+   }
+}
+
+extension ReportDetailViewController: ReportAddressDelegate {
+   func didSelectAddress(_ address: String) {
+       if let indexPath = IndexPath(item: 0, section: 2) as? IndexPath,
+          let cell = collectionView.cellForItem(at: indexPath) as? LocationCell {
+           cell.updateLocationText(address)
+       }
+   }
+}
+
+extension ReportDetailViewController: ContentCellDelegate, PhoneCellDelegate {
+   func contentDidChange(_ text: String) {
+       self.contentText = text
+   }
+   
+   func phoneNumberDidChange(_ number: String) {
+       self.phoneNumber = number
+   }
+}
+
+extension ReportDetailViewController {
+    private func setupOverlayView() {
+        view.addSubview(overlayView)
+        
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            
+            guard let locationCell = collectionView.cellForItem(
+                at: IndexPath(
+                    item: 0,
+                    section: 1
+                )
+            ) else {
+                return
+            }
+            let cellFrameInView = collectionView.convert(locationCell.frame, to: view)
+            
+            overlayView.snp.remakeConstraints {
+                $0.top.equalTo(cellFrameInView.minY)
+                $0.leading.trailing.equalToSuperview()
+                $0.bottom.equalToSuperview()
+            }
+            
+            view.layoutIfNeeded()
+        }
+    }
+    
+    private func setupSubmitButton() {
+        containerView.addSubview(submitButton)
+        
+        submitButton.snp.makeConstraints {
+            $0.left.right.equalToSuperview().inset(24)
+            $0.height.equalTo(50)
+            $0.centerY.equalToSuperview()
+        }
+    }
 }
 
 #Preview {
