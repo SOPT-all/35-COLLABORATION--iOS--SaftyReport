@@ -10,7 +10,13 @@ import UIKit
 import SnapKit
 import Then
 
+protocol ReportAddressDelegate: AnyObject {
+    func didSelectAddress(_ address: String)
+}
+
 class ReportAddressViewController: UIViewController {
+    weak var delegate: ReportAddressDelegate?
+    
     private let baseView = UIView()
     
     private let imageView = UIImageView().then {
@@ -154,7 +160,7 @@ class ReportAddressViewController: UIViewController {
         navigationItem.backBarButtonItem?.tintColor = .gray1
         navigationItem.title = "주소 입력"
     }
-
+    
     
     @objc private func searchKeywordButtonTapped() {
         print("키워드 검색 버튼이 눌렸습니다.")
@@ -165,7 +171,9 @@ class ReportAddressViewController: UIViewController {
     }
     
     @objc private func selectButtonTapped() {
-        print("위치 선택 버튼이 눌렸습니다.")
+        let selectedAddress = addressLabel.text ?? "서울특별시 마포구 땡땡12로 3"
+        delegate?.didSelectAddress(selectedAddress)
+        navigationController?.popViewController(animated: true)
     }
     
 }

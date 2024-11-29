@@ -99,6 +99,11 @@ class LocationCell: BaseCell {
             locationLabel.attributedText = attributedText
         }
     }
+    
+    func updateLocationText(_ text: String) {
+        locationLabel.text = text
+        locationLabel.textColor = .black // 선택 시 텍스트 색상 변경
+    }
 }
 
 #Preview {

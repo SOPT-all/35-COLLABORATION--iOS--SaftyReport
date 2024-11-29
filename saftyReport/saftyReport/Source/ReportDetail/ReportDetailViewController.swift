@@ -343,6 +343,7 @@ extension ReportDetailViewController: ReportTypeCellDelegate {
 extension ReportDetailViewController: LocationCellDelegate {
     func locationIconTapped() {
         let reportAddressVC = ReportAddressViewController()
+        reportAddressVC.delegate = self
         navigationController?.pushViewController(reportAddressVC, animated: true)
     }
 }
@@ -418,6 +419,18 @@ extension ReportDetailViewController {
         
         alert.addAction(okAction)
         present(alert, animated: true)
+    }
+}
+
+
+// MARK: - ReportAddressDelegate
+extension ReportDetailViewController: ReportAddressDelegate {
+    func didSelectAddress(_ address: String) {
+        // 변경된 주소를 LocationCell에 반영
+        if let indexPath = IndexPath(item: 0, section: 2) as? IndexPath,
+            let cell = collectionView.cellForItem(at: indexPath) as? LocationCell {
+            cell.updateLocationText(address)
+        }
     }
 }
 
