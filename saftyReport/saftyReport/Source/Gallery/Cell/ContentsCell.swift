@@ -15,8 +15,6 @@ class ContentsCell: UICollectionViewCell {
     var isChecked = false
     var checkboxTappedHandler: ((Bool) -> Void)?
     
-    var checkboxTappedHandler: ((Bool) -> Void)?
-    
     private var imageView = UIImageView().then {
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 5

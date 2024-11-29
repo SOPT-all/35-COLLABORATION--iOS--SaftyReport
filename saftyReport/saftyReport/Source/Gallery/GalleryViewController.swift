@@ -185,12 +185,12 @@ extension GalleryViewController: UICollectionViewDelegate {
             guard let self = self else { return }
             
             let selectedImage = indexPath.section == 2 ?
-                self.firstSectionPhotoList[indexPath.row] :
-                self.secondSectionPhotoList[indexPath.row]
+            self.firstSectionPhotoList[indexPath.row] :
+            self.secondSectionPhotoList[indexPath.row]
             
             self.updateImageSelection(isChecked: isChecked,
-                                    image: selectedImage,
-                                    at: indexPath)
+                                      image: selectedImage,
+                                      at: indexPath)
             
             if let cell = self.collectionView.cellForItem(at: indexPath) as? ContentsCell {
                 cell.updateCheckboxState(isChecked)
@@ -207,59 +207,59 @@ extension GalleryViewController: UICollectionViewDelegate {
         }
         
         cell.checkbox.addTarget(self,
-                              action: #selector(checkboxTapped(_:forEvent:)),
-                              for: .touchUpInside)
+                                action: #selector(checkboxTapped(_:forEvent:)),
+                                for: .touchUpInside)
         
         navigationController?.pushViewController(nextViewController, animated: true)
     }
-
+    
     private func updateUsingButtonState() {
-            print("updateUsingButtonState called - selectedImages count:", selectedImages.count)
-            let isEnabled = !selectedImages.isEmpty
-            
-            if isEnabled {
-                usingButton.backgroundColor = .primaryOrange
-                usingButton.setTitleColor(.gray1, for: .normal)
-                usingButton.isEnabled = true
-            } else {
-                usingButton.backgroundColor = .gray2
-                usingButton.setTitleColor(.gray4, for: .normal)
-                usingButton.isEnabled = false
-            }
-            
-            print("Button state updated - isEnabled:", isEnabled)
-            print("Button background color:", usingButton.backgroundColor ?? "nil")
+        print("updateUsingButtonState called - selectedImages count:", selectedImages.count)
+        let isEnabled = !selectedImages.isEmpty
+        
+        if isEnabled {
+            usingButton.backgroundColor = .primaryOrange
+            usingButton.setTitleColor(.gray1, for: .normal)
+            usingButton.isEnabled = true
+        } else {
+            usingButton.backgroundColor = .gray2
+            usingButton.setTitleColor(.gray4, for: .normal)
+            usingButton.isEnabled = false
         }
-
-        private func updateImageSelection(isChecked: Bool, image: GalleryPhotoList, at indexPath: IndexPath) {
-            if isChecked {
-                if !selectedImages.contains(where: { $0.photoId == image.photoId }) {
-                    selectedImages.append(image)
-                }
-                if indexPath.section == 2 {
-                    firstSectionCheckedStatus.insert(indexPath)
-                } else {
-                    secondSectionCheckedStatus.insert(indexPath)
-                }
+        
+        print("Button state updated - isEnabled:", isEnabled)
+        print("Button background color:", usingButton.backgroundColor ?? "nil")
+    }
+    
+    private func updateImageSelection(isChecked: Bool, image: GalleryPhotoList, at indexPath: IndexPath) {
+        if isChecked {
+            if !selectedImages.contains(where: { $0.photoId == image.photoId }) {
+                selectedImages.append(image)
+            }
+            if indexPath.section == 2 {
+                firstSectionCheckedStatus.insert(indexPath)
             } else {
-                selectedImages.removeAll { $0.photoId == image.photoId }
-                if indexPath.section == 2 {
-                    firstSectionCheckedStatus.remove(indexPath)
-                } else {
-                    secondSectionCheckedStatus.remove(indexPath)
-                }
+                secondSectionCheckedStatus.insert(indexPath)
             }
-            
-            print("이미지 선택 상태 변경 - isChecked:", isChecked)
-            print("현재 선택된 이미지 개수:", selectedImages.count)
-            
-            DispatchQueue.main.async { [weak self] in
-                self?.updateUsingButtonState()
-                self?.collectionView.reloadData()
+        } else {
+            selectedImages.removeAll { $0.photoId == image.photoId }
+            if indexPath.section == 2 {
+                firstSectionCheckedStatus.remove(indexPath)
+            } else {
+                secondSectionCheckedStatus.remove(indexPath)
             }
+        }
+        
+        print("이미지 선택 상태 변경 - isChecked:", isChecked)
+        print("현재 선택된 이미지 개수:", selectedImages.count)
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.updateUsingButtonState()
+            self?.collectionView.reloadData()
+        }
         
     }
-
+    
     @objc private func checkboxTapped(_ sender: UIButton, forEvent event: UIEvent) {
         guard let touch = event.allTouches?.first,
               let point = touch.view?.convert(touch.location(in: touch.view), to: collectionView),
@@ -269,14 +269,14 @@ extension GalleryViewController: UICollectionViewDelegate {
         }
         
         let selectedImage = indexPath.section == 2 ?
-            firstSectionPhotoList[indexPath.row] :
-            secondSectionPhotoList[indexPath.row]
+        firstSectionPhotoList[indexPath.row] :
+        secondSectionPhotoList[indexPath.row]
         
         updateImageSelection(isChecked: cell.isChecked,
-                            image: selectedImage,
-                            at: indexPath)
+                             image: selectedImage,
+                             at: indexPath)
     }
-
+    
 }
 
 extension GalleryViewController: UICollectionViewDataSource {
@@ -365,48 +365,9 @@ extension GalleryViewController: UICollectionViewDataSource {
             }
             
             return cell
-        case 2:
-                guard let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: ContentsCell.cellIdentifier,
-                    for: indexPath
-                ) as? ContentsCell else {
-                    return UICollectionViewCell(frame: .zero)
-                }
-                
-                let item = firstSectionPhotoList[indexPath.row]
-                cell.configure(item: item,
-                              isChecked: firstSectionCheckedStatus.contains(indexPath)) { [weak self] isChecked in
-                    guard let self = self else { return }
-                    
-                    self.updateImageSelection(isChecked: isChecked,
-                                            image: item,
-                                            at: indexPath)
-                    self.updateUsingButtonState()
-                }
-                
-                return cell
-            default:
-                guard let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: ContentsCell.cellIdentifier,
-                    for: indexPath
-                ) as? ContentsCell else {
-                    return UICollectionViewCell(frame: .zero)
-                }
-                
-                let item = secondSectionPhotoList[indexPath.row]
-                cell.configure(item: item,
-                              isChecked: secondSectionCheckedStatus.contains(indexPath)) { [weak self] isChecked in
-                    guard let self = self else { return }
-                    
-                    self.updateImageSelection(isChecked: isChecked,
-                                            image: item,
-                                            at: indexPath)
-                    self.updateUsingButtonState() 
-                }
-                
-                return cell
-            }
+            
         }
+    }
     
 }
 
