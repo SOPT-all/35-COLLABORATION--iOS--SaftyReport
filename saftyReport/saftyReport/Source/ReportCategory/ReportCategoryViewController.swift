@@ -128,7 +128,9 @@ class ReportCategoryViewController: UIViewController {
                         for: indexPath
                     ) as? ReportCategoryExpandedTableViewCell else { return nil }
                     
-                    cell.bind(item: item)
+                    cell.bind(item: item,
+                              at: self,
+                              reportButtonAction: #selector(pushReportDetailVC))
                     return cell
                     
                 } else {
@@ -154,14 +156,23 @@ class ReportCategoryViewController: UIViewController {
         
         dataSource.apply(snapshot, animatingDifferences: false)
     }
-    
-    
-    // MARK: - Objc functions
-    
+}
+
+
+// MARK: - Objc functions
+
+extension ReportCategoryViewController {
     @objc private func popSelf() {
         self.navigationController?.popViewController(animated: true)
     }
+
+    @objc private func pushReportDetailVC() {
+        let nextVC = ReportDetailViewController()
+        self.navigationController?.pushViewController(nextVC, animated: true)
+    }
 }
+
+// MARK: - TableView Extensions
 
 extension ReportCategoryViewController: UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -179,18 +190,6 @@ extension ReportCategoryViewController: UITableViewDataSource {
 }
 
 extension ReportCategoryViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-//        guard let item = dataSource.itemIdentifier(for: indexPath)
-//        else { return UITableView.automaticDimension }
-//        
-//        if item.isExpanded {
-//            return 258 + 10
-//        } else {
-//            return 58 + 10
-//        }
-        return UITableView.automaticDimension
-    }
-    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard var item = dataSource.itemIdentifier(for: indexPath) else { return }
         
@@ -204,7 +203,7 @@ extension ReportCategoryViewController: UITableViewDelegate {
         dataSource.apply(snapshot, animatingDifferences: false)
         
         // 높이 재계산
-            tableView.beginUpdates()
-            tableView.endUpdates()
+        tableView.beginUpdates()
+        tableView.endUpdates()
     }
 }
