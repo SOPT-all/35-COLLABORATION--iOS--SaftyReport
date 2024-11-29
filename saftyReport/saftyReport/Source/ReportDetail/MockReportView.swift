@@ -16,7 +16,7 @@ class MockReportView: UIView {
         "소화전",
         "교차로 모퉁이",
         "버스 정류소",
-        "황단보도",
+        "횡단보도",
         "어린이 보호구역",
         "인도",
         "기타"
@@ -51,7 +51,7 @@ class MockReportView: UIView {
         $0.layer.cornerRadius = 15
         $0.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         $0.backgroundColor = .gray3
-        CustomShadow.shared.applyShadow(to: $0.layer, width: 0, height: -4)
+//        CustomShadow.shared.applyShadow(to: $0.layer, width: 0, height: -4)
         $0.isHidden = true
     }
     
@@ -242,7 +242,7 @@ class MockReportView: UIView {
         if isExpanded {
             optionsContainer.frame = CGRect(
                 x: buttonFrame.minX,
-                y: buttonFrame.maxY + 8,
+                y: buttonFrame.maxY - 10,
                 width: buttonFrame.width,
                 height: window.frame.height * 0.5
             )
