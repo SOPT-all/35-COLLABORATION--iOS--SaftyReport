@@ -425,7 +425,6 @@ extension GalleryViewController {
         let outputFormatter = DateFormatter()
         outputFormatter.dateFormat = "yyyy년 MM월 dd일" // 원하는 출력 형식
         
-        // 입력 문자열을 Date로 변환한 후, 다시 문자열로 변환
         if let date = inputFormatter.date(from: dateTime) {
             return outputFormatter.string(from: date)
         } else {
