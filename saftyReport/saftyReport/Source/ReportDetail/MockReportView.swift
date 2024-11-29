@@ -244,7 +244,7 @@ class MockReportView: UIView {
                 x: buttonFrame.minX,
                 y: buttonFrame.maxY + 8,
                 width: buttonFrame.width,
-                height: 400//window.frame.height * 0.4
+                height: window.frame.height * 0.5
             )
             optionsContainer.isHidden = false
         }
