@@ -70,11 +70,11 @@ class GalleryDetailViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        tabBarController?.tabBar.isHidden = true
         checkbox.setBackgroundImage(
             isChecked ? .icnCheckboxISquareSelectedWhite24Px : .icnCheckboxISquareUnselectedWhite24Px,
             for: .normal
         )
-        tabBarController?.tabBar.isHidden = true
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -158,11 +158,10 @@ class GalleryDetailViewController: UIViewController {
     @objc private func checkboxTapped() {
         isChecked.toggle()
         
-        if isChecked {
-            checkbox.setBackgroundImage(.icnCheckboxISquareSelectedWhite24Px, for: .normal)
-        } else {
-            checkbox.setBackgroundImage(.icnCheckboxISquareUnselectedWhite24Px, for: .normal)
-        }
+        checkbox.setBackgroundImage(
+            isChecked ? .icnCheckboxISquareSelectedWhite24Px : .icnCheckboxISquareUnselectedWhite24Px,
+            for: .normal
+        )
     }
     
 }

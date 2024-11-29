@@ -14,6 +14,8 @@ import Kingfisher
 class ContentsCell: UICollectionViewCell {
     var isChecked = false
     
+    var checkboxTappedHandler: ((Bool) -> Void)?
+    
     private var imageView = UIImageView().then {
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 5
@@ -58,11 +60,12 @@ class ContentsCell: UICollectionViewCell {
     @objc private func checkboxTapped() {
         isChecked.toggle()
         
-        if isChecked {
-            checkbox.setImage(.icnCheckboxISquareSelectedWhite24Px, for: .normal)
-        } else {
-            checkbox.setImage(.icnCheckboxISquareUnselectedWhite24Px, for: .normal)
-        }
+        checkbox.setImage(
+            isChecked ? .icnCheckboxISquareSelectedWhite24Px : .icnCheckboxISquareUnselectedWhite24Px,
+            for: .normal
+        )
+        
+        checkboxTappedHandler?(isChecked)
     }
     
     func configure(item: GalleryPhotoList, isChecked: Bool = false){
@@ -75,7 +78,6 @@ class ContentsCell: UICollectionViewCell {
             isChecked ? .icnCheckboxISquareSelectedWhite24Px : .icnCheckboxISquareUnselectedWhite24Px,
             for: .normal
         )
-        
     }
     
 }
