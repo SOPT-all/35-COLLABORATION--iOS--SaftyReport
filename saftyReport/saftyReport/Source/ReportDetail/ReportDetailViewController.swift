@@ -350,55 +350,105 @@ extension ReportDetailViewController: LocationCellDelegate {
 
 // MARK: - Submit Action
 extension ReportDetailViewController {
+    func viewController() -> UIViewController? {
+            var nextResponder: UIResponder? = self
+            while let responder = nextResponder {
+                if let vc = responder as? UIViewController {
+                    return vc
+                }
+                nextResponder = responder.next
+            }
+            return nil
+        }
+    
+    private func createAlertContentView(text: String) -> UIView {
+        let contentView = UIView()
+        let textLabel = UILabel().then {
+            $0.attributedText = .styled(text: text, style: .body3)
+            $0.font = .systemFont(ofSize: 16, weight: .semibold)
+            $0.textColor = .gray13
+        }
+        
+        contentView.addSubview(textLabel)
+        textLabel.snp.makeConstraints {
+            $0.edges.equalToSuperview().inset(20)
+            $0.center.equalToSuperview()
+            $0.width.equalTo(200)
+            $0.height.equalTo(25)
+        }
+        
+        return contentView
+    }
+    
     @objc private func submitButtonTapped() {
         
-        let url = "\(Environment.baseURL)/api/v1/report"
+        guard let viewController = viewController() else {return}
         
-        let reportRequest = ReportRequest(
-            photoList: [
-                PhotoRequest(photoId: 1, photoUrl: "www.example1.com"),
-                PhotoRequest(photoId: 2, photoUrl: "www.example2.com")
-            ],
-            address: "사랑시 고백구 행복동",
-            content: "널 너무나 많이 사랑한죄",
-            phoneNumber: "010-2998-0867",
-            category: "PARKING"
-        )
+        let contentView = createAlertContentView(text: "신고 내용을 제출하시겠습니까?")
         
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json",
-            "userId": "1"
-        ]
+        let alertVC = BaseTwoButtonAlertViewController()
+        alertVC.modalPresentationStyle = .overFullScreen
+        alertVC.modalTransitionStyle = .crossDissolve
+        alertVC.setAlert("알림", contentView)
         
-        AF.request(
-            url,
-            method: .post,
-            parameters: reportRequest,
-            encoder: JSONParameterEncoder.default,
-            headers: headers
-        )
-        .validate()
-        .responseDecodable(of: ReportResponse.self) { [weak self] response in
-            switch response.result {
-            case .success(let reportResponse):
-                if reportResponse.status == 201 {
-                    self?.showAlert(message: "신고가 성공적으로 접수되었습니다") {
-                        self?.navigationController?.popViewController(animated: true)
+        alertVC.alertView.confirmButton.addAction(
+            UIAction { [weak alertVC, weak viewController] _ in
+                alertVC?.dismiss(animated: true) {
+                    let url = "\(Environment.baseURL)/api/v1/report"
+                    
+                    let reportRequest = ReportRequest(
+                        photoList: [
+                            PhotoRequest(photoId: 1, photoUrl: "www.example1.com"),
+                            PhotoRequest(photoId: 2, photoUrl: "www.example2.com")
+                        ],
+                        address: "사랑시 고백구 행복동",
+                        content: "널 너무나 많이 사랑한죄",
+                        phoneNumber: "010-2998-0867",
+                        category: "PARKING"
+                    )
+                    
+                    let headers: HTTPHeaders = [
+                        "Content-Type": "application/json",
+                        "userId": "1"
+                    ]
+                    
+                    AF.request(
+                        url,
+                        method: .post,
+                        parameters: reportRequest,
+                        encoder: JSONParameterEncoder.default,
+                        headers: headers
+                    )
+                    .validate()
+                    .responseDecodable(of: ReportResponse.self) { [weak self] response in
+                        switch response.result {
+                        case .success(let reportResponse):
+                            if reportResponse.status == 201 {
+                                self?.showAlert(message: "신고가 성공적으로 접수되었습니다") {
+                                    self?.navigationController?.popViewController(animated: true)
+                                }
+                            } else {
+                                self?.showAlert(message: reportResponse.message ?? NetworkError.serverError.errorMessage)
+                            }
+                            
+                        case .failure(_):
+                            if let data = response.data {
+                                self?.showAlert(message: NetworkError.decodingError.errorMessage)
+                            } else if response.response == nil {
+                                self?.showAlert(message: NetworkError.networkError(response.error!).errorMessage)
+                            } else {
+                                self?.showAlert(message: NetworkError.serverError.errorMessage)
+                            }
+                        }
                     }
-                } else {
-                    self?.showAlert(message: reportResponse.message ?? NetworkError.serverError.errorMessage)
                 }
-                
-            case .failure(_):
-                if let data = response.data {
-                    self?.showAlert(message: NetworkError.decodingError.errorMessage)
-                } else if response.response == nil {
-                    self?.showAlert(message: NetworkError.networkError(response.error!).errorMessage)
-                } else {
-                    self?.showAlert(message: NetworkError.serverError.errorMessage)
-                }
-            }
-        }
+            },
+            for: .touchUpInside)
+        
+        viewController.present(alertVC, animated: true)
+        
+        
+        
     }
     
     private func showAlert(message: String, completion: (() -> Void)? = nil) {
