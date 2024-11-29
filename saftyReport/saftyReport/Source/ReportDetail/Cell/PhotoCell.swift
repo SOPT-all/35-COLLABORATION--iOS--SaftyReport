@@ -216,6 +216,8 @@ extension PhotoCell: UICollectionViewDataSource, UICollectionViewDelegate {
 
 extension PhotoCell: GalleryViewControllerDelegate {
     func didSelectImages(_ images: [GalleryPhotoList]) {
+        print("PhotoCell에서 받은 이미지 개수:", images.count)
+        print("PhotoCell에서 받은 이미지:", images)
         updateSelectedImages(images)
     }
 }

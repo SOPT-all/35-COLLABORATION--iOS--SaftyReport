@@ -94,9 +94,11 @@ class GalleryViewController: UIViewController {
     }
     
     @objc private func usingButtonTapped() {
-           delegate?.didSelectImages(selectedImages)
-           navigationController?.popViewController(animated: true)
-       }
+        print("선택된 이미지 개수:", selectedImages.count)
+        print("선택된 이미지:", selectedImages)
+        delegate?.didSelectImages(selectedImages)
+        navigationController?.popViewController(animated: true)
+    }
     
     private func connectAPI() {
         DispatchQueue.main.async {
@@ -105,23 +107,26 @@ class GalleryViewController: UIViewController {
                 
                 switch result {
                 case let .success(list):
+                    print("API 성공 - 받아온 데이터:", list)
                     
                     self.firstSectionPhotoList = list.filter({
                         self.formatDateTime($0.createdAt!) == "2024년 10월 26일"
                     })
                     .dropLast()
                     
-                    
                     self.secondSectionPhotoList = list.filter({
                         self.formatDateTime($0.createdAt!) == "2024년 11월 26일"
                     })
                     .dropLast()
                     
+                    print("필터링된 첫 번째 섹션:", self.firstSectionPhotoList)
+                    print("필터링된 두 번째 섹션:", self.secondSectionPhotoList)
+                    
                     self.collectionView.reloadData()
+                    
                 case let .failure(error):
-                    print(error.localizedDescription)
+                    print("API 에러:", error.localizedDescription)
                 }
-                
             }
         }
     }
@@ -185,27 +190,50 @@ extension GalleryViewController: UICollectionViewDelegate {
 //        self.navigationController?.pushViewController(nextViewController, animated: true)
 //    }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-            guard indexPath.section >= 2,
-                  let cell = collectionView.cellForItem(at: indexPath) as? ContentsCell else {
-                return
-            }
-            
-            cell.isChecked.toggle()
-            
-            let selectedImage = indexPath.section == 2 ?
-                firstSectionPhotoList[indexPath.row] :
-                secondSectionPhotoList[indexPath.row]
-            
-            if cell.isChecked {
-                if !selectedImages.contains(where: { $0.photoId == selectedImage.photoId }) {
-                    selectedImages.append(selectedImage)
-                }
-            } else {
-                selectedImages.removeAll { $0.photoId == selectedImage.photoId }
-            }
-            
-            collectionView.reloadData()
+        guard indexPath.section >= 2,
+              let cell = collectionView.cellForItem(at: indexPath) as? ContentsCell else {
+            return
         }
+        
+        cell.isChecked.toggle()
+        
+        let selectedImage = indexPath.section == 2 ?
+            firstSectionPhotoList[indexPath.row] :
+            secondSectionPhotoList[indexPath.row]
+        
+        if cell.isChecked {
+            // 체크된 경우
+            selectedImages.append(selectedImage)
+            if indexPath.section == 2 {
+                firstSectionCheckedStatus.insert(indexPath)
+            } else {
+                secondSectionCheckedStatus.insert(indexPath)
+            }
+        } else {
+            // 체크 해제된 경우
+            selectedImages.removeAll { $0.photoId == selectedImage.photoId }
+            if indexPath.section == 2 {
+                firstSectionCheckedStatus.remove(indexPath)
+            } else {
+                secondSectionCheckedStatus.remove(indexPath)
+            }
+        }
+        
+        print("현재 선택된 이미지 개수:", selectedImages.count)
+        print("현재 선택된 이미지:", selectedImages)
+        
+        // 셀 업데이트
+        collectionView.reloadItems(at: [indexPath])
+        
+        // GalleryDetailViewController로 이동하는 코드는 주석 처리 또는 제거
+        // 상세 화면으로 이동하면 선택 상태가 초기화될 수 있음
+        /*
+        let nextViewController = GalleryDetailViewController()
+        nextViewController.isChecked = cell.isChecked
+        nextViewController.indexPath = indexPath
+        ...
+        */
+    }
     
 }
 
