@@ -46,12 +46,14 @@ class ReportCategoryExpandedTableViewCell: UITableViewCell {
     
     private let descriptionContentLabel = UILabel().then {
         $0.textColor = .gray13
+        $0.numberOfLines = 0
     }
     
     // MARK: - Methods
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        self.selectionStyle = .none
         setHierarchy()
         setConstraints()
     }
@@ -94,10 +96,11 @@ class ReportCategoryExpandedTableViewCell: UITableViewCell {
         descriptionContentLabel.snp.makeConstraints {
             $0.top.equalTo(descriptionTitleLabel.snp.bottom).offset(8)
             $0.horizontalEdges.equalToSuperview().inset(15)
+            $0.bottom.equalToSuperview().offset(-15)
         }
     }
     
-    func bind(item: ReportCategory.Item) {
+    func bind(item: CustomCategory.Item, at target: Any?, reportButtonAction: Selector) {
         titleLabel.attributedText = NSAttributedString.styled(
             text: item.name,
             style: .body4)
@@ -105,5 +108,7 @@ class ReportCategoryExpandedTableViewCell: UITableViewCell {
         descriptionContentLabel.attributedText = NSAttributedString.styled(
             text: item.description,
             style: .caption4)
+        
+        reportButton.addTarget(target, action: reportButtonAction, for: .touchUpInside)
     }
 }

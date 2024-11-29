@@ -8,7 +8,7 @@
 import UIKit
 
 class MyReportBannerCell: UICollectionViewCell {
-    let bannerImgList = ["img_promotion_1", "img_promotion_2", "img_promotion_3"]
+    var bannerImgList = ["img_promotion_1", "img_promotion_2", "img_promotion_3"]
     
     lazy var leftButton = UIButton().then {
         $0.setBackgroundImage(UIImage.icnArrowLeftRoundWhite24Px, for: .normal)
@@ -61,6 +61,7 @@ class MyReportBannerCell: UICollectionViewCell {
         setLayout()
         setCollectionView()
     }
+    
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -118,6 +119,12 @@ class MyReportBannerCell: UICollectionViewCell {
         let currentPage = sender.currentPage
         let indexPath = IndexPath(item: currentPage, section: 0)
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+    }
+    
+    func configure(bannerListImgUrl: [String]) {
+        bannerImgList = bannerListImgUrl
+        
+        collectionView.reloadData()
     }
 }
 

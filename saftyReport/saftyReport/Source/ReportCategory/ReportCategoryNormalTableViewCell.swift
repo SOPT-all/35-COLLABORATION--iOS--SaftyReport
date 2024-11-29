@@ -31,6 +31,7 @@ class ReportCategoryNormalTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        self.selectionStyle = .none
         setHierarchy()
         setConstraints()
     }
@@ -48,6 +49,7 @@ class ReportCategoryNormalTableViewCell: UITableViewCell {
         grayView.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview()
             $0.verticalEdges.equalToSuperview().inset(5)
+            $0.height.equalTo(58)
         }
         
         titleLabel.snp.makeConstraints {
@@ -61,7 +63,7 @@ class ReportCategoryNormalTableViewCell: UITableViewCell {
         }
     }
     
-    func bind(item: ReportCategory.Item) {
+    func bind(item: CustomCategory.Item) {
         titleLabel.attributedText = NSAttributedString.styled(text: item.name, style: .body4)
     }
 }

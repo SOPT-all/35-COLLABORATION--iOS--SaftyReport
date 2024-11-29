@@ -7,23 +7,18 @@
 
 import Foundation
 
-// MARK: - CategoryResponse
-
-struct CategoryResponse: Codable {
-    let status: Int?
-    let message: String?
-    let data: CategoryDataObject?
+struct CategoryResponse: Decodable {
+    let status: Int
+    let message: String
+    let data: CategoryDetailList
 }
 
-// MARK: - CategoryDataObject
-
-struct CategoryDataObject: Codable {
-    let categoryDetailList: [CategoryDetailList]?
+struct CategoryDetailList: Decodable {
+    let categoryDetailList: [CategoryDetail]
 }
 
-// MARK: - CategoryDetailList
-
-struct CategoryDetailList: Codable {
-    let categoryID: Int?
-    let categoryName, categoryDescription: String?
+struct CategoryDetail: Decodable, Hashable {
+    let categoryId: Int
+    let categoryName: String
+    let categoryDescription: String
 }
