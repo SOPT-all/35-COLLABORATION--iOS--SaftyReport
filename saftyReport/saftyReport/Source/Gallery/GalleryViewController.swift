@@ -327,45 +327,38 @@ extension GalleryViewController: UICollectionViewDataSource {
                 return UICollectionViewCell(frame: .zero)
             }
             
-            cell.configure(item: firstSectionPhotoList[indexPath.row], isChecked: firstSectionCheckedStatus.contains(indexPath))
-            
-            cell.checkboxTappedHandler = { [weak self] isChecked in
+            let item = firstSectionPhotoList[indexPath.row]
+            cell.configure(item: item,
+                           isChecked: firstSectionCheckedStatus.contains(indexPath)) { [weak self] isChecked in
                 guard let self = self else { return }
                 
-                if isChecked {
-                    self.firstSectionCheckedStatus.insert(indexPath)
-                } else {
-                    self.firstSectionCheckedStatus.remove(indexPath)
-                }
-                
-                self.updateUsingButton()
+                self.updateImageSelection(isChecked: isChecked,
+                                          image: item,
+                                          at: indexPath)
+                self.updateUsingButtonState()
             }
             
             return cell
         default:
             guard let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: ContentsCell.cellIdentifier,
-                for: indexPath.appending(9)
+                for: indexPath
             ) as? ContentsCell else {
                 return UICollectionViewCell(frame: .zero)
             }
             
-            cell.configure(item: secondSectionPhotoList[indexPath.row], isChecked: secondSectionCheckedStatus.contains(indexPath))
-            
-            cell.checkboxTappedHandler = { [weak self] isChecked in
+            let item = secondSectionPhotoList[indexPath.row]
+            cell.configure(item: item,
+                           isChecked: secondSectionCheckedStatus.contains(indexPath)) { [weak self] isChecked in
                 guard let self = self else { return }
                 
-                if isChecked {
-                    self.secondSectionCheckedStatus.insert(indexPath)
-                } else {
-                    self.secondSectionCheckedStatus.remove(indexPath)
-                }
-                
-                self.updateUsingButton()
+                self.updateImageSelection(isChecked: isChecked,
+                                          image: item,
+                                          at: indexPath)
+                self.updateUsingButtonState()
             }
             
             return cell
-            
         }
     }
     
