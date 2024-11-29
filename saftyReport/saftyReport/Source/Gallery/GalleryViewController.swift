@@ -10,8 +10,15 @@ import UIKit
 import SnapKit
 import Then
 
+protocol GalleryViewControllerDelegate: AnyObject {
+    func didSelectImages(_ images: [GalleryPhotoList])
+}
+
 class GalleryViewController: UIViewController {
     private let networkManager = NetworkManager()
+    weak var delegate: GalleryViewControllerDelegate?
+    
+    private var selectedImages: [GalleryPhotoList] = []
     
     private var firstSectionPhotoList: [GalleryPhotoList] = []
     private var firstSectionCheckedStatus: Set<IndexPath> = []
@@ -87,8 +94,9 @@ class GalleryViewController: UIViewController {
     }
     
     @objc private func usingButtonTapped() {
-        print("사용 버튼이 눌렸습니다.")
-    }
+           delegate?.didSelectImages(selectedImages)
+           navigationController?.popViewController(animated: true)
+       }
     
     private func connectAPI() {
         DispatchQueue.main.async {
@@ -145,37 +153,59 @@ extension GalleryViewController: UICollectionViewDelegate {
         return header
     }
     
+//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+//        guard let cell = collectionView.cellForItem(at: indexPath) as? ContentsCell else { return }
+//        
+//        let nextViewController = GalleryDetailViewController()
+//        nextViewController.isChecked = cell.isChecked
+//        nextViewController.indexPath = indexPath
+//        
+//        nextViewController.checkboxHandler = { [weak self] isChecked, indexPath in
+//            guard let self = self else { return }
+//            
+//            if isChecked {
+//                self.firstSectionCheckedStatus.insert(indexPath)
+//                self.secondSectionCheckedStatus.insert(indexPath)
+//            } else {
+//                self.firstSectionCheckedStatus.remove(indexPath)
+//                self.secondSectionCheckedStatus.remove(indexPath)
+//            }
+//            
+//            self.collectionView.reloadData()
+//        }
+//        
+//        if indexPath.section == 2 {
+//            nextViewController.configure(item: firstSectionPhotoList[indexPath.row])
+//            
+//        } else {
+//            nextViewController.configure(item: secondSectionPhotoList[indexPath.row])
+//        }
+//        
+//        
+//        self.navigationController?.pushViewController(nextViewController, animated: true)
+//    }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? ContentsCell else { return }
-        
-        let nextViewController = GalleryDetailViewController()
-        nextViewController.isChecked = cell.isChecked
-        nextViewController.indexPath = indexPath
-        
-        nextViewController.checkboxHandler = { [weak self] isChecked, indexPath in
-            guard let self = self else { return }
-            
-            if isChecked {
-                self.firstSectionCheckedStatus.insert(indexPath)
-                self.secondSectionCheckedStatus.insert(indexPath)
-            } else {
-                self.firstSectionCheckedStatus.remove(indexPath)
-                self.secondSectionCheckedStatus.remove(indexPath)
+            guard indexPath.section >= 2,
+                  let cell = collectionView.cellForItem(at: indexPath) as? ContentsCell else {
+                return
             }
             
-            self.collectionView.reloadData()
-        }
-        
-        if indexPath.section == 2 {
-            nextViewController.configure(item: firstSectionPhotoList[indexPath.row])
+            cell.isChecked.toggle()
             
-        } else {
-            nextViewController.configure(item: secondSectionPhotoList[indexPath.row])
+            let selectedImage = indexPath.section == 2 ?
+                firstSectionPhotoList[indexPath.row] :
+                secondSectionPhotoList[indexPath.row]
+            
+            if cell.isChecked {
+                if !selectedImages.contains(where: { $0.photoId == selectedImage.photoId }) {
+                    selectedImages.append(selectedImage)
+                }
+            } else {
+                selectedImages.removeAll { $0.photoId == selectedImage.photoId }
+            }
+            
+            collectionView.reloadData()
         }
-        
-        
-        self.navigationController?.pushViewController(nextViewController, animated: true)
-    }
     
 }
 

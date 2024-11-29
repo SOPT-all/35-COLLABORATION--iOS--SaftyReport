@@ -1,0 +1,17 @@
+//
+//  Config.xcconfig
+//  saftyReport
+//
+//  Created by OneTen on 11/26/24.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+// [GET] 54.180.192.157:8080/api/v1/home
+// [GET] 54.180.192.157:8080/api/v1/report/category
+// [POST] 54.180.192.157:8080/api/v1/report
+// [GET] 54.180.192.157:8080/api/v1/report/photo
+// URL은 BASE 하나만 만들어 두는 거라고 해서 BASE_URL만 만들었습니다!
+
+BASE_URL = http:/$()/54.180.192.157:8080
