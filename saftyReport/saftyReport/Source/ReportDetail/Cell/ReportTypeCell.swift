@@ -10,6 +10,10 @@ import UIKit
 import SnapKit
 import Then
 
+protocol ReportTypeCellDelegate: AnyObject {
+    func didToggleExpansion(isExpanded: Bool)
+}
+
 class ReportTypeCell: BaseCell {
     private let mockReportView = MockReportView()
     weak var delegate: ReportTypeCellDelegate?

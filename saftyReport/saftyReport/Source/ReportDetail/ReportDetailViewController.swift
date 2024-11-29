@@ -6,13 +6,41 @@
 //
 
 import UIKit
-
 import SnapKit
 import Then
 import Alamofire
 
-protocol ReportTypeCellDelegate: AnyObject {
-    func didToggleExpansion(isExpanded: Bool)
+
+actor ReportService {
+    static let shared = ReportService()
+    private init() {}
+    
+    func submitReport(_ report: ReportRequest) async throws -> ReportResponse {
+        let url = "\(Environment.baseURL)/api/v1/report"
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/json",
+            "userId": "1"
+        ]
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            AF.request(
+                url,
+                method: .post,
+                parameters: report,
+                encoder: JSONParameterEncoder.default,
+                headers: headers
+            )
+            .validate()
+            .responseDecodable(of: ReportResponse.self) { response in
+                switch response.result {
+                case .success(let reportResponse):
+                    continuation.resume(returning: reportResponse)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
 }
 
 class ReportDetailViewController: UIViewController {
@@ -44,45 +72,30 @@ class ReportDetailViewController: UIViewController {
     private var dataSource: UICollectionViewDiffableDataSource<ReportDetailSection, ReportDetailItem>!
     
     private let items: [ReportDetailItem] = [
-        ReportDetailItem(
-            section: .reportType,
-            title: "신고 유형을 선택해주세요",
-            isRequired: false,
-            placeholder: nil,
-            showInfoIcon: false
-        ),
-        ReportDetailItem(
-            section: .photo,
-            title: "사진",
-            isRequired: true,
-            placeholder: "사진을 추가해주세요",
-            showInfoIcon: true
-        ),
-        ReportDetailItem(
-            section: .location,
-            title: "발생지역",
-            isRequired: true,
-            placeholder: "지역을 입력해주세요",
-            showInfoIcon: true
-        ),
-        ReportDetailItem(
-            section: .content,
-            title: "내용",
-            isRequired: true,
-            placeholder: "내용을 입력해주세요",
-            showInfoIcon: true
-        ),
-        ReportDetailItem(
-            section: .phone,
-            title: "휴대전화",
-            isRequired: true,
-            placeholder: "전화번호를 입력해주세요",
-            showInfoIcon: false
-        )
+        ReportDetailItem(section: .reportType, title: "신고 유형을 선택해주세요", isRequired: false, placeholder: nil, showInfoIcon: false),
+        ReportDetailItem(section: .photo, title: "사진", isRequired: true, placeholder: "사진을 추가해주세요", showInfoIcon: true),
+        ReportDetailItem(section: .location, title: "발생지역", isRequired: true, placeholder: "지역을 입력해주세요", showInfoIcon: true),
+        ReportDetailItem(section: .content, title: "내용", isRequired: true, placeholder: "내용을 입력해주세요", showInfoIcon: true),
+        ReportDetailItem(section: .phone, title: "휴대전화", isRequired: true, placeholder: "전화번호를 입력해주세요", showInfoIcon: false)
     ]
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupUI()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tabBarController?.tabBar.isHidden = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        tabBarController?.tabBar.isHidden = false
+    }
+    
+    // MARK: - Setup Methods
+    private func setupUI() {
         view.backgroundColor = .white
         setupNavigationBar()
         setupCollectionView()
@@ -91,20 +104,7 @@ class ReportDetailViewController: UIViewController {
         configureDataSource()
         applySnapshot()
         
-        
         navigationController?.navigationBar.tintColor = .white
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        tabBarController?.tabBar.isHidden = true
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        tabBarController?.tabBar.isHidden = false
     }
     
     private func setupNavigationBar() {
@@ -143,6 +143,10 @@ class ReportDetailViewController: UIViewController {
             $0.bottom.equalTo(containerView.snp.top)
         }
         
+        registerCells()
+    }
+    
+    private func registerCells() {
         [(ReportTypeCell.self, ReportTypeCell.reuseIdentifier),
          (PhotoCell.self, PhotoCell.reuseIdentifier),
          (LocationCell.self, LocationCell.reuseIdentifier),
@@ -155,19 +159,19 @@ class ReportDetailViewController: UIViewController {
     private func setupOverlayView() {
         view.addSubview(overlayView)
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-            guard let self = self,
-                  let locationCell = self.collectionView.cellForItem(at: IndexPath(item: 0, section: 1)) else { return }
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 300_000_000) // 0.3초 대기
             
-            let cellFrameInView = self.collectionView.convert(locationCell.frame, to: self.view)
+            guard let locationCell = collectionView.cellForItem(at: IndexPath(item: 0, section: 1)) else { return }
+            let cellFrameInView = collectionView.convert(locationCell.frame, to: view)
             
-            self.overlayView.snp.remakeConstraints {
+            overlayView.snp.remakeConstraints {
                 $0.top.equalTo(cellFrameInView.minY)
                 $0.leading.trailing.equalToSuperview()
                 $0.bottom.equalToSuperview()
             }
             
-            self.view.layoutIfNeeded()
+            view.layoutIfNeeded()
         }
     }
     
@@ -180,345 +184,149 @@ class ReportDetailViewController: UIViewController {
             $0.centerY.equalToSuperview()
         }
         
-        submitButton.addTarget(
-            self,
-            action: #selector(submitButtonTapped),
-            for: .touchUpInside
-        )
-    }
-    
-    private func createLayout() -> UICollectionViewLayout {
-        let layout = UICollectionViewCompositionalLayout { [weak self] sectionIndex, _ in
-            guard let self = self else { return nil }
-            
-            let totalTopHeight = (navigationController?.navigationBar.frame.height ?? 0) + (view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0)
-            let availableHeight = view.frame.height - totalTopHeight - 84
-            
-            let sectionSpacing: CGFloat = 28
-            let totalSpacing = sectionSpacing * 4
-            let usableHeight = availableHeight - totalSpacing
-            
-            let section = ReportDetailSection(rawValue: sectionIndex)
-            
-            switch section {
-                
-            case .reportType:
-                return makeSection(height: totalTopHeight * 0.2, insets: .zero)
-            case .photo:
-                return makeSection(
-                    height: usableHeight * 0.2,
-                    insets: .init(top: sectionSpacing + 12, leading: 20, bottom: 0, trailing: 20)
-                )
-            case .location:
-                return makeSection(
-                    height: availableHeight * 0.15,
-                    insets: .init(top: sectionSpacing, leading: 20, bottom: 0, trailing: 20)
-                )
-            case .content:
-                return makeSection(
-                    height: availableHeight * 0.35,
-                    insets: .init(top: 0, leading: 20, bottom: 0, trailing: 20)
-                )
-            case .phone:
-                return makeSection(
-                    height: availableHeight * 0.15,
-                    insets: .init(top: 0, leading: 20, bottom: 0, trailing: 20)
-                )
-            case .none:
-                return nil
-            }
-        }
-        return layout
-    }
-    
-    private func makeSection(height: CGFloat, insets: NSDirectionalEdgeInsets) -> NSCollectionLayoutSection {
-        let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(height)
-        )
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        let group = NSCollectionLayoutGroup.horizontal(
-            layoutSize: itemSize,
-            subitems: [item]
-        )
-        let section = NSCollectionLayoutSection(group: group)
-        section.contentInsets = insets
-        return section
-    }
-    
-    private func configureDataSource() {
-        dataSource = UICollectionViewDiffableDataSource<ReportDetailSection, ReportDetailItem>(
-            collectionView: collectionView
-        ) { [weak self] collectionView, indexPath, item in
-            guard let self = self else { return UICollectionViewCell() }
-            
-            guard let section = ReportDetailSection(rawValue: indexPath.section) else {
-                return UICollectionViewCell()
-            }
-            
-            switch section {
-            case .reportType:
-                let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: ReportTypeCell.reuseIdentifier,
-                    for: indexPath
-                ) as! ReportTypeCell
-                cell.configure(with: item)
-                cell.delegate = self
-                
-                if self.isInitialState {
-                    DispatchQueue.main.async {
-                        cell.updateTitleColor(.primaryOrange)
-                    }
-                }
-                return cell
-                
-            case .photo:
-                let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: PhotoCell.reuseIdentifier,
-                    for: indexPath
-                ) as! PhotoCell
-                cell.configure(with: item)
-                return cell
-                
-            case .location:
-                let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: LocationCell.reuseIdentifier,
-                    for: indexPath
-                ) as! LocationCell
-                cell.configure(with: item)
-                cell.delegate = self
-                return cell
-                
-            case .content:
-                let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: ContentCell.reuseIdentifier,
-                    for: indexPath
-                ) as! ContentCell
-                cell.configure(with: item)
-                cell.delegate = self
-                return cell
-                
-            case .phone:
-                let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: PhoneCell.reuseIdentifier,
-                    for: indexPath
-                ) as! PhoneCell
-                cell.configure(with: item)
-                cell.delegate = self
-                return cell
-            }
-        }
-    }
-    
-    private func applySnapshot() {
-        var snapshot = NSDiffableDataSourceSnapshot<ReportDetailSection, ReportDetailItem>()
-        ReportDetailSection.allCases.forEach { section in
-            snapshot.appendSections([section])
-            snapshot.appendItems(items.filter { $0.section == section }, toSection: section)
-        }
-        dataSource.apply(snapshot, animatingDifferences: false)
-    }
-    
-    func didUpdateContent(_ text: String) {
-        self.contentText = text
-    }
-    
-    func didUpdatePhone(_ number: String) {
-        self.phoneNumber = number
-    }
-    
-    @objc private func submitButtonTapped() {
-        let contentView = createAlertContentView(text: "신고 내용을 제출하시겠습니까?")
-        let alertVC = BaseTwoButtonAlertViewController()
-        alertVC.modalPresentationStyle = .overFullScreen
-        alertVC.modalTransitionStyle = .crossDissolve
-        alertVC.setAlert("알림", contentView)
-        
-        alertVC.alertView.confirmButton.addAction(
-            UIAction { [weak self, weak alertVC] _ in
-                alertVC?.dismiss(animated: true) {
-                    self?.submitReport()
+        submitButton.addAction(
+            UIAction { [weak self] _ in
+                Task { @MainActor in
+                    await self?.handleSubmit()
                 }
             },
             for: .touchUpInside
         )
-        
-        present(alertVC, animated: true)
     }
     
-    private func submitReport() {
-        let url = "\(Environment.baseURL)/api/v1/report"
-        
-        let reportRequest = ReportRequest(
-            photoList: [
-                PhotoRequest(photoId: 1, photoUrl: "www.example1.com"),
-                PhotoRequest(photoId: 2, photoUrl: "www.example2.com")
-            ],
-            address: "서울시 마포구",
-            content: contentText,
-            phoneNumber: phoneNumber,
-            category: "PARKING"
-        )
-        
-        print("✅ Request Data:")
-        print("📝 Content: \(contentText)")
-        print("📱 Phone: \(phoneNumber)")
-        print("🌍 Address: 서울시 마포구")
-        print("📸 Photos: \(reportRequest.photoList)")
-        print("🏷 Category: PARKING")
-        
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json",
-            "userId": "1"
-        ]
-        
-        AF.request(
-            url,
-            method: .post,
-            parameters: reportRequest,
-            encoder: JSONParameterEncoder.default,
-            headers: headers
-        )
-        .validate()
-        .responseDecodable(of: ReportResponse.self) { [weak self] response in
-            guard let self = self else { return }
-            
-            print("\n✅ Response Data:")
-            if let data = response.data,
-               let jsonString = String(data: data, encoding: .utf8) {
-                print("📊 Raw Response: \(jsonString)")
-            }
-            
-            switch response.result {
-            case .success(let reportResponse):
-                print("🔵 Status: \(reportResponse.status ?? 0)")
-                print("📨 Message: \(reportResponse.message ?? "No message")")
-                if let data = reportResponse.data {
-                    print("🆔 Report ID: \(data.reportId ?? 0)")
-                    print("📍 Address: \(data.address ?? "No address")")
-                    print("📝 Content: \(data.content ?? "No content")")
-                    print("📱 Phone: \(data.phoneNumber ?? "No phone")")
-                }
-                
-                if reportResponse.status == 201 {
-                    DispatchQueue.main.async {
-                        let contentView = self.createAlertContentView(text: "신고가 성공적으로 접수되었습니다")
-                        let alertVC = BaseTwoButtonAlertViewController()
-                        alertVC.modalPresentationStyle = .overFullScreen
-                        alertVC.modalTransitionStyle = .crossDissolve
-                        alertVC.setAlert("알림", contentView)
-                        
-                        alertVC.alertView.cancelButton.setTitle("닫기", for: .normal)
-                        alertVC.alertView.confirmButton.setTitle("홈으로", for: .normal)
-                        
-                        alertVC.alertView.cancelButton.removeTarget(alertVC, action: #selector(alertVC.dismissAlert), for: .touchUpInside)
-                        alertVC.alertView.cancelButton.addTarget(alertVC, action: #selector(BaseTwoButtonAlertViewController.dismissAlert), for: .touchUpInside)
-                                                alertVC.alertView.confirmButton.removeTarget(alertVC, action: #selector(alertVC.dismissAlert), for: .touchUpInside)
-                        alertVC.alertView.confirmButton.addAction(
-                            UIAction { [weak self] _ in
-                                alertVC.dismiss(animated: true) {
-                                    self?.navigateToMain()
-                                }
-                            },
-                            for: .touchUpInside
-                        )
-                        
-                        self.present(alertVC, animated: true)
-                    }
-                } else {
-                    self.showCustomAlert(message: reportResponse.message ?? NetworkError.serverError.errorMessage)
-                }
-                
-            case .failure(let error):
-                // 오류 로깅
-                print("❌ Error: \(error)")
-                print("❌ Error Description: \(error.localizedDescription)")
-                
-                if let data = response.data {
-                    self.showCustomAlert(message: NetworkError.decodingError.errorMessage)
-                } else if response.response == nil {
-                    self.showCustomAlert(message: NetworkError.networkError(response.error!).errorMessage)
-                } else {
-                    self.showCustomAlert(message: NetworkError.serverError.errorMessage)
-                }
-            }
+    private func handleSubmit() async {
+        let shouldSubmit = await showSubmitConfirmationAlert()
+        if shouldSubmit {
+            await submitReport()
         }
     }
-
-    private func navigateToMain() {
+    
+    private func showSubmitConfirmationAlert() async -> Bool {
+        return await withCheckedContinuation { continuation in
+            let contentView = createAlertContentView(text: "신고 내용을 제출하시겠습니까?")
+            let alertVC = BaseTwoButtonAlertViewController()
+            alertVC.modalPresentationStyle = .overFullScreen
+            alertVC.modalTransitionStyle = .crossDissolve
+            alertVC.setAlert("알림", contentView)
+            
+            alertVC.alertView.confirmButton.addAction(
+                UIAction { [weak alertVC] _ in
+                    alertVC?.dismiss(animated: true) {
+                        continuation.resume(returning: true)
+                    }
+                },
+                for: .touchUpInside
+            )
+            
+            alertVC.alertView.cancelButton.addAction(
+                UIAction { [weak alertVC] _ in
+                    alertVC?.dismiss(animated: true) {
+                        continuation.resume(returning: false)
+                    }
+                },
+                for: .touchUpInside
+            )
+            
+            present(alertVC, animated: true)
+        }
+    }
+    
+    private func submitReport() async {
+        do {
+            let reportRequest = ReportRequest(
+                photoList: [
+                    PhotoRequest(photoId: 1, photoUrl: "www.example1.com"),
+                    PhotoRequest(photoId: 2, photoUrl: "www.example2.com")
+                ],
+                address: "서울시 마포구",
+                content: contentText,
+                phoneNumber: phoneNumber,
+                category: "PARKING"
+            )
+            
+            let response = try await ReportService.shared.submitReport(reportRequest)
+            
+            if response.status == 201 {
+                await showSuccessAlert()
+            } else {
+                await showErrorAlert(message: response.message ?? "오류가 발생했습니다")
+            }
+            
+        } catch {
+            await showErrorAlert(message: "네트워크 오류가 발생했습니다")
+        }
+    }
+    
+    private func showSuccessAlert() async {
+        return await withCheckedContinuation { continuation in
+            let contentView = createAlertContentView(text: "신고가 성공적으로 접수되었습니다")
+            let alertVC = BaseTwoButtonAlertViewController()
+            alertVC.modalPresentationStyle = .overFullScreen
+            alertVC.modalTransitionStyle = .crossDissolve
+            alertVC.setAlert("알림", contentView)
+            
+            alertVC.alertView.cancelButton.setTitle("닫기", for: .normal)
+            alertVC.alertView.confirmButton.setTitle("홈으로", for: .normal)
+            
+            alertVC.alertView.cancelButton.addAction(
+                UIAction { [weak alertVC] _ in
+                    alertVC?.dismiss(animated: true) {
+                        continuation.resume()
+                    }
+                },
+                for: .touchUpInside
+            )
+            
+            alertVC.alertView.confirmButton.addAction(
+                UIAction { [weak self, weak alertVC] _ in
+                    alertVC?.dismiss(animated: true) {
+                        self?.navigateToHome()
+                        continuation.resume()
+                    }
+                },
+                for: .touchUpInside
+            )
+            
+            present(alertVC, animated: true)
+        }
+    }
+    
+    private func showErrorAlert(message: String) async {
+        return await withCheckedContinuation { continuation in
+            let contentView = createAlertContentView(text: message)
+            let alertVC = BaseTwoButtonAlertViewController()
+            alertVC.modalPresentationStyle = .overFullScreen
+            alertVC.modalTransitionStyle = .crossDissolve
+            alertVC.setAlert("알림", contentView)
+            
+            alertVC.alertView.cancelButton.isHidden = true
+            
+            alertVC.alertView.confirmButton.addAction(
+                UIAction { [weak alertVC] _ in
+                    alertVC?.dismiss(animated: true) {
+                        continuation.resume()
+                    }
+                },
+                for: .touchUpInside
+            )
+            
+            present(alertVC, animated: true)
+        }
+    }
+    
+    private func navigateToHome() {
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let window = windowScene.windows.first {
+            let tabBarViewController = CustomTabBarController()
+            tabBarViewController.setNavViewControllers()
+            
             UIView.transition(with: window,
-                             duration: 0.3,
-                             options: .transitionCrossDissolve,
-                             animations: {
-                let mainVC = MainViewController()
-                let navigationController = UINavigationController(rootViewController: mainVC)
-                window.rootViewController = navigationController
+                            duration: 0.3,
+                            options: .transitionCrossDissolve,
+                            animations: {
+                window.rootViewController = tabBarViewController
             })
         }
-    }
-
-    private func showCustomAlert(message: String) {
-        let contentView = createAlertContentView(text: message)
-        let alertVC = BaseTwoButtonAlertViewController()
-        alertVC.modalPresentationStyle = .overFullScreen
-        alertVC.modalTransitionStyle = .crossDissolve
-        alertVC.setAlert("알림", contentView)
-        
-        alertVC.alertView.cancelButton.isHidden = true
-        
-        alertVC.alertView.confirmButton.addAction(
-            UIAction { [weak alertVC] _ in
-                alertVC?.dismiss(animated: true)
-            },
-            for: .touchUpInside
-        )
-        
-        present(alertVC, animated: true)
-    }
-}
-
-// MARK: - ReportTypeCellDelegate
-extension ReportDetailViewController: ReportTypeCellDelegate {
-    func didToggleExpansion(isExpanded: Bool) {
-        if isInitialState {
-            UIView.animate(withDuration: 0.3) {
-                self.overlayView.alpha = 0.0
-            } completion: { _ in
-                self.isOverlayVisible = false
-            }
-            isInitialState = false
-        }
-        
-        if let cell = collectionView.cellForItem(at: IndexPath(item: 0, section: 0)) as? ReportTypeCell {
-            let newColor: UIColor = self.isOverlayVisible || isExpanded ? .primaryOrange : .black
-            cell.updateTitleColor(newColor)
-            
-            cell.setNeedsLayout()
-            cell.layoutIfNeeded()
-        }
-    }
-}
-
-extension ReportDetailViewController: LocationCellDelegate {
-    func locationIconTapped() {
-        let reportAddressVC = ReportAddressViewController()
-        reportAddressVC.delegate = self
-        navigationController?.pushViewController(reportAddressVC, animated: true)
-    }
-}
-
-extension ReportDetailViewController {
-    func viewController() -> UIViewController? {
-        var nextResponder: UIResponder? = self
-        while let responder = nextResponder {
-            if let vc = responder as? UIViewController {
-                return vc
-            }
-            nextResponder = responder.next
-        }
-        return nil
     }
     
     private func createAlertContentView(text: String) -> UIView {
@@ -539,30 +347,190 @@ extension ReportDetailViewController {
         
         return contentView
     }
-
 }
 
-
-extension ReportDetailViewController: ReportAddressDelegate {
-    func didSelectAddress(_ address: String) {
-        if let indexPath = IndexPath(item: 0, section: 2) as? IndexPath,
-           let cell = collectionView.cellForItem(at: indexPath) as? LocationCell {
-            cell.updateLocationText(address)
+extension ReportDetailViewController: ReportTypeCellDelegate {
+    func didToggleExpansion(isExpanded: Bool) {
+        if isInitialState {
+            UIView.animate(withDuration: 0.3) {
+                self.overlayView.alpha = 0.0
+            } completion: { _ in
+                self.isOverlayVisible = false
+            }
+            isInitialState = false
+        }
+        
+        if let cell = collectionView.cellForItem(at: IndexPath(item: 0, section: 0)) as? ReportTypeCell {
+            let newColor: UIColor = self.isOverlayVisible || isExpanded ? .primaryOrange : .black
+            cell.updateTitleColor(newColor)
+            cell.setNeedsLayout()
+            cell.layoutIfNeeded()
         }
     }
 }
 
-extension ReportDetailViewController: ContentCellDelegate, PhoneCellDelegate {
-    func contentDidChange(_ text: String) {
-        self.contentText = text
-    }
-    
-    func phoneNumberDidChange(_ number: String) {
-        self.phoneNumber = number
+extension ReportDetailViewController: LocationCellDelegate {
+    func locationIconTapped() {
+        let reportAddressVC = ReportAddressViewController()
+        reportAddressVC.delegate = self
+        navigationController?.pushViewController(reportAddressVC, animated: true)
     }
 }
 
+extension ReportDetailViewController: ReportAddressDelegate {
+   func didSelectAddress(_ address: String) {
+       if let indexPath = IndexPath(item: 0, section: 2) as? IndexPath,
+          let cell = collectionView.cellForItem(at: indexPath) as? LocationCell {
+           cell.updateLocationText(address)
+       }
+   }
+}
+
+extension ReportDetailViewController: ContentCellDelegate, PhoneCellDelegate {
+   func contentDidChange(_ text: String) {
+       self.contentText = text
+   }
+   
+   func phoneNumberDidChange(_ number: String) {
+       self.phoneNumber = number
+   }
+}
+
+extension ReportDetailViewController {
+   private func createLayout() -> UICollectionViewLayout {
+       let layout = UICollectionViewCompositionalLayout { [weak self] sectionIndex, _ in
+           guard let self = self else { return nil }
+           
+           let totalTopHeight = (navigationController?.navigationBar.frame.height ?? 0) +
+                              (view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0)
+           let availableHeight = view.frame.height - totalTopHeight - 84
+           
+           let sectionSpacing: CGFloat = 28
+           let totalSpacing = sectionSpacing * 4
+           let usableHeight = availableHeight - totalSpacing
+           
+           let section = ReportDetailSection(rawValue: sectionIndex)
+           
+           switch section {
+           case .reportType:
+               return makeSection(height: totalTopHeight * 0.2, insets: .zero)
+           case .photo:
+               return makeSection(
+                   height: usableHeight * 0.2,
+                   insets: .init(top: sectionSpacing + 12, leading: 20, bottom: 0, trailing: 20)
+               )
+           case .location:
+               return makeSection(
+                   height: availableHeight * 0.15,
+                   insets: .init(top: sectionSpacing, leading: 20, bottom: 0, trailing: 20)
+               )
+           case .content:
+               return makeSection(
+                   height: availableHeight * 0.35,
+                   insets: .init(top: 0, leading: 20, bottom: 0, trailing: 20)
+               )
+           case .phone:
+               return makeSection(
+                   height: availableHeight * 0.15,
+                   insets: .init(top: 0, leading: 20, bottom: 0, trailing: 20)
+               )
+           case .none:
+               return nil
+           }
+       }
+       return layout
+   }
+   
+   private func makeSection(height: CGFloat, insets: NSDirectionalEdgeInsets) -> NSCollectionLayoutSection {
+       let itemSize = NSCollectionLayoutSize(
+           widthDimension: .fractionalWidth(1.0),
+           heightDimension: .absolute(height)
+       )
+       let item = NSCollectionLayoutItem(layoutSize: itemSize)
+       let group = NSCollectionLayoutGroup.horizontal(
+           layoutSize: itemSize,
+           subitems: [item]
+       )
+       let section = NSCollectionLayoutSection(group: group)
+       section.contentInsets = insets
+       return section
+   }
+   
+   private func configureDataSource() {
+       dataSource = UICollectionViewDiffableDataSource<ReportDetailSection, ReportDetailItem>(
+           collectionView: collectionView
+       ) { [weak self] collectionView, indexPath, item in
+           guard let self = self else { return UICollectionViewCell() }
+           
+           guard let section = ReportDetailSection(rawValue: indexPath.section) else {
+               return UICollectionViewCell()
+           }
+           
+           switch section {
+           case .reportType:
+               let cell = collectionView.dequeueReusableCell(
+                   withReuseIdentifier: ReportTypeCell.reuseIdentifier,
+                   for: indexPath
+               ) as! ReportTypeCell
+               cell.configure(with: item)
+               cell.delegate = self
+               
+               if self.isInitialState {
+                   DispatchQueue.main.async {
+                       cell.updateTitleColor(.primaryOrange)
+                   }
+               }
+               return cell
+               
+           case .photo:
+               let cell = collectionView.dequeueReusableCell(
+                   withReuseIdentifier: PhotoCell.reuseIdentifier,
+                   for: indexPath
+               ) as! PhotoCell
+               cell.configure(with: item)
+               return cell
+               
+           case .location:
+               let cell = collectionView.dequeueReusableCell(
+                   withReuseIdentifier: LocationCell.reuseIdentifier,
+                   for: indexPath
+               ) as! LocationCell
+               cell.configure(with: item)
+               cell.delegate = self
+               return cell
+               
+           case .content:
+               let cell = collectionView.dequeueReusableCell(
+                   withReuseIdentifier: ContentCell.reuseIdentifier,
+                   for: indexPath
+               ) as! ContentCell
+               cell.configure(with: item)
+               cell.delegate = self
+               return cell
+               
+           case .phone:
+               let cell = collectionView.dequeueReusableCell(
+                   withReuseIdentifier: PhoneCell.reuseIdentifier,
+                   for: indexPath
+               ) as! PhoneCell
+               cell.configure(with: item)
+               cell.delegate = self
+               return cell
+           }
+       }
+   }
+   
+   private func applySnapshot() {
+       var snapshot = NSDiffableDataSourceSnapshot<ReportDetailSection, ReportDetailItem>()
+       ReportDetailSection.allCases.forEach { section in
+           snapshot.appendSections([section])
+           snapshot.appendItems(items.filter { $0.section == section }, toSection: section)
+       }
+       dataSource.apply(snapshot, animatingDifferences: false)
+   }
+}
+
 #Preview {
-    let navigationController = UINavigationController(rootViewController: ReportDetailViewController())
-    return navigationController
+   let navigationController = UINavigationController(rootViewController: ReportDetailViewController())
+   return navigationController
 }
