@@ -19,6 +19,8 @@ class GalleryViewController: UIViewController {
     private var secondSectionPhotoList: [GalleryPhotoList] = []
     private var secondSectionCheckedStatus: Set<IndexPath> = []
     
+    private var isAnyItemChecked: Bool = false
+    
     private let collectionView = UICollectionView(frame: .zero,
                                                   collectionViewLayout: UICollectionViewLayout())
     
@@ -42,12 +44,16 @@ class GalleryViewController: UIViewController {
         setLayout()
         setupCollectionView()
         setupNavigationBar()
+        connectAPI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tabBarController?.tabBar.isHidden = true
         connectAPI()
+        
+        self.updateUsingButton()
+        self.collectionView.reloadData()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -110,11 +116,19 @@ class GalleryViewController: UIViewController {
                     .dropLast()
                     
                     self.collectionView.reloadData()
+                    self.updateUsingButton()
                 case let .failure(error):
                     print(error.localizedDescription)
                 }
                 
             }
+        }
+    }
+    
+    private func updateUsingButton() {
+        DispatchQueue.main.async {
+            self.isAnyItemChecked = !self.firstSectionCheckedStatus.isEmpty || !self.secondSectionCheckedStatus.isEmpty
+            self.usingButton.backgroundColor = self.isAnyItemChecked ? .primaryOrange : .primaryLight
         }
     }
     
@@ -163,7 +177,8 @@ extension GalleryViewController: UICollectionViewDelegate {
                 self.secondSectionCheckedStatus.remove(indexPath)
             }
             
-            self.collectionView.reloadData()
+            self.updateUsingButton()
+            self.collectionView.reloadItems(at: [indexPath])
         }
         
         if indexPath.section == 2 {
@@ -229,6 +244,18 @@ extension GalleryViewController: UICollectionViewDataSource {
             
             cell.configure(item: firstSectionPhotoList[indexPath.row], isChecked: firstSectionCheckedStatus.contains(indexPath))
             
+            cell.checkboxTappedHandler = { [weak self] isChecked in
+                guard let self = self else { return }
+                
+                if isChecked {
+                    self.firstSectionCheckedStatus.insert(indexPath)
+                } else {
+                    self.firstSectionCheckedStatus.remove(indexPath)
+                }
+                
+                self.updateUsingButton()
+            }
+            
             return cell
         default:
             guard let cell = collectionView.dequeueReusableCell(
@@ -239,6 +266,18 @@ extension GalleryViewController: UICollectionViewDataSource {
             }
             
             cell.configure(item: secondSectionPhotoList[indexPath.row], isChecked: secondSectionCheckedStatus.contains(indexPath))
+            
+            cell.checkboxTappedHandler = { [weak self] isChecked in
+                guard let self = self else { return }
+                
+                if isChecked {
+                    self.secondSectionCheckedStatus.insert(indexPath)
+                } else {
+                    self.secondSectionCheckedStatus.remove(indexPath)
+                }
+                
+                self.updateUsingButton()
+            }
             
             return cell
         }
@@ -386,7 +425,6 @@ extension GalleryViewController {
         let outputFormatter = DateFormatter()
         outputFormatter.dateFormat = "yyyy년 MM월 dd일" // 원하는 출력 형식
         
-        // 입력 문자열을 Date로 변환한 후, 다시 문자열로 변환
         if let date = inputFormatter.date(from: dateTime) {
             return outputFormatter.string(from: date)
         } else {

@@ -25,6 +25,6 @@ struct HomeDataObject: Codable {
 // MARK: - BannerList
 
 struct BannerList: Codable {
-    let bannerID: Int?
-    let bannerURL: String?
+    let bannerId: Int?
+    let bannerUrl: String?
 }

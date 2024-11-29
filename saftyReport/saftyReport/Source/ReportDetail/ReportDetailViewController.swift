@@ -11,7 +11,19 @@ import SnapKit
 import Then
 import Alamofire
 
+protocol ReportTypeCellDelegate: AnyObject {
+    func didToggleExpansion(isExpanded: Bool)
+}
+
 class ReportDetailViewController: UIViewController {
+    
+    private var isInitialState = true
+    private var isOverlayVisible = true
+    
+    private let overlayView = UIView().then {
+        $0.backgroundColor = UIColor.white.withAlphaComponent(0.6)
+        $0.isUserInteractionEnabled = false
+    }
     
     private let containerView = UIView().then {
         $0.backgroundColor = .white
@@ -27,15 +39,12 @@ class ReportDetailViewController: UIViewController {
     }
     
     private var collectionView: UICollectionView!
-    private var dataSource: UICollectionViewDiffableDataSource<
-        ReportDetailSection,
-        ReportDetailItem
-    >!
+    private var dataSource: UICollectionViewDiffableDataSource<ReportDetailSection, ReportDetailItem>!
     
     private let items: [ReportDetailItem] = [
         ReportDetailItem(
             section: .reportType,
-            title: "",
+            title: "신고 유형을 선택해주세요",
             isRequired: false,
             placeholder: nil,
             showInfoIcon: false
@@ -75,6 +84,7 @@ class ReportDetailViewController: UIViewController {
         view.backgroundColor = .white
         setupNavigationBar()
         setupCollectionView()
+        setupOverlayView()
         setupSubmitButton()
         configureDataSource()
         applySnapshot()
@@ -103,7 +113,8 @@ class ReportDetailViewController: UIViewController {
     private func setupCollectionView() {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
         collectionView.isScrollEnabled = false
-        view.addSubviews(collectionView, containerView)
+        view.addSubview(collectionView)
+        view.addSubview(containerView)
         
         containerView.snp.makeConstraints {
             $0.leading.trailing.bottom.equalToSuperview()
@@ -124,6 +135,42 @@ class ReportDetailViewController: UIViewController {
         }
     }
     
+    private func setupOverlayView() {
+        view.addSubview(overlayView)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            guard let self = self,
+                  let locationCell = self.collectionView.cellForItem(at: IndexPath(item: 0, section: 1)) else { return }
+            
+            let cellFrameInView = self.collectionView.convert(locationCell.frame, to: self.view)
+            
+            self.overlayView.snp.remakeConstraints {
+                $0.top.equalTo(cellFrameInView.minY)
+                $0.leading.trailing.equalToSuperview()
+                $0.bottom.equalToSuperview()
+            }
+            
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    private func setupSubmitButton() {
+        containerView.addSubview(submitButton)
+        
+        submitButton.snp.makeConstraints {
+            $0.left.right.equalToSuperview().inset(24)
+            $0.height.equalTo(50)
+            $0.centerY.equalToSuperview()
+        }
+        
+        submitButton.addTarget(
+            self,
+            action: #selector(submitButtonTapped),
+            for: .touchUpInside
+        )
+    }
+    
+    // MARK: - CollectionView Layout
     private func createLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewCompositionalLayout { [weak self] sectionIndex, _ in
             guard let self = self else { return nil }
@@ -136,36 +183,31 @@ class ReportDetailViewController: UIViewController {
             let usableHeight = availableHeight - totalSpacing
             
             let section = ReportDetailSection(rawValue: sectionIndex)
+            
             switch section {
+                
             case .reportType:
-                return makeSection(
-                    height: totalTopHeight * 0.2,
-                    insets: .zero
-                )
+                return makeSection(height: totalTopHeight * 0.2, insets: .zero)
             case .photo:
                 return makeSection(
                     height: usableHeight * 0.2,
                     insets: .init(top: sectionSpacing + 12, leading: 20, bottom: 0, trailing: 20)
                 )
-                
             case .location:
-                return self.makeSection(
+                return makeSection(
                     height: availableHeight * 0.15,
                     insets: .init(top: sectionSpacing, leading: 20, bottom: 0, trailing: 20)
                 )
-                
             case .content:
-                return self.makeSection(
+                return makeSection(
                     height: availableHeight * 0.35,
                     insets: .init(top: 0, leading: 20, bottom: 0, trailing: 20)
                 )
-                
             case .phone:
-                return self.makeSection(
+                return makeSection(
                     height: availableHeight * 0.15,
                     insets: .init(top: 0, leading: 20, bottom: 0, trailing: 20)
                 )
-                
             case .none:
                 return nil
             }
@@ -189,42 +231,64 @@ class ReportDetailViewController: UIViewController {
     }
     
     private func configureDataSource() {
-        dataSource = UICollectionViewDiffableDataSource<ReportDetailSection, ReportDetailItem>(collectionView: collectionView) { [weak self] collectionView, indexPath, item in
+        dataSource = UICollectionViewDiffableDataSource<ReportDetailSection, ReportDetailItem>(
+            collectionView: collectionView
+        ) { [weak self] collectionView, indexPath, item in
             guard let self = self else { return UICollectionViewCell() }
             
             guard let section = ReportDetailSection(rawValue: indexPath.section) else {
                 return UICollectionViewCell()
             }
             
-            let reuseIdentifier: String
-            
             switch section {
             case .reportType:
-                reuseIdentifier = ReportTypeCell.reuseIdentifier
+                let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: ReportTypeCell.reuseIdentifier,
+                    for: indexPath
+                ) as! ReportTypeCell
+                cell.configure(with: item)
+                cell.delegate = self
+                
+                if self.isInitialState {
+                    DispatchQueue.main.async {
+                        cell.updateTitleColor(.primaryOrange)
+                    }
+                }
+                return cell
+                
             case .photo:
-                reuseIdentifier = PhotoCell.reuseIdentifier
+                let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: PhotoCell.reuseIdentifier,
+                    for: indexPath
+                ) as! PhotoCell
+                cell.configure(with: item)
+                return cell
+                
             case .location:
-                reuseIdentifier = LocationCell.reuseIdentifier
+                let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: LocationCell.reuseIdentifier,
+                    for: indexPath
+                ) as! LocationCell
+                cell.configure(with: item)
+                cell.delegate = self
+                return cell
+                
             case .content:
-                reuseIdentifier = ContentCell.reuseIdentifier
+                let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: ContentCell.reuseIdentifier,
+                    for: indexPath
+                ) as! ContentCell
+                cell.configure(with: item)
+                return cell
+                
             case .phone:
-                reuseIdentifier = PhoneCell.reuseIdentifier
+                let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: PhoneCell.reuseIdentifier,
+                    for: indexPath
+                ) as! PhoneCell
+                cell.configure(with: item)
+                return cell
             }
-            
-            let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: reuseIdentifier,
-                for: indexPath
-            )
-            
-            if let locationCell = cell as? LocationCell {
-                locationCell.delegate = self
-            }
-            
-            if let configurableCell = cell as? ConfigurableCell {
-                configurableCell.configure(with: item)
-            }
-            
-            return cell
         }
     }
     
@@ -236,24 +300,31 @@ class ReportDetailViewController: UIViewController {
         }
         dataSource.apply(snapshot, animatingDifferences: false)
     }
-    
-    private func setupSubmitButton() {
-        containerView.addSubview(submitButton)
-        
-        submitButton.snp.makeConstraints {
-            $0.left.right.equalToSuperview().inset(24)
-            $0.height.equalTo(50)
-            $0.centerY.equalToSuperview()
+}
+
+// MARK: - ReportTypeCellDelegate
+extension ReportDetailViewController: ReportTypeCellDelegate {
+    func didToggleExpansion(isExpanded: Bool) {
+        if isInitialState {
+            UIView.animate(withDuration: 0.3) {
+                self.overlayView.alpha = 0.0
+            } completion: { _ in
+                self.isOverlayVisible = false
+            }
+            isInitialState = false
         }
         
-        submitButton.addTarget(
-            self,
-            action: #selector(submitButtonTapped),
-            for: .touchUpInside
-        )
+        if let cell = collectionView.cellForItem(at: IndexPath(item: 0, section: 0)) as? ReportTypeCell {
+            let newColor: UIColor = self.isOverlayVisible || isExpanded ? .primaryOrange : .black
+            cell.updateTitleColor(newColor)
+            
+            cell.setNeedsLayout()
+            cell.layoutIfNeeded()
+        }
     }
 }
 
+// MARK: - LocationCellDelegate
 extension ReportDetailViewController: LocationCellDelegate {
     func locationIconTapped() {
         let reportAddressVC = ReportAddressViewController()
@@ -261,9 +332,9 @@ extension ReportDetailViewController: LocationCellDelegate {
     }
 }
 
+// MARK: - Submit Action
 extension ReportDetailViewController {
     @objc private func submitButtonTapped() {
-        //  1: URL 주소 생성
         guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BASE_URL") as? String else {
             showAlert(message: NetworkError.invalidURL.errorMessage)
             return
@@ -272,7 +343,6 @@ extension ReportDetailViewController {
         let endPoint = "/api/v1/report"
         let fullURL = baseURL + endPoint
         
-        //  2: 전송할 데이터 준비 (원래는 내부 내용이 들어가야하는데 여기서는 목데이터로)
         let reportRequest = ReportRequest(
             photoList: [
                 PhotoRequest(photoId: 1, photoUrl: "www.example1.com"),
@@ -284,13 +354,11 @@ extension ReportDetailViewController {
             category: "PARKING"
         )
         
-        //  3: HTTP 헤더 설정
         let headers: HTTPHeaders = [
             "Content-Type": "application/json",
             "userId": "1"
         ]
         
-        //  4: 네트워크 요청 보내기
         AF.request(
             fullURL,
             method: .post,
@@ -311,7 +379,6 @@ extension ReportDetailViewController {
                 }
                 
             case .failure(_):
-                // 이미 정의된 NetworkError의 에러 메시지 사용
                 if let data = response.data {
                     self?.showAlert(message: NetworkError.decodingError.errorMessage)
                 } else if response.response == nil {
