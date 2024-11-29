@@ -351,13 +351,8 @@ extension ReportDetailViewController: LocationCellDelegate {
 // MARK: - Submit Action
 extension ReportDetailViewController {
     @objc private func submitButtonTapped() {
-        guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BASE_URL") as? String else {
-            showAlert(message: NetworkError.invalidURL.errorMessage)
-            return
-        }
         
-        let endPoint = "/api/v1/report"
-        let fullURL = baseURL + endPoint
+        let url = "\(Environment.baseURL)/api/v1/report"
         
         let reportRequest = ReportRequest(
             photoList: [
@@ -376,7 +371,7 @@ extension ReportDetailViewController {
         ]
         
         AF.request(
-            fullURL,
+            url,
             method: .post,
             parameters: reportRequest,
             encoder: JSONParameterEncoder.default,
